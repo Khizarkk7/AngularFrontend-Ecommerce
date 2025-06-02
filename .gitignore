@@ -1,0 +1,25 @@
+
+# Node modules
+node_modules/
+
+# Angular build output
+dist/
+out-tsc/
+
+# Temporary files
+*.log
+*.tmp
+*.temp
+
+# IDE/editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+
+# System files
+.DS_Store
+Thumbs.db

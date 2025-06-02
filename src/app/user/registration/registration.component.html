@@ -1,0 +1,132 @@
+<div id="layoutAuthentication">
+    <div id="layoutAuthentication_content">
+        <main>
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6">
+                        <div class="card shadow-lg border-0 rounded-lg mt-5">
+                            <!-- Brand Header -->
+                            <div class="card-header bg-primary text-white">
+                                <div class="text-center mb-2">
+                                    <h1 class="m-0">E Store</h1>
+                                    <p class="m-0 small">Your Premium Shopping Destination</p>
+                                </div>
+                                <h3 class="text-center font-weight-light my-2">Create Your Account</h3>
+                            </div>
+
+                            <div class="card-body">
+                                <form [formGroup]="form" (ngSubmit)="onSubmit()">
+                                    <!-- Full Name -->
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" formControlName="fullName" type="text"
+                                            [ngClass]="{'is-invalid': hasDisplayError('fullName')}"
+                                            placeholder="Full Name" />
+                                        <label for="fullName">Full Name</label>
+                                        <div class="invalid-feedback" *ngIf="hasDisplayError('fullName')">
+                                            <div *ngIf="form.get('fullName')?.errors?.['required']">*Full name is
+                                                required.</div>
+                                            <div *ngIf="form.get('fullName')?.errors?.['minlength']">*Must have at least
+                                                3 characters.</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Email -->
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" [ngClass]="{'is-invalid': hasDisplayError('email')}"
+                                            formControlName="email" type="email" placeholder="Email" />
+                                        <label for="email">Email</label>
+                                        <div class="invalid-feedback" *ngIf="hasDisplayError('email')">
+                                            <div *ngIf="form.get('email')?.errors?.['required']">*Email is required.
+                                            </div>
+                                            <div *ngIf="form.get('email')?.errors?.['email']">*Please enter a valid
+                                                email.</div>
+                                            <div *ngIf="form.get('email')?.errors?.['pattern']">*Must be a gmail.com
+                                                address.</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Role Dropdown -->
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" formControlName="role"
+                                            [ngClass]="{'is-invalid': hasDisplayError('role')}">
+                                            <option value="">Select Role</option>
+                                            <option *ngFor="let role of roles" [value]="role.roleId">{{role.roleName}}
+                                            </option>
+                                        </select>
+                                        <label for="role">Role</label>
+                                        <div class="invalid-feedback" *ngIf="hasDisplayError('role')">
+                                            <div *ngIf="form.get('role')?.errors?.['required']">*Please select a role
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Shop Dropdown -->
+                                    <div class="form-floating mb-3">
+                                        <select class="form-control" formControlName="shop"
+                                            [ngClass]="{'is-invalid': hasDisplayError('shop')}">
+                                            <option value="">Select Shop</option>
+                                            <option *ngFor="let shop of shops" [value]="shop.shopId">{{shop.shopName}}
+                                            </option>
+                                        </select>
+                                        <label for="shop">Shop</label>
+                                        <div class="invalid-feedback" *ngIf="hasDisplayError('shop')">
+                                            <div *ngIf="form.get('shop')?.errors?.['required']">*Please select a shop
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Password -->
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" formControlName="password" type="password"
+                                            placeholder="Password"
+                                            [ngClass]="{'is-invalid': hasDisplayError('password')}" />
+                                        <label for="password">Password</label>
+                                        <div class="invalid-feedback" *ngIf="hasDisplayError('password')">
+                                            <div *ngIf="form.get('password')?.errors?.['required']">*Password is
+                                                required.</div>
+                                            <div *ngIf="form.get('password')?.errors?.['minlength']">*At least 6
+                                                characters required.</div>
+                                            <div *ngIf="form.get('password')?.errors?.['maxlength']">*Maximum 12
+                                                characters required.</div>
+                                            <div *ngIf="form.get('password')?.errors?.['pattern']">*Must contain a
+                                                special character.</div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Confirm Password -->
+                                    <div class="form-floating mb-3">
+                                        <input class="form-control" formControlName="confirmPassword" type="password"
+                                            placeholder="Confirm Password"
+                                            [ngClass]="{'is-invalid': hasDisplayError('confirmPassword')}" />
+                                        <label for="confirmPassword">Confirm Password</label>
+                                        <div class="invalid-feedback" *ngIf="hasDisplayError('confirmPassword')">
+                                            <div *ngIf="form.get('confirmPassword')?.errors?.['required']">*Please
+                                                confirm your password.</div>
+                                            <div *ngIf="form.errors?.['passwordMismatch']">*Passwords do not match.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Submit Button -->
+                                    <div class="mt-4 mb-0">
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-primary btn-block py-2"
+                                                [disabled]="form.invalid">
+                                                Create Account
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="card-footer text-center py-3">
+                                <div class="small">
+                                    Already have an account? <a routerLink="/login" class="text-primary">Login here</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
