@@ -24,16 +24,20 @@ export interface Shop {
   providedIn: 'root'
 })
 export class ShopService {
-  private baseUrl = 'https://localhost:7058/api/Shop'; 
+  private baseUrl = 'https://localhost:7058/api/Shop';
+  private uploadsUrl = 'http://localhost:7058/uploads/'; // image uploads base URL
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getShops(): Observable<Shop[]> {
     return this.http.get<Shop[]>(`${this.baseUrl}/GetAllShops`);
   }
-
+  // Helper function to get full logo URL from filename
+  getFullLogoUrl(fileName: string): string {
+    return this.uploadsUrl + fileName;
+  }
   createShop(shop: FormData): Observable<any> {
-    return this.http.post(`${this.baseUrl}`, shop);
+    return this.http.post(`${this.baseUrl}/CreateShop`, shop);
   }
 
   updateShop(id: number, shop: FormData): Observable<any> {

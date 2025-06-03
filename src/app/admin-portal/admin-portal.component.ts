@@ -43,11 +43,15 @@ export class AdminPortalComponent implements OnInit {
   }
 
   loadShops() {
-    this.shopService.getShops().subscribe((data) => {
-      this.shops = data;
-      console.log(data);
-    });
-  }
+  this.shopService.getShops().subscribe((data) => {
+    this.shops = data.map(shop => ({
+      ...shop,
+      fullLogoUrl: this.shopService.getFullLogoUrl(shop.logo)  // yahan full URL add ho raha hai
+    }));
+    console.log(this.shops);
+  });
+}
+
 
   initForm() {
     this.shopForm = this.fb.group({
@@ -57,17 +61,33 @@ export class AdminPortalComponent implements OnInit {
     });
   }
 
-  onFileChange(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.logoFile = file;
-      const reader = new FileReader();
-      reader.onload = () => {
-        this.logoPreview = reader.result;
-      };
-      reader.readAsDataURL(file);
+onFileChange(event: any) {
+  const file = event.target.files[0];
+  if (file) {
+    this.logoFile = file;
+
+    // Validate file type (optional)
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('Only images are allowed.');
+      return;
     }
+
+    // Validate file size (optional, e.g. max 2MB)
+    const maxSizeInBytes = 2 * 1024 * 1024;
+    if (file.size > maxSizeInBytes) {
+      alert('File size must be less than 2MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.logoPreview = reader.result;
+    };
+    reader.readAsDataURL(file);
   }
+}
+
 
   openCreateShopModal() {
     this.isEditMode = false;
@@ -89,11 +109,20 @@ export class AdminPortalComponent implements OnInit {
 
   onSubmit() {
     const formData = new FormData();
-    formData.append('shopName', this.shopForm.value.shopName);
-    formData.append('contact_info', this.shopForm.value.contact_info);
-    formData.append('description', this.shopForm.value.description);
+    formData.append('ShopName', this.shopForm.value.shop_name);
+    formData.append('ContactInfo', this.shopForm.value.contact_info);
+    formData.append('Description', this.shopForm.value.description);
+    formData.append('CreatorId', '1'); 
+
+    console.log('Submitting form data:', {
+      shop_name: this.shopForm.value.shop_name,
+      contact_info: this.shopForm.value.contact_info,
+      description: this.shopForm.value.description,
+      logoFile: this.logoFile,
+    });
+
     if (this.logoFile) {
-      formData.append('logo', this.logoFile);
+      formData.append('Logo', this.logoFile);
     }
 
     if (this.isEditMode && this.selectedShopId) {
@@ -119,7 +148,7 @@ export class AdminPortalComponent implements OnInit {
     if (this.selectedShopId) {
       this.shopService.deleteShop(this.selectedShopId).subscribe(() => {
         this.loadShops();
-         bootstrap.Modal.getInstance(document.getElementById('deleteModal')!)?.hide();
+        bootstrap.Modal.getInstance(document.getElementById('deleteModal')!)?.hide();
       });
     }
   }
