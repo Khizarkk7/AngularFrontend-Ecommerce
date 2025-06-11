@@ -24,7 +24,7 @@ export interface Shop {
   providedIn: 'root'
 })
 export class ShopService {
-  private baseUrl = 'https://localhost:7058/api/Shop';
+  private baseUrl =    'https://localhost:7058/api/Shop';
   private uploadsUrl = 'http://localhost:7058/uploads/'; // image uploads base URL
 
   constructor(private http: HttpClient) { }
@@ -47,4 +47,5 @@ export class ShopService {
   deleteShop(id: number): Observable<any> {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
+  
 }

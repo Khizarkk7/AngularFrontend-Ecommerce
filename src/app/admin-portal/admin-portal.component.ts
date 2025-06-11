@@ -5,7 +5,7 @@ import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Router, RouterModule, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from '../shared/services/auth.service';
 import { ShopService } from '../shared/services/shops.service';
-
+import Swal from 'sweetalert2';
 
 declare var bootstrap: any; // For Bootstrap Modal
 @Component({
@@ -153,8 +153,34 @@ onFileChange(event: any) {
     }
   }
 
+  // onLogout() {
+  //   this.authService.deleteToken();
+  //   this.router.navigateByUrl('/login');
+  // }
   onLogout() {
-    this.authService.deleteToken();
-    this.router.navigateByUrl('/login');
-  }
+  Swal.fire({
+    title: 'Are you sure you want to log out?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, log out',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.authService.deleteToken();
+      this.router.navigateByUrl('/login');
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Logged out!',
+        toast: true,
+        position: 'top-end',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    }
+  });
+}
+
 }

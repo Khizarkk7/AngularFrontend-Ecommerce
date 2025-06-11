@@ -7,6 +7,8 @@ import { AuthService } from '../../shared/services/auth.service';
 import { subscribeOn } from 'rxjs';
 import { ToastrService } from 'ngx-toastr';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
+
 
 @Component({
   selector: 'app-registration',
@@ -56,68 +58,114 @@ export class RegistrationComponent implements OnInit {
   }
 
   loadDropdownData() {
-    this.isLoading = true;
+  this.isLoading = true;
 
-    //Fetch roles from your service
-    this.service.getRoles().subscribe({
-      next: (res: any) => {
-        this.roles = res;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.toastr.error('Failed to load roles', 'Error');
-        this.isLoading = false;
-      }
-    });
+  this.service.getRoles().subscribe({
+    next: (res: any) => {
+      this.roles = res;
+      this.isLoading = false;
+    },
+    error: (err) => {
+      this.isLoading = false;
+
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to load roles. Please try again later.',
+        toast: true,
+        position: 'top-end',
+        timer: 3000,
+        showConfirmButton: false
+      });
+    }
+  });
 
     // Fetch shops from your service
     this.service.getShops().subscribe({
-      next: (res: any) => {
-        this.shops = res;
-        this.isLoading = false;
-      },
-      error: (err) => {
-        this.toastr.error('Failed to load shops', 'Error');
-        this.isLoading = false;
-      }
+  next: (res: any) => {
+    this.shops = res;
+    this.isLoading = false;
+  },
+  error: (err) => {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Failed to load shops. Please try again later.',
+      toast: true,
+      position: 'top-end',
+      timer: 3000,
+      showConfirmButton: false
     });
+    this.isLoading = false;
+  }
+});
+
   }
 
 
   onSubmit() {
-    this.isSubmitted = true;
-    if (this.form.valid) {
-      const payload = {
-        username: this.form.value.fullName,
-        email: this.form.value.email,
-        password: this.form.value.password,
-        roleId: this.form.value.role,
-        shopId: this.form.value.shop
-      };
-      this.service.createUser(payload).subscribe({
-        next: (res: any) => {
-          console.log('API Response:', res);
-          if (res.succeeded) {
-            this.form.reset();
-            this.isSubmitted = false;
-            this.toastr.success(res.message, 'Success');
-          } else {
-            console.log('API Error Response:', res);
-            this.toastr.error(res.message, 'Error');
-            if (res.errors) {
-              res.errors.forEach((err: string) => {
-                console.error('Error:', err);
-              });
-            }
+  this.isSubmitted = true;
+
+  if (this.form.valid) {
+    const payload = {
+      username: this.form.value.fullName,
+      email: this.form.value.email,
+      password: this.form.value.password,
+      roleId: this.form.value.role,
+      shopId: this.form.value.shop
+    };
+
+    this.service.createUser(payload).subscribe({
+      next: (res: any) => {
+        console.log('API Response:', res);
+
+        if (res.succeeded) {
+          this.form.reset();
+          this.isSubmitted = false;
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: res.message,
+            timer: 2000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+          });
+        } else {
+          console.log('API Error Response:', res);
+
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: res.message || 'An error occurred!',
+            toast: true,
+            position: 'top-end'
+          });
+
+          if (res.errors) {
+            res.errors.forEach((err: string) => {
+              console.error('Error:', err);
+            });
           }
-        },
-        error: (err) => {
-          console.error('HTTP Error:', err);
-          this.toastr.error('An error occurred while connecting to the server.(Duplicate Entry)', 'Error');
-        },
-      });
-    }
+        }
+      },
+
+      error: (err) => {
+        console.error('HTTP Error:', err);
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'An error occurred while connecting to the server. (Duplicate Entry)',
+          toast: true,
+          position: 'top-end'
+        });
+      }
+    });
   }
+}
+
 
   hasDisplayError(controlName: string): boolean {
     const control = this.form.get(controlName);

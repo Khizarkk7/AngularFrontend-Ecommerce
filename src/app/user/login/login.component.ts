@@ -4,8 +4,10 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { RouterLink } from '@angular/router';
 import { __values } from 'tslib';
 import { AuthService } from '../../shared/services/auth.service';
-import { ToastrService } from 'ngx-toastr';
+
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
+
 
 @Component({
   selector: 'app-login',
@@ -20,7 +22,6 @@ export class LoginComponent implements OnInit {
 
   constructor(public formBuilder: FormBuilder,
     private service: AuthService,
-    private toastr: ToastrService,
     private router: Router
   ) {
 
@@ -50,30 +51,100 @@ export class LoginComponent implements OnInit {
     return !!(control?.invalid && (this.isSubmitted || control?.touched || control?.dirty));
   }
   
-  onSubmit() {
-    this.isSubmitted = true;
+//  onSubmit() {
+//   this.isSubmitted = true;
 
-    if (this.form.valid) {
-      this.service.signin(this.form.value).subscribe({
-        next: (res: any) => {
-          this.service.saveToken(res.token);
+//   if (this.form.valid) {
+//     this.service.signin(this.form.value).subscribe({
+//       next: (res: any) => {
+//         this.service.saveToken(res.token);
+
+//         // Store user info
+//         localStorage.setItem('role', res.role);
+//         localStorage.setItem('username', res.username);
+
+//         if (res.role?.toLowerCase() === 'shopadmin') {
+//           const shopId = res.shopId;
+//           const shopNameSlug = res.shopName?.replace(/\s+/g, '-').toLowerCase() || 'shop';
+          
+//           this.router.navigate([`/shop/${shopId}/${shopNameSlug}`]);
+//         } else {
+//           this.router.navigateByUrl('/app-admin');
+//         }
+//       },
+//       error: (err) => {
+//         if (err.status === 400) {
+//           this.toastr.error('Please provide valid login details.', 'Login Failed');
+//         } else if (err.status === 401) {
+//           this.toastr.error('Incorrect email or password.', 'Login Failed');
+//         } else {
+//           this.toastr.error('An unexpected error occurred. Please try again later.', 'Login Failed');
+//           console.error('Error during login:', err);
+//         }
+//       },
+//     });
+//   } else {
+//     this.toastr.warning('Please fill out the form correctly.', 'Validation Error');
+//   }
+// }
+onSubmit() {
+  this.isSubmitted = true;
+
+  if (this.form.valid) {
+    this.service.signin(this.form.value).subscribe({
+      next: (res: any) => {
+        this.service.saveToken(res.token);
+
+        localStorage.setItem('role', res.role);
+        localStorage.setItem('username', res.username);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Login Successful',
+          text: `Welcome, ${res.username}!`,
+          timer: 2000,
+          showConfirmButton: false
+        });
+
+        if (res.role?.toLowerCase() === 'shopadmin') {
+          const shopId = res.shopId;
+          const shopNameSlug = res.shopName?.replace(/\s+/g, '-').toLowerCase() || 'shop';
+          this.router.navigate([`/shop/${shopId}/${shopNameSlug}`]);
+        } else {
           this.router.navigateByUrl('/app-admin');
-        },
-        error: (err) => {
-          if (err.status === 400) {
-            this.toastr.error('Please provide valid login details.', 'Login Failed');
-          } else if (err.status === 401) {
-            this.toastr.error('Incorrect email or password.', 'Login Failed');
-          } else {
-            this.toastr.error('An unexpected error occurred. Please try again later.', 'Login Failed');
-            console.error('Error during login:', err);
-          }
-        },
-      });
-    } else {
-      this.toastr.warning('Please fill out the form correctly.', 'Validation Error');
-    }
-  }
+        }
+      },
 
+      error: (err) => {
+        if (err.status === 400) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Login Failed',
+            text: 'Please provide valid login details.'
+          });
+        } else if (err.status === 401) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Login Failed',
+            text: 'Incorrect email or password.'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Unexpected Error',
+            text: 'An unexpected error occurred. Please try again later.'
+          });
+          console.error('Error during login:', err);
+        }
+      }
+    });
+  } else {
+    Swal.fire({
+      icon: 'info',
+      title: 'Validation Error',
+      text: 'Please fill out the form correctly.'
+    });
+  }
+}
 
 }
