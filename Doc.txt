@@ -1,0 +1,6 @@
+
+
+Using localStorage -- for remember me
+1 If "Remember Me" is checked, store the JWT token and username in cookies with a long expiry (e.g., 30 days).
+
+2 If unchecked, store the token in sessionStorage/localStorage (default behavior).

@@ -244,3 +244,39 @@
 .is-invalid {
   border-color: #dc3545;
 }
+
+.action-card:hover {
+  background-color: #f0f8ff;
+  transform: scale(1.02);
+  transition: all 0.3s ease-in-out;
+}
+
+
+.custom-header {
+  background: linear-gradient(to right, #1a237e, #303f9f); /* professional blue gradient */
+  color: white;
+}
+
+.custom-header .navbar-brand .brand-title {
+  color: #ffffff;
+}
+
+.custom-header .btn-outline-light {
+  border-color: #c5cae9;
+}
+
+.custom-header .btn-outline-light:hover {
+  background-color: #3949ab;
+  color: white;
+}
+
+/* Sidebar Styling */
+.bg-sidebar {
+  background: linear-gradient(to right, #1a237e, #303f9f); /* deep dark */
+}
+
+/* Hover effect on nav links */
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}

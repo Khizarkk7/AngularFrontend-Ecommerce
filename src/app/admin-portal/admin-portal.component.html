@@ -1,8 +1,65 @@
-<nav>
-      <button class="btn btn" (click)="onLogout()">
-  <i class="fas fa-right-from-bracket me-2"></i> Logout
-</button>
-</nav>
+
+<div class="d-flex flex-column vh-100">
+  <!-- Header -->
+ <header class="navbar navbar-expand-lg custom-header shadow-sm">
+    <div class="container-fluid">
+      <!-- Sidebar Toggle -->
+      <button class="btn text-white me-2" (click)="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+      </button>
+
+      <!-- Brand Logo -->
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <span class="fs-4 fw-bold brand-title">E-Store</span>
+      </a>
+
+      <!-- Right Controls -->
+      <div class="ms-auto d-flex align-items-center">
+        <button class="btn btn-light text-primary me-3" (click)="openCreateShopModal()">
+          <i class="fas fa-plus me-2"></i>Create Shop
+        </button>
+
+        <!-- Profile Dropdown -->
+        <div class="dropdown ms-auto">
+          <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user-circle me-1"></i>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item text-primary" href="#"><i class="fas fa-user me-2 text-primary"></i> Profile</a></li>
+            <li><a class="dropdown-item text-primary" href="#"><i class="fas fa-cog me-2 text-primary"></i> Change Password</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <button class="dropdown-item text-primary" (click)="onLogout()">
+                <i class="fas fa-right-from-bracket me-2 text-primary"></i> Logout
+              </button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+    <div class="d-flex flex-grow-1">
+    <!-- Sidebar -->
+ <aside class="bg-sidebar text-white" [class.collapsed]="sidebarCollapsed()">
+      <div class="sidebar-sticky pt-3 px-2">
+        <ul class="nav flex-column">
+          <li class="nav-item">
+            <a class="nav-link text-white" routerLink="/dashboard" routerLinkActive="active">
+              <i class="fas fa-tachometer-alt me-2"></i>
+              <span [class.d-none]="sidebarCollapsed()">Dashboard</span>
+            </a>
+          </li>
+          <hr class="bg-light my-2">
+          <li class="nav-item">
+            <a class="nav-link text-white" routerLink="/shops" routerLinkActive="active">
+              <i class="fas fa-store me-2"></i>
+              <span [class.d-none]="sidebarCollapsed()">Shops Management</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
 <div id="layoutSidenav_content">
     <main>
         <div class="container-fluid px-4">
@@ -10,10 +67,10 @@
 
             <!-- Welcome Header -->
             <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
-                <h1 class="mt-4">Welcome to Admin Dashboard</h1>
-                <button class="btn btn-primary" (click)="openCreateShopModal()">
+                <h1 class="mt-4 text-primary">Welcome to Admin Dashboard</h1>
+                <!-- <button class="btn btn-primary" (click)="openCreateShopModal()">
                     <i class="fas fa-plus me-2"></i>Create Shop
-                </button>
+                </button> -->
             </div>
 
             <!-- Shops Grid -->
@@ -42,8 +99,8 @@
                                     <td>{{ shop.shopId  }}</td>
                                     <td>
                                         <img [src]="shop.fullLogoUrl || 'assets/default-shop.png'" 
-                                             class="img-thumbnail shop-logo" 
-                                             alt="Shop Logo">
+                                             class="img-thumbnail shop-logo" style="width: 30%; height: 40%; max-width: 200px;" 
+                                             alt="Shop Logo" >
                                     </td>
                                     <td>{{ shop.shopName  }}</td>
                                     <td class="text-truncate" style="max-width: 200px;">{{ shop.description }}</td>

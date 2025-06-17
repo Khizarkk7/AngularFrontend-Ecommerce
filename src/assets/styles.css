@@ -244,3 +244,7 @@
 .is-invalid {
   border-color: #dc3545;
 }
+/* toggle*/
+.collapsing {
+  transition: width 0.3s ease;
+}

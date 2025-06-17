@@ -25,126 +25,107 @@ export class LoginComponent implements OnInit {
     private router: Router
   ) {
 
-    this.form = this.formBuilder.group(
-      {
-        email: [
-          '',
-          [Validators.required,],
-        ],
-        password: [
-          '',
-          [Validators.required,],
-        ],
-      },
-
-    );
+    this.form = this.formBuilder.group({
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required]],
+      rememberMe: [false]
+    });
   }
 
   ngOnInit(): void {
-    if(this.service.isLogedIn()){
+    if (this.service.isLogedIn()) {
       this.router.navigateByUrl('/app-admin')
     }
-  }   
+    //remember email
+    const rememberedEmail = localStorage.getItem('rememberedEmail');
+    if (rememberedEmail) {
+      this.form.patchValue({ email: rememberedEmail });
+    }
+  }
 
   hasDisplayError(controlName: string): boolean {
     const control = this.form.get(controlName);
     return !!(control?.invalid && (this.isSubmitted || control?.touched || control?.dirty));
   }
-  
-//  onSubmit() {
-//   this.isSubmitted = true;
 
-//   if (this.form.valid) {
-//     this.service.signin(this.form.value).subscribe({
-//       next: (res: any) => {
-//         this.service.saveToken(res.token);
+  onSubmit() {
+    this.isSubmitted = true;
 
-//         // Store user info
-//         localStorage.setItem('role', res.role);
-//         localStorage.setItem('username', res.username);
+    if (this.form.valid) {
+      // Show loading alert
+      Swal.fire({
+        title: 'Sending...',
+        text: 'Please wait while we are fetching your data.',
+        didOpen: () => {
+          Swal.showLoading();
+        },
+        allowOutsideClick: false,
+        showConfirmButton: false
+      });
 
-//         if (res.role?.toLowerCase() === 'shopadmin') {
-//           const shopId = res.shopId;
-//           const shopNameSlug = res.shopName?.replace(/\s+/g, '-').toLowerCase() || 'shop';
-          
-//           this.router.navigate([`/shop/${shopId}/${shopNameSlug}`]);
-//         } else {
-//           this.router.navigateByUrl('/app-admin');
-//         }
-//       },
-//       error: (err) => {
-//         if (err.status === 400) {
-//           this.toastr.error('Please provide valid login details.', 'Login Failed');
-//         } else if (err.status === 401) {
-//           this.toastr.error('Incorrect email or password.', 'Login Failed');
-//         } else {
-//           this.toastr.error('An unexpected error occurred. Please try again later.', 'Login Failed');
-//           console.error('Error during login:', err);
-//         }
-//       },
-//     });
-//   } else {
-//     this.toastr.warning('Please fill out the form correctly.', 'Validation Error');
-//   }
-// }
-onSubmit() {
-  this.isSubmitted = true;
+      const { email, password, rememberMe } = this.form.value;
+      this.service.signin(this.form.value).subscribe({
+        next: (res: any) => {
+          this.service.saveToken(res.token, rememberMe);
+          if (rememberMe) {
+            localStorage.setItem('rememberedEmail', email);
+          } else {
+            localStorage.removeItem('rememberedEmail');
+          }
 
-  if (this.form.valid) {
-    this.service.signin(this.form.value).subscribe({
-      next: (res: any) => {
-        this.service.saveToken(res.token);
+          localStorage.setItem('role', res.role);
+          localStorage.setItem('username', res.username);
 
-        localStorage.setItem('role', res.role);
-        localStorage.setItem('username', res.username);
+          Swal.fire({
+            icon: 'success',
+            title: 'Login Successful',
+            text: `Welcome, ${res.username}!`,
+            timer: 2000,
+            showConfirmButton: false
+          });
 
-        Swal.fire({
-          icon: 'success',
-          title: 'Login Successful',
-          text: `Welcome, ${res.username}!`,
-          timer: 2000,
-          showConfirmButton: false
-        });
+          if (res.role?.toLowerCase() === 'shopadmin') {
+            const shopId = res.shopId;
+            const shopNameSlug = res.shopName?.replace(/\s+/g, '-').toLowerCase() || 'shop';
+            // Store for future use (guard redirects)
+            localStorage.setItem('shopId', shopId);
+            localStorage.setItem('shopName', res.shopName || 'shop');
+            this.router.navigate([`/shop/${shopNameSlug}/${shopId}`]);
+          } else {
+            this.router.navigateByUrl('/app-admin');
+          }
+        },
 
-        if (res.role?.toLowerCase() === 'shopadmin') {
-          const shopId = res.shopId;
-          const shopNameSlug = res.shopName?.replace(/\s+/g, '-').toLowerCase() || 'shop';
-          this.router.navigate([`/shop/${shopId}/${shopNameSlug}`]);
-        } else {
-          this.router.navigateByUrl('/app-admin');
+        error: (err) => {
+          if (err.status === 400) {
+            Swal.fire({
+              icon: 'warning',
+              title: 'Login Failed',
+              text: 'Please provide valid login details.'
+            });
+          } else if (err.status === 401) {
+            Swal.fire({
+              icon: 'error',
+              title: 'Login Failed',
+              text: 'Incorrect email or password.'
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Unexpected Error',
+              text: 'An unexpected error occurred. Please try again later.'
+            });
+            console.error('Error during login:', err);
+          }
         }
-      },
-
-      error: (err) => {
-        if (err.status === 400) {
-          Swal.fire({
-            icon: 'warning',
-            title: 'Login Failed',
-            text: 'Please provide valid login details.'
-          });
-        } else if (err.status === 401) {
-          Swal.fire({
-            icon: 'error',
-            title: 'Login Failed',
-            text: 'Incorrect email or password.'
-          });
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Unexpected Error',
-            text: 'An unexpected error occurred. Please try again later.'
-          });
-          console.error('Error during login:', err);
-        }
-      }
-    });
-  } else {
-    Swal.fire({
-      icon: 'info',
-      title: 'Validation Error',
-      text: 'Please fill out the form correctly.'
-    });
+      });
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: 'Validation Error',
+        text: 'Please fill out the form correctly.'
+      });
+    }
   }
-}
 
 }

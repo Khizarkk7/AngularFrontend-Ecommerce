@@ -19,6 +19,9 @@ import { AuthService } from '../shared/services/auth.service';
   styleUrl: './shop.component.css'
 })
 export class ShopComponent implements OnInit {
+toggleSidebar() {
+throw new Error('Method not implemented.');
+}
   shopId: number = 0;
   shopName: string = '';
   username: any;
@@ -54,6 +57,13 @@ export class ShopComponent implements OnInit {
       if (result.isConfirmed) {
         this.authService.deleteToken();
         this.router.navigateByUrl('/login');
+        localStorage.removeItem('token');
+        localStorage.removeItem('role');
+        localStorage.removeItem('shopId');
+        localStorage.removeItem('shopName');
+        localStorage.removeItem('username');
+        sessionStorage.clear();
+
 
         Swal.fire({
           icon: 'success',

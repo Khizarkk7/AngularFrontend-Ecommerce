@@ -1,11 +1,12 @@
-// ======= admin-portal.component.ts ==========
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Router, RouterModule, RouterLink, RouterOutlet } from '@angular/router';
 import { AuthService } from '../shared/services/auth.service';
 import { ShopService } from '../shared/services/shops.service';
 import Swal from 'sweetalert2';
+
+
 
 declare var bootstrap: any; // For Bootstrap Modal
 @Component({
@@ -17,11 +18,13 @@ declare var bootstrap: any; // For Bootstrap Modal
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
+
   ],
   templateUrl: './admin-portal.component.html',
   styleUrl: './admin-portal.component.css'
 })
 export class AdminPortalComponent implements OnInit {
+
   shops: any[] = [];
   shopForm!: FormGroup;
   isEditMode: boolean = false;
@@ -43,14 +46,14 @@ export class AdminPortalComponent implements OnInit {
   }
 
   loadShops() {
-  this.shopService.getShops().subscribe((data) => {
-    this.shops = data.map(shop => ({
-      ...shop,
-      fullLogoUrl: this.shopService.getFullLogoUrl(shop.logo)  // yahan full URL add ho raha hai
-    }));
-    console.log(this.shops);
-  });
-}
+    this.shopService.getShops().subscribe((data) => {
+      this.shops = data.map(shop => ({
+        ...shop,
+        fullLogoUrl: this.shopService.getFullLogoUrl(shop.logo)
+      }));
+      console.log(this.shops);
+    });
+  }
 
 
   initForm() {
@@ -61,32 +64,32 @@ export class AdminPortalComponent implements OnInit {
     });
   }
 
-onFileChange(event: any) {
-  const file = event.target.files[0];
-  if (file) {
-    this.logoFile = file;
+  onFileChange(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      this.logoFile = file;
 
-    // Validate file type (optional)
-    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
-    if (!allowedTypes.includes(file.type)) {
-      alert('Only images are allowed.');
-      return;
+      // Validate file type (optional)
+      const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Only images are allowed.');
+        return;
+      }
+
+      // Validate file size (optional, e.g. max 2MB)
+      const maxSizeInBytes = 2 * 1024 * 1024;
+      if (file.size > maxSizeInBytes) {
+        alert('File size must be less than 2MB.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.logoPreview = reader.result;
+      };
+      reader.readAsDataURL(file);
     }
-
-    // Validate file size (optional, e.g. max 2MB)
-    const maxSizeInBytes = 2 * 1024 * 1024;
-    if (file.size > maxSizeInBytes) {
-      alert('File size must be less than 2MB.');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.logoPreview = reader.result;
-    };
-    reader.readAsDataURL(file);
   }
-}
 
 
   openCreateShopModal() {
@@ -98,21 +101,38 @@ onFileChange(event: any) {
     modal.show();
   }
 
+  // openEditShopModal(shop: any) {
+  //   this.isEditMode = true;
+  //   this.selectedShopId = shop.shop_id;
+  //   this.shopForm.patchValue(shop);
+  //   this.logoPreview = this.shopService.getFullLogoUrl(shop.logo);
+  //   const modal = new bootstrap.Modal('#shopModal');
+  //   modal.show();
+  // }
   openEditShopModal(shop: any) {
-    this.isEditMode = true;
-    this.selectedShopId = shop.shop_id;
-    this.shopForm.patchValue(shop);
-    this.logoPreview = shop.logo;
-    const modal = new bootstrap.Modal('#shopModal');
-    modal.show();
-  }
+  this.isEditMode = true;
+  this.selectedShopId = shop.shopId; //  Correct key
+
+  // Form ko sahi data se patch kar rahe hain
+  this.shopForm.patchValue({
+    shop_name: shop.shopName,        //  correct mapping
+    contact_info: shop.contactInfo,  //  correct mapping
+    description: shop.description    //  correct mapping
+  });
+
+  this.logoPreview = this.shopService.getFullLogoUrl(shop.logo);
+
+  const modal = new bootstrap.Modal('#shopModal');
+  modal.show();
+}
+
 
   onSubmit() {
     const formData = new FormData();
     formData.append('ShopName', this.shopForm.value.shop_name);
     formData.append('ContactInfo', this.shopForm.value.contact_info);
     formData.append('Description', this.shopForm.value.description);
-    formData.append('CreatorId', '1'); 
+    formData.append('CreatorId', '1');
 
     console.log('Submitting form data:', {
       shop_name: this.shopForm.value.shop_name,
@@ -126,9 +146,11 @@ onFileChange(event: any) {
     }
 
     if (this.isEditMode && this.selectedShopId) {
+      // UPDATE mode
       this.shopService.updateShop(this.selectedShopId, formData).subscribe(() => {
         this.loadShops();
         bootstrap.Modal.getInstance(document.getElementById('shopModal')!)?.hide();
+
       });
     } else {
       this.shopService.createShop(formData).subscribe(() => {
@@ -136,6 +158,9 @@ onFileChange(event: any) {
         bootstrap.Modal.getInstance(document.getElementById('shopModal')!)?.hide();
       });
     }
+    console.log("Edit Mode:", this.isEditMode);
+    console.log("Shop ID:", this.selectedShopId);
+
   }
 
   confirmDelete(shopId: number) {
@@ -158,29 +183,41 @@ onFileChange(event: any) {
   //   this.router.navigateByUrl('/login');
   // }
   onLogout() {
-  Swal.fire({
-    title: 'Are you sure you want to log out?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Yes, log out',
-    cancelButtonText: 'Cancel'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      this.authService.deleteToken();
-      this.router.navigateByUrl('/login');
-      
-      Swal.fire({
-        icon: 'success',
-        title: 'Logged out!',
-        toast: true,
-        position: 'top-end',
-        timer: 2000,
-        showConfirmButton: false
-      });
-    }
-  });
-}
+    Swal.fire({
+      title: 'Are you sure you want to log out?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, log out',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.authService.deleteToken();
+        this.router.navigateByUrl('/login');
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Logged out!',
+          toast: true,
+          position: 'top-end',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
+
+    //added on monday
+  }
+  sidebarCollapsed = signal(false);
+  isProfileOpen = signal(false);
+
+  toggleSidebar() {
+    this.sidebarCollapsed.update(prev => !prev);
+  }
+
+  toggleProfile() {
+    this.isProfileOpen.update(prev => !prev);
+  }
 
 }

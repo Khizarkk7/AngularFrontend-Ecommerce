@@ -1,21 +1,18 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { TOKEN_KEY } from '../constants';
-import { Token } from '@angular/compiler';
+import { TOKEN_KEY, REMEMBER_ME_KEY, REMEMBERED_EMAIL_KEY } from '../constants';
 
 @Injectable({
   providedIn: 'root'
 })
-//1 add http client in app,config.ts
 export class AuthService {
+  constructor(private http: HttpClient) { }
+  baseURL = 'https://localhost:7058/api';
 
-  constructor(private http: HttpClient) { } //recieve an instance of HttpClient
-  baseURL = 'https://localhost:7058/api';//observable handle the delays &  //allows to combine mutiple async operations
-
-
-  createUser(formData: any) { //formData is an object 
+  createUser(formData: any) {
     return this.http.post(this.baseURL + '/Login/register', formData);
   }
+
   getRoles() {
     return this.http.get(`${this.baseURL}/Role`);
   }
@@ -24,23 +21,52 @@ export class AuthService {
     return this.http.get(`${this.baseURL}/Shop`);
   }
 
-
-  signin(formData: any) { //formData is an object 
+  signin(formData: any) {
     return this.http.post(this.baseURL + '/Login/login', formData);
   }
 
-  isLogedIn() {
-
-    return localStorage.getItem(TOKEN_KEY) != null ? true : false
-
+  // Updated login check (checks both storage locations)
+  isLogedIn(): boolean {
+    return !!(localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY));
   }
-  deleteToken() {
+
+  // Updated token deletion
+  deleteToken(): void {
     localStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REMEMBER_ME_KEY);
   }
-  saveToken(token: string) {
-    localStorage.setItem(TOKEN_KEY, token);
+
+  // Token storage with remember me option
+  saveToken(token: string, rememberMe: boolean = false): void {
+    if (rememberMe) {
+      localStorage.setItem(TOKEN_KEY, token);
+      localStorage.setItem(REMEMBER_ME_KEY, 'true');
+    } else {
+      sessionStorage.setItem(TOKEN_KEY, token);
+      localStorage.removeItem(REMEMBER_ME_KEY);
+    }
   }
+
+  // Remember email functionality
+  saveRememberedEmail(email: string): void {
+    localStorage.setItem(REMEMBERED_EMAIL_KEY, email);
+  }
+
+  getRememberedEmail(): string | null {
+    return localStorage.getItem(REMEMBERED_EMAIL_KEY);
+  }
+
+  clearRememberedEmail(): void {
+    localStorage.removeItem(REMEMBERED_EMAIL_KEY);
+  }
+
   forgotPassword(email: string) {
-  return this.http.post(`${this.baseURL}/forgot-password`, { email });
-}
+    return this.http.post(`${this.baseURL}/forgot-password`, { email });
+  }
+
+  // New: Get current token
+  getToken(): string | null {
+    return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+  }
 }
