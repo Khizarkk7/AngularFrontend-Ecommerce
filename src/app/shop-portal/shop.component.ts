@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterModule, RouterOutlet } from '@angular/router';
 import Swal from 'sweetalert2';
 import { AuthService } from '../shared/services/auth.service';
+import { NgbDropdownModule } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-shop',
@@ -14,14 +15,40 @@ import { AuthService } from '../shared/services/auth.service';
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
+    NgbDropdownModule
   ],
   templateUrl: './shop.component.html',
   styleUrl: './shop.component.css'
 })
 export class ShopComponent implements OnInit {
-toggleSidebar() {
-throw new Error('Method not implemented.');
+  sidebarCollapsed = signal(false);
+  isProfileOpen = signal(false);
+  isShopMenuOpen = false;
+  isHomeMenuOpen = false;
+
+  toggleSidebar() {
+    this.sidebarCollapsed.update(prev => !prev);
+  }
+
+  toggleProfile() {
+    this.isProfileOpen.update(prev => !prev);
+  }
+
+toggleShopMenu() {
+  this.isShopMenuOpen = !this.isShopMenuOpen;
 }
+
+closeShopMenu() {
+  this.isShopMenuOpen = false;
+}
+toggleHomeMenu() {
+  this.isHomeMenuOpen = !this.isHomeMenuOpen;
+}
+
+closeHomeMenu() {
+  this.isHomeMenuOpen = false;
+}
+
   shopId: number = 0;
   shopName: string = '';
   username: any;

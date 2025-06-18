@@ -127,42 +127,119 @@ export class AdminPortalComponent implements OnInit {
 }
 
 
-  onSubmit() {
-    const formData = new FormData();
-    formData.append('ShopName', this.shopForm.value.shop_name);
-    formData.append('ContactInfo', this.shopForm.value.contact_info);
-    formData.append('Description', this.shopForm.value.description);
-    formData.append('CreatorId', '1');
+  // onSubmit() {
+  //   const formData = new FormData();
+  //   formData.append('ShopName', this.shopForm.value.shop_name);
+  //   formData.append('ContactInfo', this.shopForm.value.contact_info);
+  //   formData.append('Description', this.shopForm.value.description);
+  //   formData.append('CreatorId', '1');
 
-    console.log('Submitting form data:', {
-      shop_name: this.shopForm.value.shop_name,
-      contact_info: this.shopForm.value.contact_info,
-      description: this.shopForm.value.description,
-      logoFile: this.logoFile,
-    });
+  //   console.log('Submitting form data:', {
+  //     shop_name: this.shopForm.value.shop_name,
+  //     contact_info: this.shopForm.value.contact_info,
+  //     description: this.shopForm.value.description,
+  //     logoFile: this.logoFile,
+  //   });
 
-    if (this.logoFile) {
-      formData.append('Logo', this.logoFile);
-    }
+  //   if (this.logoFile) {
+  //     formData.append('Logo', this.logoFile);
+  //   }
 
-    if (this.isEditMode && this.selectedShopId) {
-      // UPDATE mode
-      this.shopService.updateShop(this.selectedShopId, formData).subscribe(() => {
-        this.loadShops();
-        bootstrap.Modal.getInstance(document.getElementById('shopModal')!)?.hide();
+  //   if (this.isEditMode && this.selectedShopId) {
+  //     // UPDATE mode
+  //     this.shopService.updateShop(this.selectedShopId, formData).subscribe(() => {
+  //       this.loadShops();
+  //       bootstrap.Modal.getInstance(document.getElementById('shopModal')!)?.hide();
 
-      });
-    } else {
-      this.shopService.createShop(formData).subscribe(() => {
-        this.loadShops();
-        bootstrap.Modal.getInstance(document.getElementById('shopModal')!)?.hide();
-      });
-    }
-    console.log("Edit Mode:", this.isEditMode);
-    console.log("Shop ID:", this.selectedShopId);
+  //     });
+  //   } else {
+  //     this.shopService.createShop(formData).subscribe(() => {
+  //       this.loadShops();
+  //       bootstrap.Modal.getInstance(document.getElementById('shopModal')!)?.hide();
+  //     });
+  //   }
+  //   console.log("Edit Mode:", this.isEditMode);
+  //   console.log("Shop ID:", this.selectedShopId);
 
+  // }
+onSubmit() {
+  const formData = new FormData();
+  
+  // Always include these fields
+  formData.append('ShopName', this.shopForm.value.shop_name);
+  formData.append('ContactInfo', this.shopForm.value.contact_info);
+  formData.append('Description', this.shopForm.value.description);
+  formData.append('CreatorId', '1');
+
+  // Include ShopId when in edit mode
+  if (this.isEditMode && this.selectedShopId) {
+    formData.append('ShopId', this.selectedShopId.toString());
   }
 
+  console.log('Submitting form data:', {
+    shop_name: this.shopForm.value.shop_name,
+    contact_info: this.shopForm.value.contact_info,
+    description: this.shopForm.value.description,
+    logoFile: this.logoFile,
+    shopId: this.isEditMode ? this.selectedShopId : 'N/A (create mode)'
+  });
+
+  if (this.logoFile) {
+    formData.append('Logo', this.logoFile);
+  }
+   // Explicitly tell backend to keep existing logo
+  else{
+    formData.append('KeepExistingLogo', 'true')
+  }
+
+ if (this.isEditMode && this.selectedShopId) {
+  this.shopService.updateShop(this.selectedShopId, formData).subscribe({
+    next: () => {
+      this.loadShops();
+      bootstrap.Modal.getInstance(document.getElementById('shopModal')!)?.hide();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Shop Updated',
+        text: 'The shop details were updated successfully.',
+        confirmButtonColor: '#3085d6'
+      });
+    },
+    error: (err) => {
+      console.error('Update failed:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Update Failed',
+        text: err?.error?.message || 'Something went wrong while updating.',
+        confirmButtonColor: '#d33'
+      });
+    }
+    });
+  } else {
+  this.shopService.createShop(formData).subscribe({
+    next: () => {
+      this.loadShops();
+      bootstrap.Modal.getInstance(document.getElementById('shopModal')!)?.hide();
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Shop Created',
+        text: 'The shop was created successfully.',
+        confirmButtonColor: '#3085d6'
+      });
+    },
+    error: (err) => {
+      console.error('Creation failed:', err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Creation Failed',
+        text: err?.error?.message || 'Something went wrong while creating the shop.',
+        confirmButtonColor: '#d33'
+      });
+    }
+    });
+  }
+}
   confirmDelete(shopId: number) {
     this.selectedShopId = shopId;
     const modal = new bootstrap.Modal('#deleteModal');

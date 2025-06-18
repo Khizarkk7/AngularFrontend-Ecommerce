@@ -8,6 +8,7 @@ import { authGuard } from './shared/auth.guard';
 import { UserComponent } from './user/user.component';
 import { ShopComponent } from './shop-portal/shop.component';
 import { UnauthorizedComponent } from './user/unauthorized/unauthorized.component';
+import { InventoryComponent } from './inventory/inventory.component';
 
 
 
@@ -36,7 +37,8 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { roles: ['shopAdmin'] }  // only ShopAdmin can access
   },
-  { path: 'unauthorized', component: UnauthorizedComponent }
+  { path: 'unauthorized', component: UnauthorizedComponent },
+  { path: 'product', component: InventoryComponent }
 
 ];
 

@@ -55,6 +55,7 @@
               <i class="fas fa-store me-2"></i>
               <span [class.d-none]="sidebarCollapsed()">Shops Management</span>
             </a>
+            <hr>
           </li>
         </ul>
       </div>
@@ -68,10 +69,12 @@
             <!-- Welcome Header -->
             <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
                 <h1 class="mt-4 text-primary">Welcome to Admin Dashboard</h1>
+                
                 <!-- <button class="btn btn-primary" (click)="openCreateShopModal()">
                     <i class="fas fa-plus me-2"></i>Create Shop
                 </button> -->
             </div>
+            <hr>
 
             <!-- Shops Grid -->
             <div class="card mb-4">
@@ -84,7 +87,7 @@
                         <table class="table table-bordered table-hover">
                             <thead class="table-primary">
                                 <tr>
-                                    <th>ID</th>
+                                    <!-- <th >ID</th> -->
                                     <th>Logo</th>
                                     <th>Shop Name</th>
                                     <th>Description</th>
@@ -96,7 +99,7 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let shop of shops">
-                                    <td>{{ shop.shopId  }}</td>
+                                    <!-- <td>{{ shop.shopId  }}</td> -->
                                     <td>
                                         <img [src]="shop.fullLogoUrl || 'assets/default-shop.png'" 
                                              class="img-thumbnail shop-logo" style="width: 30%; height: 40%; max-width: 200px;" 

@@ -39,10 +39,6 @@ export class ShopService {
   getFullLogoUrl(fileName: string): string {
     return this.uploadsUrl + fileName;
   }
-  
-
-
-
   createShop(shop: FormData): Observable<any> {
     return this.http.post(`${this.baseUrl}/CreateShop`, shop);
   }

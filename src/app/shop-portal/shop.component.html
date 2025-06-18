@@ -32,7 +32,58 @@
     </div>
   </div>
 </header>
-
+<div class="d-flex flex-grow-1">
+  <!-- Sidebar -->
+  <aside class="bg-sidebar text-white" [class.collapsed]="sidebarCollapsed()">
+    <div class="sidebar-sticky pt-3 px-2">
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <a class="nav-link text-white" routerLink="/dashboard" routerLinkActive="active">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            <span [class.d-none]="sidebarCollapsed()"> Dashboard</span>
+          </a>
+        </li>
+        <hr class="bg-light my-2">
+        
+        <!-- Shop Dropdown -->
+        <li class="nav-item dropdown" [class.show]="isShopMenuOpen">
+          <a class="nav-link text-white dropdown-toggle" 
+             (click)="toggleShopMenu()"
+             aria-expanded="false">
+            <i class="fas fa-store me-2"></i>
+            <span [class.d-none]="sidebarCollapsed()">MyShop</span>
+          </a>
+          <ul class="dropdown-menu bg-sidebar text-white" [class.show]="isShopMenuOpen">
+            <li>
+              <a class="dropdown-item text-white" routerLink="" 
+                 (click)="closeShopMenu()" routerLinkActive="active">
+                <i class="fas fa-info-circle me-2"></i> Shop Info
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item text-white" routerLink="" 
+                 (click)="closeShopMenu()" routerLinkActive="active">
+                <i class="fas fa-receipt me-2"></i> View Transactions
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item text-white" routerLink="/" 
+                 (click)="closeShopMenu()" routerLinkActive="active">
+                <i class="fas fa-users me-2"></i> Manage Staff
+              </a>
+            </li>
+            <li>
+              <a class="dropdown-item text-white" routerLink="" 
+                 (click)="closeShopMenu()" routerLinkActive="active">
+                <i class="fas fa-boxes me-2"></i> Inventory
+              </a>
+            </li>
+          </ul>
+        </li>
+        <hr class="bg-light my-2">
+      </ul>
+    </div>
+  </aside>
 
 <div class="container mt-5">
   <div class="row mb-4">
