@@ -110,21 +110,27 @@ export class AdminPortalComponent implements OnInit {
   //   modal.show();
   // }
   openEditShopModal(shop: any) {
-  this.isEditMode = true;
-  this.selectedShopId = shop.shopId; //  Correct key
-
-  // Form ko sahi data se patch kar rahe hain
-  this.shopForm.patchValue({
-    shop_name: shop.shopName,        //  correct mapping
-    contact_info: shop.contactInfo,  //  correct mapping
-    description: shop.description    //  correct mapping
-  });
-
-  this.logoPreview = this.shopService.getFullLogoUrl(shop.logo);
-
-  const modal = new bootstrap.Modal('#shopModal');
-  modal.show();
-}
+    this.isEditMode = true;
+    this.selectedShopId = shop.shopId;
+  
+    this.shopForm.patchValue({
+      shop_name: shop.shopName,
+      contact_info: shop.contactInfo,
+      description: shop.description
+    });
+  
+    // Defensive: handle missing or full URL
+    if (shop.logo) {
+      this.logoPreview = shop.logo.startsWith('http')
+        ? shop.logo
+        : this.shopService.getFullLogoUrl(shop.logo);
+    } else {
+      this.logoPreview = 'assets/default-shop.png';
+    }
+  
+    const modal = new bootstrap.Modal('#shopModal');
+    modal.show();
+  }
 
 
   // onSubmit() {
@@ -164,8 +170,7 @@ export class AdminPortalComponent implements OnInit {
   // }
 onSubmit() {
   const formData = new FormData();
-  
-  // Always include these fields
+  //formData.append('ShopId', this.selectedShopId.toString());
   formData.append('ShopName', this.shopForm.value.shop_name);
   formData.append('ContactInfo', this.shopForm.value.contact_info);
   formData.append('Description', this.shopForm.value.description);
@@ -186,10 +191,8 @@ onSubmit() {
 
   if (this.logoFile) {
     formData.append('Logo', this.logoFile);
-  }
-   // Explicitly tell backend to keep existing logo
-  else{
-    formData.append('KeepExistingLogo', 'true')
+  } else {
+    formData.append('KeepExistingLogo', 'true');
   }
 
  if (this.isEditMode && this.selectedShopId) {

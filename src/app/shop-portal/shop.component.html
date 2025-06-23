@@ -73,9 +73,9 @@
               </a>
             </li>
             <li>
-              <a class="dropdown-item text-white" routerLink="" 
-                 (click)="closeShopMenu()" routerLinkActive="active">
-                <i class="fas fa-boxes me-2"></i> Inventory
+              <a class="dropdown-item text-white" 
+                 (click)="closeShopMenu()" (click)="openInventoryInNewTab()" >
+                <i class="fas fa-boxes me-2" ></i> Inventory
               </a>
             </li>
           </ul>
@@ -106,9 +106,15 @@
       </div>
     </div>
   </div>
+  <div class="main-content">
+    <!-- Dashboard content -->
+    
+    <!-- This is where child routes (like inventory) will render -->
+    <router-outlet></router-outlet>
+  </div>
 
   <!-- Quick Actions -->
-  <div class="row text-center">
+  <!-- <div class="row text-center">
     <div class="col-md-4 mb-3">
       <div class="card action-card shadow-sm border-0 rounded-4 p-3 h-100">
         <h6 class="text-primary">🧾 View Transactions</h6>
@@ -126,8 +132,9 @@
     <div class="col-md-4 mb-3">
       <div class="card action-card shadow-sm border-0 rounded-4 p-3 h-100">
         <h6 class="text-primary">📦 Inventory</h6>
-        <button class="btn btn-outline-primary mt-2 w-100">Go</button>
+        <button class="btn btn-outline-primary mt-2 w-100" 
+                (click)="openInventoryInNewTab()">Go</button>
       </div>
     </div>
-  </div>
+  </div> -->
 </div>

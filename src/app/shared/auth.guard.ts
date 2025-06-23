@@ -18,8 +18,10 @@ export const authGuard: CanActivateFn = (route, state) => {
 
   const isLoggedIn = authService.isLogedIn();
   const expectedRoles = route.data?.['roles'] as string[]; // e.g. ['SystemAdmin']
-  const userRole = localStorage.getItem('role'); // assuming role is stored during login
+  console.log(expectedRoles);
 
+  const userRole = localStorage.getItem('role'); // assuming role is stored during login
+console.log(userRole);
   if (!isLoggedIn) {
     router.navigate(['/login']);
     return false;

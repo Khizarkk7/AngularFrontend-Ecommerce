@@ -31,14 +31,33 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { roles: ['systemAdmin'] }  // only SystemAdmin can access
   },
+  // {
+  //   path: 'shop/:shopName/:shopId',
+  //   component: ShopComponent,
+  //   canActivate: [authGuard],
+  //   data: { roles: ['shopAdmin'] },
+  //   children: [
+  //     {
+  //       path: 'inventory', 
+  //       component: InventoryComponent
+  //     }
+  //   ]
+  // },
   {
     path: 'shop/:shopName/:shopId',
     component: ShopComponent,
     canActivate: [authGuard],
-    data: { roles: ['shopAdmin'] }  // only ShopAdmin can access
+    data: { roles: ['shopAdmin'] },
+    children: [
+      {
+        path: 'inventory',
+        component: InventoryComponent
+      }
+    ]
   },
+  { path: 'inventory', component: InventoryComponent },
   { path: 'unauthorized', component: UnauthorizedComponent },
-  { path: 'product', component: InventoryComponent }
+  
 
 ];
 
