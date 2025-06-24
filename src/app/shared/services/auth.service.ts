@@ -69,4 +69,29 @@ export class AuthService {
   getToken(): string | null {
     return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
   }
+
+getDecodedToken(): any {
+  const token = this.getToken();
+  if (!token) return null;
+
+  try {
+    const payloadBase64 = token.split('.')[1];
+    const payloadJson = decodeURIComponent(
+      atob(payloadBase64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(payloadJson);
+  } catch (e) {
+    console.error('Error decoding token:', e);
+    return null;
+  }
+}
+
+getCurrentShopId(): number | null {
+  const payload = this.getDecodedToken();
+  return payload?.shopId ? parseInt(payload.shopId) : null;
+}
+
 }
