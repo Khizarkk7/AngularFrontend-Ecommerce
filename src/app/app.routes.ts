@@ -1,13 +1,12 @@
 import { Routes } from '@angular/router';
 
-import { RegistrationComponent } from './user/registration/registration.component';
-import { LoginComponent } from './user/login/login.component';
-import { ForgotPassComponent } from './user/forgot-pass/forgot-pass.component';
+import { RegistrationComponent } from './cardentials/registration/registration.component';
+import { LoginComponent } from './cardentials/login/login.component';
+import { ForgotPassComponent } from './cardentials/forgot-pass/forgot-pass.component';
 import { AdminPortalComponent } from './admin-portal/admin-portal.component';
 import { authGuard } from './shared/auth.guard';
-import { UserComponent } from './user/user.component';
 import { ShopComponent } from './shop-portal/shop.component';
-import { UnauthorizedComponent } from './user/unauthorized/unauthorized.component';
+import { UnauthorizedComponent } from './cardentials/unauthorized/unauthorized.component';
 import { InventoryComponent } from './inventory/inventory.component';
 
 
