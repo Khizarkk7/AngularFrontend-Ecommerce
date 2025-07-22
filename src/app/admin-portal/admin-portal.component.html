@@ -1,133 +1,38 @@
 
 <div class="d-flex flex-column vh-100">
   <!-- Header -->
- <header class="navbar navbar-expand-lg custom-header shadow-sm">
-    <div class="container-fluid">
-      <!-- Sidebar Toggle -->
-      <button class="btn text-white me-2" (click)="toggleSidebar()">
-        <i class="fas fa-bars"></i>
-      </button>
-
-      <!-- Brand Logo -->
-      <a class="navbar-brand d-flex align-items-center" href="#">
-        <span class="fs-4 fw-bold brand-title">E-Store</span>
-      </a>
-
-      <!-- Right Controls -->
-      <div class="ms-auto d-flex align-items-center">
-        <button class="btn btn-light text-primary me-3" (click)="openCreateShopModal()">
-          <i class="fas fa-plus me-2"></i>Create Shop
-        </button>
-
-        <!-- Profile Dropdown -->
-        <div class="dropdown ms-auto">
-          <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="fas fa-user-circle me-1"></i>
-          </button>
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item text-primary" href="#"><i class="fas fa-user me-2 text-primary"></i> Profile</a></li>
-            <li><a class="dropdown-item text-primary" href="#"><i class="fas fa-cog me-2 text-primary"></i> Change Password</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li>
-              <button class="dropdown-item text-primary" (click)="onLogout()">
-                <i class="fas fa-right-from-bracket me-2 text-primary"></i> Logout
-              </button>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </header>
+  <app-admin-header
+    (logout)="onLogout()"
+    (createShop)="openCreateShopModal()"
+  ></app-admin-header>
     <div class="d-flex flex-grow-1">
     <!-- Sidebar -->
- <aside class="bg-sidebar text-white" [class.collapsed]="sidebarCollapsed()">
-      <div class="sidebar-sticky pt-3 px-2">
-        <ul class="nav flex-column">
-          <li class="nav-item">
-            <a class="nav-link text-white" routerLink="/dashboard" routerLinkActive="active">
-              <i class="fas fa-tachometer-alt me-2"></i>
-              <span [class.d-none]="sidebarCollapsed()">Dashboard</span>
-            </a>
-          </li>
-          <hr class="bg-light my-2">
-          <li class="nav-item">
-            <a class="nav-link text-white" routerLink="/shops" routerLinkActive="active">
-              <i class="fas fa-store me-2"></i>
-              <span [class.d-none]="sidebarCollapsed()">Shops Management</span>
-            </a>
-            <hr>
-          </li>
-        </ul>
-      </div>
-    </aside>
-
-<div id="layoutSidenav_content">
-    <main>
-        <div class="container-fluid px-4">
-         
-
-            <!-- Welcome Header -->
-            <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
-                <h1 class="mt-4 text-primary">Welcome to Admin Dashboard</h1>
-                
-                <!-- <button class="btn btn-primary" (click)="openCreateShopModal()">
-                    <i class="fas fa-plus me-2"></i>Create Shop
-                </button> -->
-            </div>
-            <hr>
-
-            <!-- Shops Grid -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <i class="fas fa-store me-1"></i>
-                    Shops Management
+    <app-aside-bar (shopInfoClick)="showShopTable = true"></app-aside-bar>
+    <div id="layoutSidenav_content">
+        <main>
+            <div class="container-fluid px-4">
+                <!-- Welcome Header -->
+                <div class="d-flex justify-content-between align-items-center mt-4 mb-4">
+                    <h1 class="mt-4 text-primary">Welcome to Admin Dashboard</h1>
                 </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead class="table-primary">
-                                <tr>
-                                    <!-- <th >ID</th> -->
-                                    <th>Logo</th>
-                                    <th>Shop Name</th>
-                                    <th>Description</th>
-                                    <th>Contact Info</th>
-                                    <th>Created By</th>
-                                    <th>Created At</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let shop of shops">
-                                    <!-- <td>{{ shop.shopId  }}</td> -->
-                                    <td>
-                                        <img [src]="shop.fullLogoUrl || 'assets/default-shop.png'" 
-                                             class="img-thumbnail shop-logo" style="width: 30%; height: 40%; max-width: 200px;" 
-                                             alt="Shop Logo" >
-                                    </td>
-                                    <td>{{ shop.shopName  }}</td>
-                                    <td class="text-truncate" style="max-width: 200px;">{{ shop.description }}</td>
-                                    <td>{{ shop.contactInfo  }}</td>
-                                    <td>{{ shop.creatorName }}</td> <!-- Creator name shown -->
-                                    <td>{{ shop.createdAt  | date:'shortDate' }}</td>
-                                    <td>
-                                        <button class="btn btn-sm btn-warning me-2" 
-                                                (click)="openEditShopModal(shop)">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" 
-                                                (click)="confirmDelete(shop.shopId)">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <hr>
+                <!-- Shops Grid -->
+                <app-all-shops-table
+                    *ngIf="showShopTable"
+                    [shops]="shops"
+                    [isEditMode]="isEditMode"
+                    [shopForm]="shopForm"
+                    [logoPreview]="logoPreview"
+                    [logoFile]="logoFile"
+                    (createShop)="openCreateShopModal()"
+                    (editShop)="openEditShopModal($event)"
+                    (deleteShop)="confirmDelete($event)"
+                    (fileChange)="onFileChange($event)"
+                    (submitShop)="onSubmit()"
+                ></app-all-shops-table>
             </div>
-        </div>
-    </main>
+        </main>
+    </div>
 
     <!-- Shop Form Modal -->
     <div class="modal fade" id="shopModal" tabindex="-1" aria-hidden="true">

@@ -5,7 +5,9 @@ import { Router, RouterModule, RouterLink, RouterOutlet } from '@angular/router'
 import { AuthService } from '../shared/services/auth.service';
 import { ShopService } from '../shared/services/shops.service';
 import Swal from 'sweetalert2';
-
+import { AsideBarComponent } from '../ui/aside-bar/aside-bar.component';
+import { AllShopsTableComponent } from '../ui/all-shops-table.component';
+import { AdminHeaderComponent } from '../ui/admin-header.component';
 
 
 declare var bootstrap: any; // For Bootstrap Modal
@@ -18,7 +20,9 @@ declare var bootstrap: any; // For Bootstrap Modal
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
-
+    AsideBarComponent,
+    AllShopsTableComponent,
+    AdminHeaderComponent
   ],
   templateUrl: './admin-portal.component.html',
   styleUrl: './admin-portal.component.css'
@@ -31,6 +35,7 @@ export class AdminPortalComponent implements OnInit {
   selectedShopId: number | null = null;
   logoPreview: string | ArrayBuffer | null = null;
   logoFile: File | null = null;
+  showShopTable = false;
 
 
   constructor(
@@ -101,14 +106,7 @@ export class AdminPortalComponent implements OnInit {
     modal.show();
   }
 
-  // openEditShopModal(shop: any) {
-  //   this.isEditMode = true;
-  //   this.selectedShopId = shop.shop_id;
-  //   this.shopForm.patchValue(shop);
-  //   this.logoPreview = this.shopService.getFullLogoUrl(shop.logo);
-  //   const modal = new bootstrap.Modal('#shopModal');
-  //   modal.show();
-  // }
+
   openEditShopModal(shop: any) {
     this.isEditMode = true;
     this.selectedShopId = shop.shopId;
@@ -133,41 +131,7 @@ export class AdminPortalComponent implements OnInit {
   }
 
 
-  // onSubmit() {
-  //   const formData = new FormData();
-  //   formData.append('ShopName', this.shopForm.value.shop_name);
-  //   formData.append('ContactInfo', this.shopForm.value.contact_info);
-  //   formData.append('Description', this.shopForm.value.description);
-  //   formData.append('CreatorId', '1');
-
-  //   console.log('Submitting form data:', {
-  //     shop_name: this.shopForm.value.shop_name,
-  //     contact_info: this.shopForm.value.contact_info,
-  //     description: this.shopForm.value.description,
-  //     logoFile: this.logoFile,
-  //   });
-
-  //   if (this.logoFile) {
-  //     formData.append('Logo', this.logoFile);
-  //   }
-
-  //   if (this.isEditMode && this.selectedShopId) {
-  //     // UPDATE mode
-  //     this.shopService.updateShop(this.selectedShopId, formData).subscribe(() => {
-  //       this.loadShops();
-  //       bootstrap.Modal.getInstance(document.getElementById('shopModal')!)?.hide();
-
-  //     });
-  //   } else {
-  //     this.shopService.createShop(formData).subscribe(() => {
-  //       this.loadShops();
-  //       bootstrap.Modal.getInstance(document.getElementById('shopModal')!)?.hide();
-  //     });
-  //   }
-  //   console.log("Edit Mode:", this.isEditMode);
-  //   console.log("Shop ID:", this.selectedShopId);
-
-  // }
+  
 onSubmit() {
   const formData = new FormData();
   //formData.append('ShopId', this.selectedShopId.toString());

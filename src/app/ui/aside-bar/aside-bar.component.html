@@ -19,15 +19,14 @@
           </a>
           <ul class="dropdown-menu bg-sidebar text-white" [class.show]="isShopMenuOpen">
             <li>
-              <a class="dropdown-item text-white" routerLink="" 
-                 (click)="closeShopMenu()" routerLinkActive="active">
+              <a class="dropdown-item text-white" (click)="onShopInfoClick(); closeShopMenu()">
                 <i class="fas fa-info-circle me-2"></i> Shop Info
               </a>
             </li>
             <li>
               <a class="dropdown-item text-white" routerLink="" 
                  (click)="closeShopMenu()" routerLinkActive="active">
-                <i class="fas fa-receipt me-2"></i> View Transactions
+                <i class="fas fa-receipt me-2"></i> Create Shop
               </a>
             </li>
             <li>

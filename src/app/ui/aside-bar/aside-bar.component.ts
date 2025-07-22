@@ -1,5 +1,5 @@
 import { isPlatformBrowser } from '@angular/common';
-import { Component, Inject, PLATFORM_ID, signal } from '@angular/core';
+import { Component, Inject, PLATFORM_ID, signal, EventEmitter, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../shared/services/auth.service';
 
@@ -16,6 +16,8 @@ sidebarCollapsed = signal(false);
   isProfileOpen = signal(false);
   isShopMenuOpen = false;
   isHomeMenuOpen = false;
+  
+  @Output() shopInfoClick = new EventEmitter<void>();
   
   constructor(
       private route: ActivatedRoute,
@@ -46,6 +48,10 @@ sidebarCollapsed = signal(false);
 
   closeHomeMenu() {
     this.isHomeMenuOpen = false;
+  }
+
+  onShopInfoClick() {
+    this.shopInfoClick.emit();
   }
 
   openInventoryInNewTab() {

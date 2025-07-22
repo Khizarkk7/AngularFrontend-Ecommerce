@@ -1,0 +1,81 @@
+/* Responsive and modern table styles using color palette */
+.table {
+  background: #fff;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+.table th, .table td {
+  vertical-align: middle;
+  border-color: var(--color-border);
+}
+.img-thumbnail {
+  background: var(--color-bg-light);
+  border: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.card {
+  border-radius: 1rem;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 2px 8px rgba(44, 62, 80, 0.04);
+}
+.card-header {
+  border-radius: 1rem 1rem 0 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  background: var(--color-primary);
+  color: #fff;
+}
+.btn-warning {
+  background: var(--color-secondary);
+  color: #fff;
+  border: none;
+}
+.btn-warning:hover, .btn-warning:focus {
+  background: #00bfa3;
+  color: #fff;
+}
+.btn-danger {
+  background: var(--color-accent);
+  color: #fff;
+  border: none;
+}
+.btn-danger:hover, .btn-danger:focus {
+  background: #ff8787;
+  color: #fff;
+}
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+}
+.btn-primary:hover, .btn-primary:focus {
+  background: var(--color-secondary);
+  color: #fff;
+}
+.pagination .page-link {
+  color: var(--color-primary);
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  transition: background 0.2s, color 0.2s;
+}
+.pagination .page-item.active .page-link {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+.pagination .page-link:hover {
+  background: var(--color-secondary);
+  color: #fff;
+}
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.95rem;
+  }
+  .img-thumbnail {
+    width: 48px !important;
+    height: 48px !important;
+  }
+  .table th, .table td {
+    padding: 0.5rem;
+  }
+} 
