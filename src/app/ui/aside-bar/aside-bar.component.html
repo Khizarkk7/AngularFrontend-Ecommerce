@@ -1,49 +1,50 @@
- <aside class="bg-sidebar text-white" [class.collapsed]="sidebarCollapsed()">
-    <div class="sidebar-sticky pt-3 px-2">
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link text-white" routerLink="/dashboard" routerLinkActive="active">
-            <i class="fas fa-tachometer-alt me-2"></i>
-            <span [class.d-none]="sidebarCollapsed()"> Dashboard</span>
+ 
+ 
+ <!-- admin-layout.component.html -->
+<div class="d-flex">
+  <!-- Sidebar -->
+  <aside class="bg-dark text-white p-3 vh-100" style="width: 250px;">
+    <!-- Insert your dynamic menu code here -->
+    <ul class="nav flex-column">
+      <li class="nav-item" *ngFor="let menu of structuredMenu">
+
+        <!-- Dropdown menu -->
+        <ng-container *ngIf="menu.children.length > 0; else simpleLink">
+          <a class="nav-link text-white dropdown-toggle"
+             (click)="menu.expanded = !menu.expanded"
+             [attr.aria-expanded]="menu.expanded">
+            <i class="{{ menu.icon }} me-2"></i>
+            <span [class.d-none]="sidebarCollapsed()">{{ menu.title }}</span>
           </a>
-        </li>
-        <hr class="bg-light my-2">
-        
-        <!-- Shop Dropdown -->
-        <li class="nav-item dropdown" [class.show]="isShopMenuOpen">
-          <a class="nav-link text-white dropdown-toggle" 
-             (click)="toggleShopMenu()"
-             aria-expanded="false">
-            <i class="fas fa-store me-2"></i>
-            <span [class.d-none]="sidebarCollapsed()">MyShop</span>
-          </a>
-          <ul class="dropdown-menu bg-sidebar text-white" [class.show]="isShopMenuOpen">
-            <li>
-              <a class="dropdown-item text-white" (click)="onShopInfoClick(); closeShopMenu()">
-                <i class="fas fa-info-circle me-2"></i> Shop Info
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item text-white" routerLink="" 
-                 (click)="closeShopMenu()" routerLinkActive="active">
-                <i class="fas fa-receipt me-2"></i> Create Shop
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item text-white" routerLink="/" 
-                 (click)="closeShopMenu()" routerLinkActive="active">
-                <i class="fas fa-users me-2"></i> Manage Staff
-              </a>
-            </li>
-            <li>
-              <a class="dropdown-item text-white" 
-                 (click)="closeShopMenu()" (click)="openInventoryInNewTab()" >
-                <i class="fas fa-boxes me-2" ></i> Inventory
+
+          <ul class="dropdown-menu bg-sidebar text-white" [class.show]="menu.expanded">
+            <li *ngFor="let child of menu.children">
+              <a class="dropdown-item text-white"
+                 [routerLink]="child.route"
+                 routerLinkActive="active"
+                 (click)="menu.expanded = false">
+                <i class="{{ child.icon }} me-2"></i> {{ child.title }}
               </a>
             </li>
           </ul>
-        </li>
-        <hr class="bg-light my-2">
-      </ul>
-    </div>
+        </ng-container>
+
+        <!-- Simple link -->
+        <ng-template #simpleLink>
+          <a class="nav-link text-white"
+             [routerLink]="menu.route"
+             routerLinkActive="active">
+            <i class="{{ menu.icon }} me-2"></i>
+            <span [class.d-none]="sidebarCollapsed()">{{ menu.title }}</span>
+          </a>
+        </ng-template>
+
+      </li>
+    </ul>
   </aside>
+
+  <!-- Main Content -->
+  <!-- <main class="flex-grow-1 p-4">
+    <router-outlet></router-outlet>
+  </main>  -->
+</div>

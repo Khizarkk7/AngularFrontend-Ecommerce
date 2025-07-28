@@ -25,6 +25,12 @@ export class AuthService {
     return this.http.post(this.baseURL + '/Login/login', formData);
   }
 
+  getRoleId(): number | null {
+  const payload = this.getDecodedToken();
+  return payload?.roleId ? parseInt(payload.roleId) : null;
+}
+
+
   // Updated login check (checks both storage locations)
   isLogedIn(): boolean {
     return !!(localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY));
