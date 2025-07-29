@@ -28,20 +28,8 @@ export const routes: Routes = [
     path: 'app-admin',
     component: AdminPortalComponent,
     canActivate: [authGuard],
-    data: { roles: ['systemAdmin'] }  // only SystemAdmin can access
+    data: { roles: ['systemAdmin','shopAdmin'] }  // only SystemAdmin can access
   },
-  // {
-  //   path: 'shop/:shopName/:shopId',
-  //   component: ShopComponent,
-  //   canActivate: [authGuard],
-  //   data: { roles: ['shopAdmin'] },
-  //   children: [
-  //     {
-  //       path: 'inventory', 
-  //       component: InventoryComponent
-  //     }
-  //   ]
-  // },
   {
     path: 'shop/:shopName/:shopId',
     component: ShopComponent,

@@ -9,5 +9,6 @@ export class MenuService {
 
   getMenusByRole(roleId: number) {
     return this.http.get<any[]>(`${this.baseUrl}/GetMenusByRole/${roleId}`);
+    
   }
 }

@@ -14,25 +14,25 @@ export const shopGuard: CanActivateFn = (route, state) => {
   console.log('Token Data:', tokenData);
   console.log('Requested Shop ID:', requestedShopId);
 
-  if (!tokenData?.shopId) {
-    return router.createUrlTree(['/unauthorized'], {
-      queryParams: { 
-        reason: 'no_shop_association',
-        returnUrl: state.url
-      }
-    });
-  }
+  // if (!tokenData?.shopId) {
+  //   return router.createUrlTree(['/unauthorized'], {
+  //     queryParams: { 
+  //       reason: 'no_shop_association',
+  //       returnUrl: state.url
+  //     }
+  //   });
+  // }
 
-  if (requestedShopId !== tokenData.shopId.toString()) {
-    return router.createUrlTree(['/unauthorized'], {
-      queryParams: { 
-        reason: 'shop_mismatch',
-        attemptedShopId: requestedShopId,
-        userShopId: tokenData.shopId,
-        returnUrl: state.url
-      }
-    });
-  }
+  // if (requestedShopId !== tokenData.shopId.toString()) {
+  //   return router.createUrlTree(['/unauthorized'], {
+  //     queryParams: { 
+  //       reason: 'shop_mismatch',
+  //       attemptedShopId: requestedShopId,
+  //       userShopId: tokenData.shopId,
+  //       returnUrl: state.url
+  //     }
+  //   });
+  // }
 
   return true;
 };

@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { RouterLink } from '@angular/router';
 import { __values } from 'tslib';
 import { AuthService } from '../../shared/services/auth.service';
-
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
@@ -84,13 +83,14 @@ export class LoginComponent implements OnInit {
             showConfirmButton: false
           });
 
-          if (res.role?.toLowerCase() === 'shopadmin') {
+          if (res.role?.toLowerCase() === 'shopadmin'|| 'systemadmin') {
             const shopId = res.shopId;
             const shopNameSlug = res.shopName?.replace(/\s+/g, '-').toLowerCase() || 'shop';
             // Store for future use (guard redirects)
             localStorage.setItem('shopId', shopId);
             localStorage.setItem('shopName', res.shopName || 'shop');
-            this.router.navigate([`/shop/${shopNameSlug}/${shopId}`]);
+            //this.router.navigate([`/shop/${shopNameSlug}/${shopId}`]);
+            this.router.navigateByUrl('/app-admin');
           } else {
             this.router.navigateByUrl('/app-admin');
           }

@@ -18,7 +18,7 @@ export class AsideBarComponent {
   isHomeMenuOpen = false;
 
   menuItems: any[] = [];
-  structuredMenu: any[] = []; // ✅ Add this property
+  structuredMenu: any[] = []; 
 
   @Output() shopInfoClick = new EventEmitter<void>();
 
@@ -30,83 +30,94 @@ export class AsideBarComponent {
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
-  ngOnInit(): void {
-    const roleId = this.authService.getRoleId();
+ ngOnInit(): void {
+  const roleId = this.authService.getRoleId();
 
-    if (roleId) {
-      this.menuService.getMenusByRole(roleId).subscribe({
-        next: (data) => {
-          this.menuItems = data;
-          this.structuredMenu = this.buildMenuTree(this.menuItems); // ✅ Now assign structured tree
-        },
-        error: (err) => {
-          console.error('Error loading menus:', err);
-        }
-      });
-    } else {
-      console.warn('No roleId found in token.');
-    }
-  }
+  if (roleId) {
+    this.menuService.getMenusByRole(roleId).subscribe({
+      next: (data) => {
+        this.menuItems = data;
+        this.structuredMenu = this.buildMenuTree(this.menuItems);
 
-  buildMenuTree(menuList: any[]): any[] {
-    const map = new Map<number, any>();
-    const roots: any[] = [];
-
-    menuList.forEach(menu => {
-      menu.children = [];
-      map.set(menu.id, menu);
-    });
-
-    menuList.forEach(menu => {
-      if (menu.parentId) {
-        const parent = map.get(menu.parentId);
-        if (parent) parent.children.push(menu);
-      } else {
-        roots.push(menu);
+        // Initialize expanded state
+        this.structuredMenu.forEach(menu => {
+          menu.expanded = false;
+        });
+      },
+      error: (err) => {
+        console.error('Error loading menus:', err);
       }
     });
+  } else {
+    console.warn('No roleId found in token.');
+  }
+}
 
-    return roots;
+
+ buildMenuTree(menuList: any[]): any[] {
+  const map = new Map<number, any>();
+  const roots: any[] = [];
+
+  menuList.forEach(menu => {
+    menu.children = [];
+    map.set(menu.id, menu);
+  });
+
+  menuList.forEach(menu => {
+    menu.expanded = false; // Add this line here too
+    if (menu.parentId) {
+      const parent = map.get(menu.parentId);
+      if (parent) parent.children.push(menu);
+    } else {
+      roots.push(menu);
+    }
+  });
+
+  return roots;
+}
+
+  toggleMenu(menu: any) {
+    menu.expanded = !menu.expanded;
   }
 
   toggleSidebar() {
     this.sidebarCollapsed.update(prev => !prev);
   }
 
-  toggleProfile() {
-    this.isProfileOpen.update(prev => !prev);
-  }
+  // toggleProfile() {
+  //   this.isProfileOpen.update(prev => !prev);
+  // }
 
-  toggleShopMenu() {
-    this.isShopMenuOpen = !this.isShopMenuOpen;
-  }
+  // toggleShopMenu() {
+  //   this.isShopMenuOpen = !this.isShopMenuOpen;
+  // }
 
-  closeShopMenu() {
-    this.isShopMenuOpen = false;
-  }
+  // closeShopMenu() {
+  //   this.isShopMenuOpen = false;
+  // }
 
-  toggleHomeMenu() {
-    this.isHomeMenuOpen = !this.isHomeMenuOpen;
-  }
+  // toggleHomeMenu() {
+  //   this.isHomeMenuOpen = !this.isHomeMenuOpen;
+  // }
 
-  closeHomeMenu() {
-    this.isHomeMenuOpen = false;
-  }
+  // closeHomeMenu() {
+  //   this.isHomeMenuOpen = false;
+  // }
 
-  onShopInfoClick() {
-    this.shopInfoClick.emit();
-  }
+  // onShopInfoClick() {
+  //   this.shopInfoClick.emit();
+  // }
 
-  openInventoryInNewTab() {
-    if (!isPlatformBrowser(this.platformId)) return;
+  // openInventoryInNewTab() {
+  //   if (!isPlatformBrowser(this.platformId)) return;
 
-    const urlTree = this.router.createUrlTree(['inventory'], {
-      relativeTo: this.route
-    });
+  //   const urlTree = this.router.createUrlTree(['inventory'], {
+  //     relativeTo: this.route
+  //   });
 
-    const url = this.router.serializeUrl(urlTree);
-    const fullUrl = window.location.origin + url;
+  //   const url = this.router.serializeUrl(urlTree);
+  //   const fullUrl = window.location.origin + url;
 
-    window.open(fullUrl, '_blank', 'noopener,noreferrer');
-  }
+  //   window.open(fullUrl, '_blank', 'noopener,noreferrer');
+  // }
 }

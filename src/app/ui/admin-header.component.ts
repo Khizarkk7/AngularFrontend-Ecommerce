@@ -9,6 +9,11 @@ import { Component, EventEmitter, Output } from '@angular/core';
 export class AdminHeaderComponent {
   @Output() logout = new EventEmitter<void>();
   @Output() createShop = new EventEmitter<void>();
+  @Output() toggleSidebar = new EventEmitter<void>();
+
+  onToggleSidebar() {
+    this.toggleSidebar.emit();
+  }
 
   onLogout() {
     this.logout.emit();

@@ -88,16 +88,25 @@ getDecodedToken(): any {
         .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
         .join('')
     );
-    return JSON.parse(payloadJson);
+    const decoded = JSON.parse(payloadJson);
+    //console.log('Decoded JWT Token:', decoded); 
+    return decoded;
   } catch (e) {
     console.error('Error decoding token:', e);
     return null;
   }
 }
 
+
 getCurrentShopId(): number | null {
   const payload = this.getDecodedToken();
   return payload?.shopId ? parseInt(payload.shopId) : null;
 }
+
+getUserName(): string | null {
+  const payload = this.getDecodedToken();
+  return payload?.name || null;
+}
+
 
 }
