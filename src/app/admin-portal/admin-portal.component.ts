@@ -2,12 +2,12 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Router, RouterModule, RouterLink, RouterOutlet } from '@angular/router';
-import { AuthService } from '../shared/services/auth.service';
-import { ShopService } from '../shared/services/shops.service';
+import { AuthService } from '../core/services/auth.service';
+import { ShopService } from '../core/services/shops.service';
 import Swal from 'sweetalert2';
-import { AsideBarComponent } from '../ui/aside-bar/aside-bar.component';
-import { AllShopsTableComponent } from '../ui/all-shops-table.component';
-import { AdminHeaderComponent } from '../ui/admin-header.component';
+import { AsideBarComponent } from '../shared/ui/aside-bar/aside-bar.component';
+import { AllShopsTableComponent } from '../shared/ui/all-shops/all-shops-table.component';
+import { AdminHeaderComponent } from '../shared/ui/admin-header/admin-header.component';
 
 
 declare var bootstrap: any; // For Bootstrap Modal
