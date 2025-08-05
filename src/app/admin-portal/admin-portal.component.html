@@ -7,7 +7,7 @@
     
   ></app-admin-header>
     <div class="d-flex flex-grow-1">
-    <!-- Sidebar -->
+    
     <app-aside-bar (shopInfoClick)="showShopTable = true"></app-aside-bar>
 <div id="layoutSidenav_content">
     <main>
@@ -18,7 +18,7 @@
                 </div>
                 <hr>
                 <!-- Shops Grid -->
-                <app-all-shops-table
+                <!-- <app-all-shops-table
                     *ngIf="showShopTable"
                     [shops]="shops"
                     [isEditMode]="isEditMode"
@@ -30,12 +30,12 @@
                     (deleteShop)="confirmDelete($event)"
                     (fileChange)="onFileChange($event)"
                     (submitShop)="onSubmit()"
-                ></app-all-shops-table>
+                ></app-all-shops-table> -->
             </div>
         </main>
         </div>
 
-    <!-- Shop Form Modal -->
+    <!-- Shop Form Modal
     <div class="modal fade" id="shopModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -76,10 +76,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <!-- <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -96,4 +96,4 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->

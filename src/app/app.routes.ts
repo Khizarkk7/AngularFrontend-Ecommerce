@@ -8,6 +8,8 @@ import { authGuard } from './core/guards/auth.guard';
 //import { ShopComponent } from './shop-portal/shop.component';
 import { UnauthorizedComponent } from './core/unauthorized/unauthorized.component';
 import { InventoryComponent } from './shared/inventory/inventory.component';
+import { AddUserComponent } from './admin-portal/users/add-user/add-user.component';
+import { ShowAllUsersComponent } from './admin-portal/users/show-all-users/show-all-users.component';
 
 
 
@@ -44,6 +46,8 @@ export const routes: Routes = [
   // },
   { path: 'inventory', component: InventoryComponent },
   { path: 'unauthorized', component: UnauthorizedComponent },
+  { path: 'users/add', component: AddUserComponent },
+  { path: 'users/edit', component: ShowAllUsersComponent },
 
 
 ];
