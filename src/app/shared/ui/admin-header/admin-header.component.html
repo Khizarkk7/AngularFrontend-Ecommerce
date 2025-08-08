@@ -10,7 +10,10 @@
     </a>
     <!-- Right Controls -->
     <div class="ms-auto d-flex align-items-center">
-      <button class="btn btn-light text-primary me-3" (click)="onCreateShop()">
+      <button 
+       *ngIf="userRole === 'systemadmin'"
+        class="btn btn-light text-primary me-3" 
+        (click)="onCreateShop()">
         <i class="fas fa-plus me-2"></i>Create Shop
       </button>
       <!-- Profile Dropdown -->

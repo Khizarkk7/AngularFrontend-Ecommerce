@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, Input,Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
 import { Router, RouterModule, RouterLink, RouterOutlet } from '@angular/router';
@@ -36,14 +36,22 @@ export class AdminPortalComponent implements OnInit {
   logoPreview: string | ArrayBuffer | null = null;
   logoFile: File | null = null;
   showShopTable = false;
-
+  userRole: string = '';
+  
 
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private authService: AuthService,
     private shopService: ShopService
-  ) { }
+  ) { 
+    const token = localStorage.getItem('token');
+    if (token) {
+      const payload =  JSON.parse(atob(token.split('.')[1]));
+       this.userRole = payload.role; // Adjust 'role' if your payload uses a different key
+    }
+    // Check user role from token or service
+  }
 
   userName: string = '';
 
