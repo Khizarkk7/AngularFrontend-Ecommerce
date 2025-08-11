@@ -16,7 +16,7 @@
           <ul class="nav flex-column ps-3" *ngIf="menu.expanded">
             <li *ngFor="let child of menu.children">
               <a class="nav-link text-white"
-                 [routerLink]="child.route"
+                 [routerLink]="'/app-admin/'+ child.route"
                  routerLinkActive="active">
                 <i class="{{ child.icon }} me-2"></i> {{ child.title }}
               </a>
@@ -36,4 +36,6 @@
       </li>
     </ul>
   </aside>
+
+  
 

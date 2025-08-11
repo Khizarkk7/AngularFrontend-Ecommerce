@@ -65,7 +65,7 @@ export class RegistrationComponent implements OnInit {
         this.roles = res;
         this.isLoading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         this.isLoading = false;
 
         Swal.fire({

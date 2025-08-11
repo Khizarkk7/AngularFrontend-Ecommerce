@@ -1,0 +1,11 @@
+.table th, .table td {
+  vertical-align: middle;
+}
+
+.btn {
+  min-width: 70px;
+}
+
+.pagination .page-link {
+  cursor: pointer;
+}

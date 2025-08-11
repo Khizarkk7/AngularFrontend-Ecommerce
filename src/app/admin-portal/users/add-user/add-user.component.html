@@ -1,1 +1,63 @@
-<p>add-user works!</p>
+<div class="add-user-card">
+  <h2>Add New User</h2>
+
+  <form [formGroup]="addUserForm" (ngSubmit)="onSubmit()">
+    <!-- Username -->
+    <div class="form-group">
+      <label>Username</label>
+      <input formControlName="username" type="text" placeholder="Enter username">
+      <small *ngIf="addUserForm.get('username')?.touched && addUserForm.get('username')?.invalid" class="error">
+        Username is required (min 3 characters).
+      </small>
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+      <label>Email</label>
+      <input formControlName="email" type="email" placeholder="Enter email">
+      <small *ngIf="addUserForm.get('email')?.touched && addUserForm.get('email')?.invalid" class="error">
+        Valid email is required.
+      </small>
+    </div>
+
+    <!-- Password -->
+    <div class="form-group">
+      <label>Password</label>
+      <input formControlName="password" type="password" placeholder="Enter password">
+      <small *ngIf="addUserForm.get('password')?.touched && addUserForm.get('password')?.invalid" class="error">
+        Password is required (min 6 characters).
+      </small>
+    </div>
+
+    <!-- Role -->
+    <div class="form-group">
+      <label>Role</label>
+      <select formControlName="role">
+        <option value="" disabled>Select role</option>
+        <option *ngIf="isLoadingRoles" disabled>Loading roles...</option>
+        <option *ngFor="let role of roles" [value]="role.name">{{ role.name }}</option>
+      </select>
+    </div>
+
+    <!-- Shop -->
+    <div class="form-group">
+      <label>Shop</label>
+      <select formControlName="shopId">
+        <option value="" disabled>Select shop</option>
+        <option *ngIf="isLoadingShops" disabled>Loading shops...</option>
+        <option *ngFor="let shop of shops" [value]="shop.id">{{ shop.name }}</option>
+      </select>
+    </div>
+
+    <!-- Buttons -->
+    <div class="button-group">
+      <button type="submit" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Saving...' : 'Add User' }}
+      </button>
+    </div>
+  </form>
+
+  <!-- Messages -->
+  <div *ngIf="successMessage" class="alert success">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="alert error">{{ errorMessage }}</div>
+</div>

@@ -64,7 +64,7 @@ export class AsideBarComponent {
   });
 
   menuList.forEach(menu => {
-    menu.expanded = false; // Add this line here too
+    menu.expanded = false; 
     if (menu.parentId) {
       const parent = map.get(menu.parentId);
       if (parent) parent.children.push(menu);

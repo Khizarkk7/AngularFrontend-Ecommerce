@@ -9,6 +9,7 @@ import { UnauthorizedComponent } from './core/unauthorized/unauthorized.componen
 import { InventoryComponent } from './shared/inventory/inventory.component';
 import { AddUserComponent } from './admin-portal/users/add-user/add-user.component';
 import { ShowAllUsersComponent } from './admin-portal/users/show-all-users/show-all-users.component';
+import { DashboardComponent } from './admin-portal/dashboard/dashboard.component';
 
 export const routes: Routes = [
   {
@@ -27,10 +28,15 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { roles: ['systemAdmin', 'shopAdmin'] },
     children: [
-      { path: 'inventory', component: InventoryComponent },
+        
+      { path: '', redirectTo: 'dashboard',pathMatch: 'full' },
+      { path: 'dashboard', component: DashboardComponent },
       { path: 'users/add', component: AddUserComponent },
-      { path: 'users/edit', component: ShowAllUsersComponent }
-      // add more menu items here
+      { path: 'users/edit', component: ShowAllUsersComponent },
+      { path: 'inventory', component: InventoryComponent },
+      {path:  'users/all', component: ShowAllUsersComponent },
+
+      
     ]
   },
 

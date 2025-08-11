@@ -1,0 +1,29 @@
+.welcome-container {
+  display: flex;
+  justify-content: center; /* horizontally center */
+  align-items: flex-start; /* align to top */
+  height: 100%; /* full height of parent container */
+  padding-top: 3rem; /* gap from top */
+  background: var(--color-bg-light);
+}
+
+.welcome-card {
+  text-align: center;
+  background: white;
+  padding: 2rem 3rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+  max-width: 500px;
+  width: 100%;
+}
+
+.welcome-card h1 {
+  color: var(--color-primary);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.role-text {
+  color: var(--color-text-secondary);
+  font-size: 1.1rem;
+}

@@ -58,12 +58,7 @@ export class AdminPortalComponent implements OnInit {
   ngOnInit(): void {
     this.loadShops();
     this.initForm();
-    //h1 heading binding name
-    const decoded = this.authService.getDecodedToken();
-    if (decoded) {
-      this.userName = decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'];
-    }
-    console.log(this.userName)
+
   }
 
   loadShops() {
