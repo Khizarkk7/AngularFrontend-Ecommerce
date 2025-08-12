@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
+import Swal from 'sweetalert2';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-add-user',
@@ -18,10 +20,15 @@ export class AddUserComponent implements OnInit {
 
   roles: any[] = [];
   shops: any[] = [];
-  isLoadingRoles = true;
-  isLoadingShops = true;
+  isSubmitted: boolean = false;
 
-  constructor(private fb: FormBuilder, private http: HttpClient) {}
+  isLoading: boolean = false;
+
+  private apiUrl = 'https://localhost:7058/api';
+
+  constructor(private fb: FormBuilder, private http: HttpClient,
+               private service: AuthService,
+             ) { }
 
   ngOnInit(): void {
     this.addUserForm = this.fb.group({
@@ -32,34 +39,53 @@ export class AddUserComponent implements OnInit {
       shopId: ['', Validators.required]
     });
 
-    this.loadRoles();
-    this.loadShops();
+    this.loadDropdownData();
   }
 
-  loadRoles() {
-    this.http.get<any[]>('https://your-api-url.com/GetRoles').subscribe({
-      next: (data) => {
-        this.roles = data;
-        this.isLoadingRoles = false;
-      },
-      error: () => {
-        this.errorMessage = ' Failed to load roles.';
-        this.isLoadingRoles = false;
-      }
-    });
-  }
+  loadDropdownData() {
+    this.isLoading = true;
 
-  loadShops() {
-    this.http.get<any[]>('https://your-api-url.com/GetShops').subscribe({
-      next: (data) => {
-        this.shops = data;
-        this.isLoadingShops = false;
+    this.service.getRoles().subscribe({
+      next: (res: any) => {
+        this.roles = res;
+        this.isLoading = false;
+        console.log('Roles loaded:', this.roles);
       },
-      error: () => {
-        this.errorMessage = ' Failed to load shops.';
-        this.isLoadingShops = false;
+      error: (err: any) => {
+        this.isLoading = false;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to load roles. Please try again later.',
+          toast: true,
+          position: 'top-end',
+          timer: 3000,
+          showConfirmButton: false
+        });
       }
     });
+
+    // Fetch shops from your service
+    this.service.getShops().subscribe({
+      next: (res: any) => {
+        this.shops = res;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to load shops. Please try again later.',
+          toast: true,
+          position: 'top-end',
+          timer: 3000,
+          showConfirmButton: false
+        });
+        this.isLoading = false;
+      }
+    });
+
   }
 
   onSubmit() {

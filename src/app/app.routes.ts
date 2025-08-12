@@ -10,6 +10,8 @@ import { InventoryComponent } from './shared/inventory/inventory.component';
 import { AddUserComponent } from './admin-portal/users/add-user/add-user.component';
 import { ShowAllUsersComponent } from './admin-portal/users/show-all-users/show-all-users.component';
 import { DashboardComponent } from './admin-portal/dashboard/dashboard.component';
+import { AddShopComponent } from './admin-portal/shops/add-shop/add-shop.component';
+import { AllShopsComponent } from './admin-portal/shops/all-shops/all-shops.component';
 
 export const routes: Routes = [
   {
@@ -34,7 +36,9 @@ export const routes: Routes = [
       { path: 'users/add', component: AddUserComponent },
       { path: 'users/edit', component: ShowAllUsersComponent },
       { path: 'inventory', component: InventoryComponent },
-      {path:  'users/all', component: ShowAllUsersComponent },
+      { path: 'users/all', component: ShowAllUsersComponent },
+      { path: 'shops/add', component: AddShopComponent },
+      { path: 'shops/view', component: AllShopsComponent },
 
       
     ]

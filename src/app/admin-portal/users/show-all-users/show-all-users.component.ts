@@ -22,6 +22,8 @@ export class ShowAllUsersComponent implements OnInit {
   pageSize = 10;
   totalPages = 0;
 
+  private apiUrl = 'https://localhost:7058/api'
+   
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
@@ -30,7 +32,7 @@ export class ShowAllUsersComponent implements OnInit {
 
   loadUsers() {
     this.loading = true;
-    this.http.get<any[]>('https://localhost:7058/api/user')
+    this.http.get<any[]>(`${this.apiUrl}/user`)
       .subscribe({
         next: (data) => {
           this.users = data;
@@ -62,10 +64,7 @@ export class ShowAllUsersComponent implements OnInit {
   editUser(user: any) {
     Swal.fire({
       title: 'Edit User',
-      html: `
-        <input id="username" class="swal2-input" placeholder="Username" value="${user.username}">
-        <input id="email" class="swal2-input" placeholder="Email" value="${user.email}">
-      `,
+      html: ` `,
       focusConfirm: false,
       showCancelButton: true,
       confirmButtonText: 'Save Changes',
