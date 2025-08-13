@@ -224,14 +224,7 @@ export class AdminPortalComponent implements OnInit {
     modal.show();
   }
 
-  deleteShop() {
-    if (this.selectedShopId) {
-      this.shopService.deleteShop(this.selectedShopId).subscribe(() => {
-        this.loadShops();
-        bootstrap.Modal.getInstance(document.getElementById('deleteModal')!)?.hide();
-      });
-    }
-  }
+
 
   // onLogout() {
   //   this.authService.deleteToken();

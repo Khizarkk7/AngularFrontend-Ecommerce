@@ -1,9 +1,53 @@
+<div class="container py-4">
+  <div class="card shadow-lg border-0">
+    <div class="card-header create-shop-header text-white">
+      <h4 class="mb-0">Create New Shop</h4>
+    </div>
+    <div class="card-body">
+      <form [formGroup]="shopForm" (ngSubmit)="onSubmit()">
 
+        <!-- Shop Name -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">
+            Shop Name <span class="text-accent">*</span>
+          </label>
+          <input type="text" formControlName="shopName" class="form-control"
+                 [class.is-invalid]="shopForm.get('shopName')?.invalid && shopForm.get('shopName')?.touched">
+          <div class="invalid-feedback">Shop name is required and must be at least 3 characters.</div>
+        </div>
 
-<div class="container">
-  <button class="cool-btn" >
-    <span class="btn-text">Check Lahore Status</span>
-    <span class="btn-icon">🚨</span>
-  </button>
+        <!-- Description -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Description</label>
+          <textarea formControlName="description" rows="3" class="form-control"></textarea>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">
+            Contact Info <span class="text-accent">*</span>
+          </label>
+          <input type="text" formControlName="contactInfo" class="form-control"
+                 [class.is-invalid]="shopForm.get('contactInfo')?.invalid && shopForm.get('contactInfo')?.touched">
+          <div class="invalid-feedback">Contact info is required.</div>
+        </div>
+
+        <!-- Logo Upload -->
+        <div class="mb-3">
+          <label class="form-label fw-semibold">
+            Shop Logo <span class="text-accent">*</span>
+          </label>
+          <input type="file" class="form-control" (change)="onFileSelected($event)" accept="image/*">
+          <small class="text-secondary">Accepted formats: jpg, png, gif</small>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="d-grid">
+          <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
+            <i class="fas fa-save me-2"></i> Create Shop
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
-

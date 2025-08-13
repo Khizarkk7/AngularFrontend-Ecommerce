@@ -1,81 +1,28 @@
-.add-user-card {
-  background: var(--color-bg-light);
-  padding: 2rem;
-  border-radius: 12px;
-  max-width: 500px;
-  margin: 0 auto;
-  box-shadow: 0px 4px 20px rgba(0,0,0,0.08);
+.card {
+  background-color: #ffffff;
 }
 
-.add-user-card h2 {
-  color: var(--color-primary);
-  margin-bottom: 1.5rem;
-  text-align: center;
+.card-header {
+  background-color: #6C63FF !important; /* Primary from your palette */
 }
 
-.form-group {
-  margin-bottom: 1rem;
+.btn-primary {
+  background-color: #6C63FF;
+  border-color: #6C63FF;
 }
 
-label {
-  font-weight: 600;
-  display: block;
-  margin-bottom: 0.5rem;
-  color: var(--color-text-primary);
+.btn-primary:hover {
+  background-color: #574bdb;
+  border-color: #574bdb;
 }
 
-input, select {
-  width: 100%;
-  padding: 0.6rem 0.8rem;
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  outline: none;
-  font-size: 0.95rem;
+.form-control,
+.form-select {
+  border: 1px solid #ddd;
 }
 
-input:focus, select:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(108, 99, 255, 0.15);
-}
-
-.error {
-  color: var(--color-accent);
-  font-size: 0.8rem;
-}
-
-.button-group {
-  text-align: center;
-  margin-top: 1rem;
-}
-
-button {
-  background: var(--color-primary);
-  color: white;
-  padding: 0.7rem 1.2rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-button:hover {
-  background: var(--color-secondary);
-}
-
-.alert {
-  margin-top: 1rem;
-  padding: 0.7rem;
-  border-radius: 6px;
-  font-size: 0.9rem;
-}
-
-.alert.success {
-  background: var(--color-success);
-  color: white;
-}
-
-.alert.error {
-  background: var(--color-accent);
-  color: white;
+.form-control:focus,
+.form-select:focus {
+  border-color: #6C63FF;
+  box-shadow: 0 0 0 0.2rem rgba(108, 99, 255, 0.25);
 }

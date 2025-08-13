@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import Swal from 'sweetalert2';
 import { AuthService } from '../../../core/services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-add-user',
@@ -13,32 +14,42 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrls: ['./add-user.component.css']
 })
 export class AddUserComponent implements OnInit {
-  addUserForm!: FormGroup;
-  isSubmitting = false;
-  successMessage = '';
-  errorMessage = '';
-
+  form: FormGroup;
+  isSubmitted: boolean = false;
   roles: any[] = [];
   shops: any[] = [];
-  isSubmitted: boolean = false;
-
   isLoading: boolean = false;
 
-  private apiUrl = 'https://localhost:7058/api';
 
-  constructor(private fb: FormBuilder, private http: HttpClient,
-               private service: AuthService,
-             ) { }
+  constructor(
+    public formBuilder: FormBuilder,
+    private service: AuthService,
+    //private toastr: ToastrService,
+    private router: Router
+  ) {
+    this.form = this.formBuilder.group(
+      {
+        fullName: ['', [Validators.required, Validators.minLength(3)]],
+        email: [
+          '',
+          [Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@gmail\.com$/)],
+        ],
+        role: ['', Validators.required],
+        shop: ['', Validators.required],
+        password: [
+          '',
+          [Validators.required, Validators.maxLength(12), Validators.minLength(6), Validators.pattern(/(?=.*[^a-zA-Z0-9])/)],
+        ],
+        confirmPassword: ['', Validators.required],
+      },
+      { validators: this.passwordMatchValidator }
+    );
+  }
 
   ngOnInit(): void {
-    this.addUserForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      role: ['', Validators.required],
-      shopId: ['', Validators.required]
-    });
-
+    if (this.service.isLogedIn()) {
+      this.router.navigateByUrl('/users/add');
+    }
     this.loadDropdownData();
   }
 
@@ -49,7 +60,6 @@ export class AddUserComponent implements OnInit {
       next: (res: any) => {
         this.roles = res;
         this.isLoading = false;
-        console.log('Roles loaded:', this.roles);
       },
       error: (err: any) => {
         this.isLoading = false;
@@ -88,30 +98,89 @@ export class AddUserComponent implements OnInit {
 
   }
 
+
   onSubmit() {
-    if (this.addUserForm.invalid) {
-      this.addUserForm.markAllAsTouched();
-      return;
-    }
+    this.isSubmitted = true;
 
-    this.isSubmitting = true;
-    this.successMessage = '';
-    this.errorMessage = '';
+    if (this.form.valid) {
+      const payload = {
+        username: this.form.value.fullName,
+        email: this.form.value.email,
+        password: this.form.value.password,
+        roleId: this.form.value.role,
+        shopId: this.form.value.shop
+      };
+      // Show loading alert
+      Swal.fire({
+        title: 'Sending...',
+        text: 'Please wait while we are fetching your data.',
+        didOpen: () => {
+          Swal.showLoading();
+        },
+        allowOutsideClick: false,
+        showConfirmButton: false
+      });
 
-    this.http.post('https://your-api-url.com/AddUser', this.addUserForm.value).subscribe({
-      next: () => {
-        this.successMessage = ' User added successfully!';
-        this.isSubmitting = false;
-        this.addUserForm.reset();
-      },
-      error: (err) => {
-        if (err.status === 409) {
-          this.errorMessage = ' This email is already in use.';
-        } else {
-          this.errorMessage = ' Failed to add user. Please try again.';
+      this.service.createUser(payload).subscribe({
+        next: (res: any) => {
+          console.log('API Response:', res);
+
+          if (res.succeeded) {
+            this.form.reset();
+            this.isSubmitted = false;
+
+            Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: res.message,
+              timer: 2000,
+              showConfirmButton: false,
+              toast: true,
+              position: 'top-end'
+            });
+          } else {
+            console.log('API Error Response:', res);
+
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: res.message || 'An error occurred!',
+              toast: true,
+              position: 'top-end'
+            });
+
+            if (res.errors) {
+              res.errors.forEach((err: string) => {
+                console.error('Error:', err);
+              });
+            }
+          }
+        },
+
+        error: (err) => {
+          console.error('HTTP Error:', err);
+
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while connecting to the server. (Duplicate Entry)',
+            toast: true,
+            position: 'top-end'
+          });
         }
-        this.isSubmitting = false;
-      }
-    });
+      });
+    }
+  }
+
+
+  hasDisplayError(controlName: string): boolean {
+    const control = this.form.get(controlName);
+    return !!(control?.invalid && (this.isSubmitted || control?.touched || control?.dirty));
+  }
+
+  passwordMatchValidator(group: AbstractControl): { [key: string]: boolean } | null {
+    const password = group.get('password')?.value;
+    const confirmPassword = group.get('confirmPassword')?.value;
+    return password === confirmPassword ? null : { passwordMismatch: true };
   }
 }

@@ -8,23 +8,18 @@ import { Component,Input, EventEmitter, Output } from '@angular/core';
     CommonModule,NgIf
   ],
   templateUrl: './admin-header.component.html',
-  styleUrl: './admin-header.component.css'
+  styleUrls: ['./admin-header.component.css'] 
 })
 export class AdminHeaderComponent {
   @Input() userRole!: string; 
   @Output() logout = new EventEmitter<void>();
-  @Output() createShop = new EventEmitter<void>();
-  @Output() toggleSidebar = new EventEmitter<void>();
+  
 
   onToggleSidebar() {
-    this.toggleSidebar.emit();
+    
   }
 
   onLogout() {
     this.logout.emit();
-  }
-
-  onCreateShop() {
-    this.createShop.emit();
   }
 } 
