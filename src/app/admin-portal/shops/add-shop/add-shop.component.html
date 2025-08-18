@@ -1,53 +1,154 @@
-<div class="container py-4">
-  <div class="card shadow-lg border-0">
-    <div class="card-header create-shop-header text-white">
-      <h4 class="mb-0">Create New Shop</h4>
-    </div>
-    <div class="card-body">
-      <form [formGroup]="shopForm" (ngSubmit)="onSubmit()">
-
-        <!-- Shop Name -->
-        <div class="mb-3">
-          <label class="form-label fw-semibold">
-            Shop Name <span class="text-accent">*</span>
-          </label>
-          <input type="text" formControlName="shopName" class="form-control"
-                 [class.is-invalid]="shopForm.get('shopName')?.invalid && shopForm.get('shopName')?.touched">
-          <div class="invalid-feedback">Shop name is required and must be at least 3 characters.</div>
+<div class="container-fluid px-0 py-3">
+  <div class="row justify-content-center ">
+    <div class="col-12 px-0">
+      <div class="card shadow-lg border-0 rounded-0 rounded-bottom-4">
+        <div class="card-header  text-white rounded-top-0 d-flex align-items-center py-3">
+          <i class="fas fa-store me-2"></i>
+          <h5 class="mb-0">Create New Shop</h5>
         </div>
 
-        <!-- Description -->
-        <div class="mb-3">
-          <label class="form-label fw-semibold">Description</label>
-          <textarea formControlName="description" rows="3" class="form-control"></textarea>
-        </div>
+        <div class="card-body p-4 p-md-5">
+          <form [formGroup]="shopForm" (ngSubmit)="onSubmit()" novalidate class="row g-3">
+            
+            <!-- Shop Name -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Shop Name <span class="text-danger">*</span>
+              </label>
+              <input type="text"
+                     class="form-control rounded-pill px-3"
+                     formControlName="shopName"
+                     placeholder="Enter shop name"
+                     [ngClass]="{'is-invalid': shopForm.get('shopName')?.invalid && shopForm.get('shopName')?.touched}">
+              <div class="invalid-feedback" *ngIf="shopForm.get('shopName')?.invalid && shopForm.get('shopName')?.touched">
+                Shop name is required and must be at least 3 characters.
+              </div>
+            </div>
 
-        <!-- Contact Info -->
-        <div class="mb-3">
-          <label class="form-label fw-semibold">
-            Contact Info <span class="text-accent">*</span>
-          </label>
-          <input type="text" formControlName="contactInfo" class="form-control"
-                 [class.is-invalid]="shopForm.get('contactInfo')?.invalid && shopForm.get('contactInfo')?.touched">
-          <div class="invalid-feedback">Contact info is required.</div>
-        </div>
+            <!-- Contact Info -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Contact Info <span class="text-danger">*</span>
+              </label>
+              <input type="text"
+                     class="form-control rounded-pill px-3"
+                     formControlName="contactInfo"
+                     placeholder="Enter contact information"
+                     [ngClass]="{'is-invalid': shopForm.get('contactInfo')?.invalid && shopForm.get('contactInfo')?.touched}">
+              <div class="invalid-feedback" *ngIf="shopForm.get('contactInfo')?.invalid && shopForm.get('contactInfo')?.touched">
+                Contact info is required.
+              </div>
+            </div>
 
-        <!-- Logo Upload -->
-        <div class="mb-3">
-          <label class="form-label fw-semibold">
-            Shop Logo <span class="text-accent">*</span>
-          </label>
-          <input type="file" class="form-control" (change)="onFileSelected($event)" accept="image/*">
-          <small class="text-secondary">Accepted formats: jpg, png, gif</small>
-        </div>
+            <!-- Description -->
+            <div class="col-12">
+              <label class="form-label fw-semibold">Description</label>
+              <textarea rows="3"
+                        class="form-control rounded-3 px-3"
+                        formControlName="description"
+                        placeholder="Enter shop description"></textarea>
+            </div>
 
-        <!-- Submit Button -->
-        <div class="d-grid">
-          <button type="submit" class="btn btn-primary" [disabled]="isSubmitting">
-            <i class="fas fa-save me-2"></i> Create Shop
-          </button>
+            <!-- Logo Upload -->
+            <div class="col-12">
+              <label class="form-label fw-semibold">
+                Shop Logo <span class="text-danger">*</span>
+              </label>
+              <input type="file"
+                     class="form-control"
+                     (change)="onFileSelected($event)"
+                     accept="image/*"
+                     [ngClass]="{'is-invalid': !shopForm.get('logo')?.value}">
+              <small class="text-secondary mt-1 d-block">Accepted formats: jpg, png, gif</small>
+            </div>
+
+
+                        <!-- Shop Admin Section -->
+            <div class="col-12 mt-4">
+              <hr class="my-4">
+              <h6 class="mb-3 text-primary"><i class="fas fa-user-shield me-2"></i>Shop Admin Account</h6>
+            </div>
+
+            <!-- Admin Full Name -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Full Name <span class="text-danger">*</span>
+              </label>
+              <input type="text"
+                     class="form-control rounded-pill px-3"
+                     formControlName="adminFullName"
+                     placeholder="Enter admin's full name"
+                     [ngClass]="{'is-invalid': shopForm.get('')?.invalid && shopForm.get('')?.touched}">
+              <div class="invalid-feedback" *ngIf="shopForm.get('')?.invalid && shopForm.get('')?.touched">
+                Full name is required.
+              </div>
+            </div>
+
+            <!-- Admin Email -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Email <span class="text-danger">*</span>
+              </label>
+              <input type="email"
+                     class="form-control rounded-pill px-3"
+                     formControlName="adminEmail"
+                     placeholder="Enter admin's email"
+                     [ngClass]="{'is-invalid': shopForm.get('')?.invalid && shopForm.get('')?.touched}">
+              <div class="invalid-feedback" *ngIf="shopForm.get('')?.invalid && shopForm.get('')?.touched">
+                <div *ngIf="shopForm.get('')?.errors?.['required']">Email is required.</div>
+                <div *ngIf="shopForm.get('')?.errors?.['email']">Please enter a valid email.</div>
+              </div>
+            </div>
+
+            <!-- Admin Password -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Password <span class="text-danger">*</span>
+              </label>
+              <input type="password"
+                     class="form-control rounded-pill px-3"
+                     formControlName="adminPassword"
+                     placeholder="Enter password"
+                     [ngClass]="{'is-invalid': shopForm.get('')?.invalid && shopForm.get('')?.touched}">
+              <div class="invalid-feedback" *ngIf="shopForm.get('')?.invalid && shopForm.get('')?.touched">
+                <div *ngIf="shopForm.get('')?.errors?.['required']">Password is required.</div>
+                <div *ngIf="shopForm.get('')?.errors?.['minlength']">At least 8 characters required.</div>
+              </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Confirm Password <span class="text-danger">*</span>
+              </label>
+              <input type="password"
+                     class="form-control rounded-pill px-3"
+                     formControlName="adminConfirmPassword"
+                     placeholder="Confirm password"
+                     [ngClass]="{'is-invalid': (shopForm.get('')?.invalid && shopForm.get('')?.touched) || shopForm.errors?.['passwordMismatch']}">
+              <div class="invalid-feedback" *ngIf="(shopForm.get('')?.invalid && shopForm.get('')?.touched) || shopForm.errors?.['passwordMismatch']">
+                <div *ngIf="shopForm.get('')?.errors?.['required']">Please confirm your password.</div>
+                <div *ngIf="shopForm.errors?.['']">Passwords do not match.</div>
+              </div>
+            </div>
+
+
+
+
+            <!-- Submit Button -->
+            <div class="col-12 mt-4">
+              <div class="d-flex justify-content-end ">
+                <button type="submit"
+                        class="btn px-4 btn-primary rounded-pill"
+                        >
+                  <i class="fas fa-save me-1"></i>
+                  {{ isSubmitting ? 'Creating...' : 'Create Shop' }}
+                </button>
+              </div>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 </div>

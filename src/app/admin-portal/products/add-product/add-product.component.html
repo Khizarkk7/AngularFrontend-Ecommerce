@@ -1,0 +1,111 @@
+<div class="container-fluid px-0 py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 px-0">
+      <div class="card shadow-lg border-0 rounded-0 rounded-bottom-4">
+        <div class="card-header bg-primary text-white rounded-top-0 d-flex align-items-center py-3">
+          <i class="fas fa-cube me-2"></i>
+          <h5 class="mb-0">Add New Product</h5>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+          <form [formGroup]="productForm" (ngSubmit)="onSubmit()" novalidate class="row g-3">
+            
+            <!-- Product Information Section -->
+            <div class="col-12">
+              <h6 class="mb-3 text-primary"><i class="fas fa-info-circle me-2"></i>Product Information</h6>
+            </div>
+            
+            <!-- Product Name -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Product Name <span class="text-danger">*</span>
+              </label>
+              <input type="text"
+                     class="form-control rounded-pill px-3"
+                     formControlName="productName"
+                     placeholder="Enter product name"
+                     [ngClass]="{'is-invalid': productForm.get('productName')?.invalid && productForm.get('productName')?.touched}">
+              <div class="invalid-feedback" *ngIf="productForm.get('productName')?.invalid && productForm.get('productName')?.touched">
+                Product name is required and must be at least 3 characters.
+              </div>
+            </div>
+
+            <!-- Price -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Price <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <span class="input-group-text rounded-start-pill">$</span>
+                <input type="number"
+                       class="form-control rounded-end-pill"
+                       formControlName="price"
+                       placeholder="0.00"
+                       step="0.01"
+                       min="0"
+                       [ngClass]="{'is-invalid': productForm.get('price')?.invalid && productForm.get('price')?.touched}">
+              </div>
+              <div class="invalid-feedback" *ngIf="productForm.get('price')?.invalid && productForm.get('price')?.touched">
+                <div *ngIf="productForm.get('price')?.errors?.['required']">Price is required.</div>
+                <div *ngIf="productForm.get('price')?.errors?.['min']">Price must be positive.</div>
+              </div>
+            </div>
+
+            <!-- Stock Quantity -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Stock Quantity <span class="text-danger">*</span>
+              </label>
+              <input type="number"
+                     class="form-control rounded-pill px-3"
+                     formControlName="stockQuantity"
+                     placeholder="Enter available quantity"
+                     min="0"
+                     [ngClass]="{'is-invalid': productForm.get('stockQuantity')?.invalid && productForm.get('stockQuantity')?.touched}">
+              <div class="invalid-feedback" *ngIf="productForm.get('stockQuantity')?.invalid && productForm.get('stockQuantity')?.touched">
+                <div *ngIf="productForm.get('stockQuantity')?.errors?.['required']">Stock quantity is required.</div>
+                <div *ngIf="productForm.get('stockQuantity')?.errors?.['min']">Quantity cannot be negative.</div>
+              </div>
+            </div>
+
+            <!-- Product Image -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Product Image <span class="text-danger">*</span>
+              </label>
+              <input type="file"
+                     class="form-control"
+                     (change)="onImageSelected($event)"
+                     accept="image/*"
+                     [ngClass]="{'is-invalid': !productForm.get('imageUrl')?.value}">
+              <small class="text-secondary mt-1 d-block">Accepted formats: jpg, png (Max 5MB)</small>
+            </div>
+
+            <!-- Description -->
+            <div class="col-12">
+              <label class="form-label fw-semibold">Description</label>
+              <textarea rows="3"
+                        class="form-control rounded-3 px-3"
+                        formControlName="description"
+                        placeholder="Enter product description"></textarea>
+            </div>
+
+            <!-- Shop ID (hidden, populated from token) -->
+            <input type="hidden" formControlName="shopId">
+
+            <!-- Submit Button -->
+            <div class="col-12 mt-4">
+              <div class="d-flex justify-content-end">
+                <button type="submit"
+                        class="btn btn-primary px-4 rounded-pill">
+                  <i class="fas fa-save me-1"></i>
+                  {{ isSubmitting ? 'Saving...' : 'Add Product' }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

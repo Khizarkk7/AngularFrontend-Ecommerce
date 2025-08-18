@@ -21,7 +21,6 @@ export class AddShopComponent implements OnInit {
   constructor(private fb: FormBuilder,
               private http: HttpClient,
               private authService: AuthService,
-              
               ) {}
 
   ngOnInit(): void {

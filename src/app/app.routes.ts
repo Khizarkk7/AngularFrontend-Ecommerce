@@ -12,6 +12,9 @@ import { ShowAllUsersComponent } from './admin-portal/users/show-all-users/show-
 import { DashboardComponent } from './admin-portal/dashboard/dashboard.component';
 import { AddShopComponent } from './admin-portal/shops/add-shop/add-shop.component';
 import { AllShopsComponent } from './admin-portal/shops/all-shops/all-shops.component';
+import { ViewStockComponent } from './admin-portal/stocks/view-stock/view-stock.component';
+import { AddStockComponent } from './admin-portal/stocks/add-stock/add-stock.component';
+import { AddProductComponent } from './admin-portal/products/add-product/add-product.component';
 
 export const routes: Routes = [
   {
@@ -34,11 +37,15 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard',pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'users/add', component: AddUserComponent },
-      { path: 'users/edit', component: ShowAllUsersComponent },
+      //{ path: 'users/edit', component: EditUserComponent },
       { path: 'inventory', component: InventoryComponent },
       { path: 'users/all', component: ShowAllUsersComponent },
       { path: 'shops/add', component: AddShopComponent },
       { path: 'shops/view', component: AllShopsComponent },
+      { path: 'stock/view', component: ViewStockComponent },
+      { path: 'stock/add', component: AddStockComponent },
+      { path: 'products/add', component: AddProductComponent },
+
 
       
     ]

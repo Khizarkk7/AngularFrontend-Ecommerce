@@ -1,7 +1,7 @@
 .create-shop-header {
   background: var(--color-primary);
   border-radius: 1rem 1rem 0 0;
-  color: var(--color-bg-light); /* force white text */
+  color: var(--color-bg-light); 
 }
 
 .text-accent {
@@ -10,4 +10,32 @@
 
 .invalid-feedback {
   font-size: 0.85rem;
+}
+.card {
+  background-color: #ffffff;
+}
+
+.card-header {
+  background-color: #6C63FF !important; /* Primary from your palette */
+}
+
+.btn-primary {
+  background-color: #6C63FF;
+  border-color: #6C63FF;
+}
+
+.btn-primary:hover {
+  background-color: #574bdb;
+  border-color: #574bdb;
+}
+
+.form-control,
+.form-select {
+  border: 1px solid #ddd;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #6C63FF;
+  box-shadow: 0 0 0 0.2rem rgba(108, 99, 255, 0.25);
 }

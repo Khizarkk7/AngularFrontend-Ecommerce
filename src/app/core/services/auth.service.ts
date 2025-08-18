@@ -7,6 +7,7 @@ import { TOKEN_KEY, REMEMBER_ME_KEY, REMEMBERED_EMAIL_KEY } from '../constants';
   providedIn: 'root'
 })
 export class AuthService {
+  currentUserValue: any;
   constructor(private http: HttpClient) { }
   baseURL = 'https://localhost:7058/api';
 

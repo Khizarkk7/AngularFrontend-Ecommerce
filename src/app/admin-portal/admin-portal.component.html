@@ -1,7 +1,8 @@
 <div class="d-flex flex-column vh-100">
 
-    <app-admin-header [userRole]="userRole" (logout)="onLogout()"
-        (createShop)="openCreateShopModal()"></app-admin-header>
+    <app-admin-header [userRole]="userRole" (logout)="onLogout()">
+        
+    </app-admin-header>
     <div class="d-flex flex-grow-1">
         <app-aside-bar (shopInfoClick)="showShopTable = true" (dashboardClick)="showShopTable = false"></app-aside-bar>
         <div id="layoutSidenav_content">
@@ -18,17 +19,3 @@
 </div>
 
 
-<!-- Shops Grid -->
-<!-- <app-all-shops-table
-                    *ngIf="showShopTable"
-                    [shops]="shops"
-                    [isEditMode]="isEditMode"
-                    [shopForm]="shopForm"
-                    [logoPreview]="logoPreview"
-                    [logoFile]="logoFile"
-                    (createShop)="openCreateShopModal()"
-                    (editShop)="openEditShopModal($event)"
-                    (deleteShop)="confirmDelete($event)"
-                    (fileChange)="onFileChange($event)"
-                    (submitShop)="onSubmit()"
-                ></app-all-shops-table> -->
