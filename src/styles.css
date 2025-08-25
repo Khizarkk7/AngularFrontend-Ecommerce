@@ -23,7 +23,7 @@ html, body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: var(--color-text-primary);
+  color: var(--color-bg-light);
   font-weight: 700;
   margin-bottom: 0.5em;
 }
