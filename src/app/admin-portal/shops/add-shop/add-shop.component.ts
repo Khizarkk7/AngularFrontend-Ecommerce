@@ -118,28 +118,35 @@ export class AddShopComponent implements OnInit {
     });
   }
 
-  private prepareFormData(): FormData {
-    const formData = new FormData();
-    const currentUser = this.authService.currentUserValue;
+private prepareFormData(): FormData {
+  const formData = new FormData();
+  const currentUser = this.authService.currentUserValue;
 
-    // Shop data
-    formData.append('ShopName', this.shopForm.value.shopName);
-    formData.append('Description', this.shopForm.value.description);
-    formData.append('ContactInfo', this.shopForm.value.contactInfo);
-    if (this.logoFile) {
-      formData.append('Logo', this.logoFile);
-    }
-
-    // Admin user data
-    formData.append('AdminFullName', this.shopForm.value.adminFullName);
-    formData.append('AdminEmail', this.shopForm.value.adminEmail);
-    formData.append('AdminPassword', this.shopForm.value.adminPassword);
-    
-    // Creator ID (from authenticated user)
-    formData.append('CreatorId', currentUser?.userId?.toString() || '1');
-
-    return formData;
+  // Shop data
+  formData.append('ShopName', this.shopForm.value.shopName);
+  formData.append('Description', this.shopForm.value.description);
+  formData.append('ContactInfo', this.shopForm.value.contactInfo);
+  if (this.logoFile) {
+    formData.append('Logo', this.logoFile);
   }
+
+  // Admin user data (exact same names as backend model)
+  formData.append('FullName', this.shopForm.value.adminFullName);
+  formData.append('Email', this.shopForm.value.adminEmail);
+  formData.append('Password', this.shopForm.value.adminPassword);
+
+  // Creator ID (from authenticated user → JWT se)
+  formData.append('CreatorId', currentUser?.userId?.toString() || '1');
+
+  // Debugging: backend ko bhejne se pehle check karlo
+  formData.forEach((value, key) => {
+    console.log(key, value);
+  });
+
+  return formData;
+}
+
+  
 
   private handleSuccess(response: any): void {
     this.isSubmitting = false;

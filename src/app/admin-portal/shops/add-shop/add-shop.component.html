@@ -21,7 +21,7 @@
                      placeholder="Enter shop name"
                      [ngClass]="{'is-invalid': shopForm.get('shopName')?.invalid && shopForm.get('shopName')?.touched}">
               <div class="invalid-feedback" *ngIf="shopForm.get('shopName')?.invalid && shopForm.get('shopName')?.touched">
-                Shop name is required and must be at least 3 characters.
+                   Shop name is required and must be at least 3 characters.
               </div>
             </div>
 
@@ -78,8 +78,8 @@
                      class="form-control rounded-pill px-3"
                      formControlName="adminFullName"
                      placeholder="Enter admin's full name"
-                     [ngClass]="{'is-invalid': shopForm.get('')?.invalid && shopForm.get('')?.touched}">
-              <div class="invalid-feedback" *ngIf="shopForm.get('')?.invalid && shopForm.get('')?.touched">
+                     [ngClass]="{'is-invalid': shopForm.get('adminFullName')?.invalid && shopForm.get('')?.touched}">
+              <div class="invalid-feedback" *ngIf="shopForm.get('adminFullName')?.invalid && shopForm.get('')?.touched">
                 Full name is required.
               </div>
             </div>
@@ -93,8 +93,8 @@
                      class="form-control rounded-pill px-3"
                      formControlName="adminEmail"
                      placeholder="Enter admin's email"
-                     [ngClass]="{'is-invalid': shopForm.get('')?.invalid && shopForm.get('')?.touched}">
-              <div class="invalid-feedback" *ngIf="shopForm.get('')?.invalid && shopForm.get('')?.touched">
+                     [ngClass]="{'is-invalid': shopForm.get('adminEmail')?.invalid && shopForm.get('adminEmail')?.touched}">
+              <div class="invalid-feedback" *ngIf="shopForm.get('adminEmail')?.invalid && shopForm.get('adminEmail')?.touched">
                 <div *ngIf="shopForm.get('')?.errors?.['required']">Email is required.</div>
                 <div *ngIf="shopForm.get('')?.errors?.['email']">Please enter a valid email.</div>
               </div>
@@ -109,8 +109,8 @@
                      class="form-control rounded-pill px-3"
                      formControlName="adminPassword"
                      placeholder="Enter password"
-                     [ngClass]="{'is-invalid': shopForm.get('')?.invalid && shopForm.get('')?.touched}">
-              <div class="invalid-feedback" *ngIf="shopForm.get('')?.invalid && shopForm.get('')?.touched">
+                     [ngClass]="{'is-invalid': shopForm.get('adminPassword')?.invalid && shopForm.get('adminPassword')?.touched}">
+              <div class="invalid-feedback" *ngIf="shopForm.get('adminPassword')?.invalid && shopForm.get('adminPassword')?.touched">
                 <div *ngIf="shopForm.get('')?.errors?.['required']">Password is required.</div>
                 <div *ngIf="shopForm.get('')?.errors?.['minlength']">At least 8 characters required.</div>
               </div>
@@ -125,10 +125,10 @@
                      class="form-control rounded-pill px-3"
                      formControlName="adminConfirmPassword"
                      placeholder="Confirm password"
-                     [ngClass]="{'is-invalid': (shopForm.get('')?.invalid && shopForm.get('')?.touched) || shopForm.errors?.['passwordMismatch']}">
-              <div class="invalid-feedback" *ngIf="(shopForm.get('')?.invalid && shopForm.get('')?.touched) || shopForm.errors?.['passwordMismatch']">
-                <div *ngIf="shopForm.get('')?.errors?.['required']">Please confirm your password.</div>
-                <div *ngIf="shopForm.errors?.['']">Passwords do not match.</div>
+                     [ngClass]="{'is-invalid': (shopForm.get('adminConfirmPassword')?.invalid && shopForm.get('adminConfirmPassword')?.touched) || shopForm.errors?.['passwordMismatch']}">
+              <div class="invalid-feedback" *ngIf="(shopForm.get('adminConfirmPassword')?.invalid && shopForm.get('adminConfirmPassword')?.touched) || shopForm.errors?.['passwordMismatch']">
+                <div *ngIf="shopForm.get('adminConfirmPassword')?.errors?.['required']">Please confirm your password.</div>
+                <div *ngIf="shopForm.errors?.['passwordMismatch']">Passwords do not match.</div>
               </div>
             </div>
 
