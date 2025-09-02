@@ -13,6 +13,7 @@ import { Component,Input, EventEmitter, Output } from '@angular/core';
 export class AdminHeaderComponent {
   @Input() userRole!: string; 
   @Output() logout = new EventEmitter<void>();
+  @Output() toggleSidebar = new EventEmitter<void>();
   
 
   onToggleSidebar() {

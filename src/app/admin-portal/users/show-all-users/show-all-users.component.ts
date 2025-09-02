@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -23,8 +24,10 @@ export class ShowAllUsersComponent implements OnInit {
   totalPages = 0;
 
   private apiUrl = 'https://localhost:7058/api'
-   
-  constructor(private http: HttpClient) {}
+
+  constructor(private http: HttpClient,
+              private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadUsers();
@@ -48,6 +51,11 @@ export class ShowAllUsersComponent implements OnInit {
       });
   }
 
+  navigateToAddUser(){
+    this.router.navigate(['/app-admin/users/add']);
+
+  }
+
   updatePaginatedData() {
     const start = (this.currentPage - 1) * this.pageSize;
     const end = start + this.pageSize;
@@ -61,31 +69,11 @@ export class ShowAllUsersComponent implements OnInit {
     }
   }
 
+  //  Redirect to edit page 
   editUser(user: any) {
-    Swal.fire({
-      title: 'Edit User',
-      html: ` `,
-      focusConfirm: false,
-      showCancelButton: true,
-      confirmButtonText: 'Save Changes',
-      preConfirm: () => {
-        const updatedUser = {
-          ...user,
-          username: (document.getElementById('username') as HTMLInputElement).value,
-          email: (document.getElementById('email') as HTMLInputElement).value
-        };
-        // Call API to update user
-        return this.http.put(`https://localhost:7058/api/user/${user.userId}`, updatedUser).toPromise();
-      }
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire('Updated!', 'User has been updated.', 'success');
-        this.loadUsers();
-      }
-    }).catch(err => {
-      Swal.fire('Error', 'Failed to update user.', 'error');
-    });
+    this.router.navigate(['/app-admin/users/edit', user.userId]);
   }
+
 
   deleteUser(userId: number) {
     Swal.fire({
@@ -99,7 +87,7 @@ export class ShowAllUsersComponent implements OnInit {
       background: '#fff',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.http.delete(`https://localhost:7058/api/user/${userId}`)
+        this.http.delete(this.apiUrl + `/user/${userId}`)
           .subscribe({
             next: () => {
               Swal.fire({

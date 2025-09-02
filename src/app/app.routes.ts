@@ -15,6 +15,9 @@ import { AllShopsComponent } from './admin-portal/shops/all-shops/all-shops.comp
 import { ViewStockComponent } from './admin-portal/stocks/view-stock/view-stock.component';
 import { AddStockComponent } from './admin-portal/stocks/add-stock/add-stock.component';
 import { AddProductComponent } from './admin-portal/products/add-product/add-product.component';
+import { EditUserComponent} from './admin-portal/users/edit-user/edit-user.component';
+import { EditShopComponent } from './admin-portal/shops/edit-shop/edit-shop.component';
+
 
 export const routes: Routes = [
   {
@@ -37,11 +40,12 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard',pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'users/add', component: AddUserComponent },
-      //{ path: 'users/edit', component: EditUserComponent },
+      { path: 'users/edit/:id', component: EditUserComponent},
       { path: 'inventory', component: InventoryComponent },
       { path: 'users/all', component: ShowAllUsersComponent },
       { path: 'shops/add', component: AddShopComponent },
       { path: 'shops/view', component: AllShopsComponent },
+      { path: 'shops/edit/:id', component: EditShopComponent },
       { path: 'stock/view', component: ViewStockComponent },
       { path: 'stock/add', component: AddStockComponent },
       { path: 'products/add', component: AddProductComponent },

@@ -1,0 +1,125 @@
+<div class="container-fluid px-0 py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 px-0">
+      <div class="card shadow-lg border-0 rounded-0 rounded-bottom-4">
+        <div class="card-header bg-primary text-white rounded-top-0 d-flex align-items-center py-3">
+          <i class="fas fa-store me-2"></i>
+          <h5 class="mb-0">Edit Shop</h5>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+          <form [formGroup]="shopForm" (ngSubmit)="onSubmit()" novalidate class="row g-3" enctype="multipart/form-data">
+            
+            <!-- Shop Logo Section -->
+            <div class="col-12 text-center mb-4">
+              <div class="position-relative d-inline-block">
+                <img [src]="logoPreview || 'assets/images/default-shop.png'" 
+                     class="rounded-circle shadow shop-logo" 
+                     width="150" 
+                     height="150"
+                     alt="Shop Logo">
+                <label for="logoUpload" class="btn btn-primary btn-sm rounded-circle position-absolute" 
+                       style="bottom: 10px; right: 10px;">
+                  <i class="fas fa-camera"></i>
+                </label>
+                <input #fileInput type="file" id="logoUpload" class="d-none" 
+                       accept="image/*" (change)="onLogoSelected($event)">
+              </div>
+              <div class="mt-2">
+                <small class="text-muted">Click the camera icon to change shop logo</small>
+                <div *ngIf="currentLogoPath" class="text-info small mt-1">
+                  Current logo: {{currentLogoPath.split('/').pop()}}
+                </div>
+              </div>
+              <div *ngIf="selectedLogoFile" class="mt-2">
+                <span class="badge bg-info">{{selectedLogoFile.name}}</span>
+                <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="removeSelectedLogo()">
+                  <i class="fas fa-times"></i> Remove
+                </button>
+              </div>
+            </div>
+
+            <!-- Shop Information Section -->
+            <div class="col-12">
+              <h6 class="mb-3 text-primary"><i class="fas fa-info-circle me-2"></i>Shop Information</h6>
+            </div>
+
+            <!-- Shop ID (Hidden) -->
+            <input type="hidden" formControlName="shopId">
+            <input type="hidden" formControlName="creatorId">
+
+            <!-- Shop Name -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Shop Name <span class="text-danger">*</span>
+              </label>
+              <input type="text"
+                     class="form-control rounded-pill px-3"
+                     formControlName="shopName"
+                     placeholder="Enter shop name"
+                     [ngClass]="{'is-invalid': hasFieldError('shopName')}">
+              <div class="invalid-feedback" *ngIf="hasFieldError('shopName')">
+                <div *ngIf="shopForm.get('shopName')?.errors?.['required']">Shop name is required.</div>
+                <div *ngIf="shopForm.get('shopName')?.errors?.['minlength']">Must have at least 3 characters.</div>
+              </div>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Contact Info <span class="text-danger">*</span>
+              </label>
+              <input type="text"
+                     class="form-control rounded-pill px-3"
+                     formControlName="contactInfo"
+                     placeholder="Enter contact information"
+                     [ngClass]="{'is-invalid': hasFieldError('contactInfo')}">
+              <div class="invalid-feedback" *ngIf="hasFieldError('contactInfo')">
+                Contact information is required.
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div class="col-12">
+              <label class="form-label fw-semibold">Description</label>
+              <textarea rows="4"
+                        class="form-control rounded-3 px-3"
+                        formControlName="description"
+                        placeholder="Enter shop description (optional)"></textarea>
+              <small class="text-muted">Maximum 500 characters</small>
+            </div>
+
+            <!-- Buttons -->
+            <div class="col-12 mt-4">
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button" 
+                        class="btn btn-outline-secondary px-4 rounded-pill"
+                        (click)="goBack()">
+                  <i class="fas fa-times me-1"></i> Cancel
+                </button>
+                <button type="submit"
+                        class="btn btn-primary px-4 rounded-pill"
+                        [disabled]="shopForm.invalid || isSubmitting">
+                  <i class="fas fa-save me-1"></i>
+                  {{ isSubmitting ? 'Updating...' : 'Update Shop' }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Success Toast -->
+<div *ngIf="successMessage" class="toast-container position-fixed top-0 end-0 p-3">
+  <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        <i class="fas fa-check-circle me-2"></i> {{ successMessage }}
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" (click)="successMessage = ''"></button>
+    </div>
+  </div>
+</div>

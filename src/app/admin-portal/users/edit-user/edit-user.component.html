@@ -1,0 +1,149 @@
+<div class="container-fluid px-0 py-5">
+  <div class="row justify-content-center">
+    <div class="col-12 px-0">
+      <div class="card shadow-lg border-0 rounded-0 rounded-bottom-4">
+        <div class="card-header bg-primary text-white rounded-top-0 d-flex align-items-center py-3">
+          <i class="fas fa-user-edit me-2"></i>
+          <h5 class="mb-0">Edit User Profile</h5>
+        </div>
+
+        <div class="card-body p-4 p-md-5">
+          <form [formGroup]="editForm" (ngSubmit)="onSubmit()" novalidate class="row g-3">
+            
+            <!-- Profile Picture Section (Commented) -->
+            <!--
+            <div class="col-12 text-center mb-4">
+              <div class="position-relative d-inline-block">
+                <img [src]="profileImage || 'assets/images/default-avatar.png'" 
+                     class="rounded-circle shadow profile-image" 
+                     width="120" 
+                     height="120"
+                     alt="Profile Picture">
+                <label for="profileUpload" class="btn btn-primary btn-sm rounded-circle position-absolute" 
+                       style="bottom: 10px; right: 10px;">
+                  <i class="fas fa-camera"></i>
+                </label>
+                <input #fileInput type="file" id="profileUpload" class="d-none" 
+                       accept="image/*" (change)="onFileSelected($event)">
+              </div>
+              <div class="mt-2">
+                <small class="text-muted">Click the camera icon to change your profile picture</small>
+              </div>
+              <div *ngIf="selectedFile" class="mt-2">
+                <span class="badge bg-info">{{selectedFile.name}}</span>
+                <button type="button" class="btn btn-sm btn-outline-danger ms-2" (click)="removeSelectedFile()">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+            </div>
+            -->
+
+            <!-- User Information Section -->
+            <div class="col-12">
+              <h6 class="mb-3 text-primary"><i class="fas fa-user-circle me-2"></i>User Information</h6>
+            </div>
+
+            <!-- User Name -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                User Name <span class="text-danger">*</span>
+              </label>
+              <input type="text"
+                     class="form-control rounded-pill px-3"
+                     formControlName="userName"
+                     placeholder="Enter user name"
+                     [ngClass]="{'is-invalid': hasFieldError('userName')}">
+              <div class="invalid-feedback" *ngIf="hasFieldError('userName')">
+                <div *ngIf="editForm.get('userName')?.errors?.['required']">User name is required.</div>
+                <div *ngIf="editForm.get('userName')?.errors?.['minlength']">Must have at least 3 characters.</div>
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Email <span class="text-danger">*</span>
+              </label>
+              <input type="email"
+                     class="form-control rounded-pill px-3"
+                     formControlName="email"
+                     placeholder="Enter email address"
+                     [ngClass]="{'is-invalid': hasFieldError('email')}">
+              <div class="invalid-feedback" *ngIf="hasFieldError('email')">
+                <div *ngIf="editForm.get('email')?.errors?.['required']">Email is required.</div>
+                <div *ngIf="editForm.get('email')?.errors?.['email']">Please enter a valid email.</div>
+              </div>
+            </div>
+
+            <!-- Role Selection -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Role <span class="text-danger">*</span>
+              </label>
+              <!-- Role -->
+<select class="form-select rounded-pill px-3"
+        formControlName="roleId"
+        [ngClass]="{'is-invalid': hasFieldError('roleId')}">
+  <option value="" disabled>Select role</option>
+  <option *ngFor="let role of roles" [value]="role.roleId">{{role.roleName}}</option>
+</select>
+              <div class="invalid-feedback" *ngIf="hasFieldError('roleId')">
+                Please select a role.
+              </div>
+            </div>
+
+            <!-- Shop Selection -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Shop <span class="text-danger">*</span>
+              </label>
+             <select class="form-select rounded-pill px-3"
+        formControlName="shopId"
+        [ngClass]="{'is-invalid': hasFieldError('shopId')}">
+  <option value="" disabled>Select shop</option>
+  <option *ngFor="let shop of shops" [value]="shop.shopId">{{shop.shopName}}</option>
+</select>
+              <div class="invalid-feedback" *ngIf="hasFieldError('shopId')">
+                Please select a shop.
+              </div>
+            </div>
+
+            <!-- Status -->
+            <div class="col-12 col-md-6">
+              <label class="form-label fw-semibold">
+                Status <span class="text-danger">*</span>
+              </label>
+              <select class="form-select rounded-pill px-3"
+                      formControlName="status"
+                      [ngClass]="{'is-invalid': hasFieldError('status')}">
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="hasFieldError('status')">
+                Please select a status.
+              </div>
+            </div>
+
+
+            <!-- Buttons -->
+            <div class="col-12 mt-4">
+              <div class="d-flex justify-content-end gap-2">
+                <button type="button" 
+                        class="btn btn-outline-secondary px-4 rounded-pill"
+                        (click)="goBack()">
+                  <i class="fas fa-times me-1"></i> Cancel
+                </button>
+                <button type="submit"
+                        class="btn btn-primary px-4 rounded-pill"
+                        [disabled]="editForm.invalid || isSubmitting">
+                  <i class="fas fa-save me-1"></i>
+                  {{ isSubmitting ? 'Saving...' : 'Save Changes' }}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -129,7 +129,7 @@ input:focus, textarea:focus, select:focus, .form-control:focus {
 
 @media (min-width: 768px) {
   .card-body {
-    padding: 3rem !important;
+    padding: 2rem !important;
   }
 }
 

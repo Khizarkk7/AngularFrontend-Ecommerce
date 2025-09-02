@@ -1,21 +1,23 @@
 <div class="d-flex flex-column vh-100">
 
-    <app-admin-header [userRole]="userRole" (logout)="onLogout()">
-        
+    <app-admin-header [userRole]="userRole" (logout)="onLogout()" (toggleSidebar)="toggleSidebar()">
+
     </app-admin-header>
     <div class="d-flex flex-grow-1">
-        <app-aside-bar (shopInfoClick)="showShopTable = true" (dashboardClick)="showShopTable = false"></app-aside-bar>
+
+        <app-aside-bar (shopInfoClick)="showShopTable = true" (dashboardClick)="showShopTable = false">
+        </app-aside-bar>
         <div id="layoutSidenav_content">
+
+
             <main>
                 <div class="container-fluid px-4">
 
-                    
-                    
+
+
                     <router-outlet></router-outlet>
                 </div>
             </main>
         </div>
     </div>
 </div>
-
-

@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
+import { routes } from '../../../app.routes';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-all-shops',
   standalone: true,
@@ -12,6 +14,7 @@ import Swal from 'sweetalert2';
 export class AllShopsComponent implements OnInit {
   shops: any[] = [];
   paginatedShops: any[] = [];
+  
   loading = true;
   error = '';
 
@@ -23,7 +26,9 @@ export class AllShopsComponent implements OnInit {
   private apiUrl = 'https://localhost:7058/api/Shop'
   private baseUrl = 'https://localhost:7058'
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.loadShops();
@@ -77,10 +82,29 @@ export class AllShopsComponent implements OnInit {
     this.setPaginatedData();
   }
 
-  openEditShopModal(shop: any) {
-    console.log('Edit shop:', shop);
-    // Open modal or navigate to edit form
+  updatePaginatedData() {
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedShops = this.shops.slice(start, end);
   }
+   changePage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePaginatedData();
+    }
+  }
+
+
+ //  Redirect to edit page 
+  editShop(shop: any) {
+    this.router.navigate(['/app-admin/shops/edit', shop.shopId]);
+  }
+
+navigateToAddUser(){
+  this.router.navigate(['/app-admin/shops/add']);
+}
+navigateToAddShop(){}
+
 
   confirmDelete(shopId: number) {
     Swal.fire({
@@ -100,29 +124,44 @@ export class AllShopsComponent implements OnInit {
   }
 
   deleteShop(shopId: number) {
-    this.http.delete(`${this.apiUrl}/${shopId}`)
-      .subscribe({
-        next: () => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Deleted!',
-            text: 'The shop has been deleted.',
-            timer: 1500,
-            showConfirmButton: false
-          });
-          this.shops = this.shops.filter(s => s.shopId !== shopId);
-          this.totalPages = Math.ceil(this.shops.length / this.pageSize);
-          if (this.currentPage > this.totalPages) this.currentPage = this.totalPages || 1;
-          this.setPaginatedData();
-        },
-        error: (err) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Error',
-            text: 'Failed to delete shop.',
-          });
-          console.error(err);
-        }
-      });
-  }
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'Do you really want to delete this shop?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
+    confirmButtonColor: '#6C63FF',
+      cancelButtonColor: '#FF6B6B',
+    reverseButtons: true
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.http.delete(`${this.apiUrl}/${shopId}`)
+        .subscribe({
+          next: () => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Deleted!',
+              text: 'The shop has been deleted.',
+              timer: 1500,
+              showConfirmButton: false
+            });
+            this.shops = this.shops.filter(s => s.shopId !== shopId);
+            this.totalPages = Math.ceil(this.shops.length / this.pageSize);
+            if (this.currentPage > this.totalPages) this.currentPage = this.totalPages || 1;
+            this.setPaginatedData();
+          },
+          error: (err) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to delete shop.',
+            });
+            console.error(err);
+          }
+        });
+    }
+  });
+}
+
 }
