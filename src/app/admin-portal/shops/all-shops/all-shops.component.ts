@@ -4,6 +4,9 @@ import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { routes } from '../../../app.routes';
 import { Router } from '@angular/router';
+import { CustomSwal } from '../../../core/services/custom-swal.service';
+import { ShopService } from '../../../core/services/shops.service';
+import { AuthService } from '../../../core/services/auth.service';
 @Component({
   selector: 'app-all-shops',
   standalone: true,
@@ -14,21 +17,25 @@ import { Router } from '@angular/router';
 export class AllShopsComponent implements OnInit {
   shops: any[] = [];
   paginatedShops: any[] = [];
-  
+
   loading = true;
   error = '';
 
   // Pagination
   currentPage = 1;
-  pageSize = 5;
+  pageSize = 8;
   totalPages = 0;
 
   private apiUrl = 'https://localhost:7058/api/Shop'
   private baseUrl = 'https://localhost:7058'
 
   constructor(private http: HttpClient,
-    private router: Router
-  ) {}
+    private router: Router,
+    private shopService: ShopService,
+    private authService: AuthService,
+  ) {
+
+  }
 
   ngOnInit(): void {
     this.loadShops();
@@ -87,7 +94,7 @@ export class AllShopsComponent implements OnInit {
     const end = start + this.pageSize;
     this.paginatedShops = this.shops.slice(start, end);
   }
-   changePage(page: number) {
+  changePage(page: number) {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.updatePaginatedData();
@@ -95,25 +102,24 @@ export class AllShopsComponent implements OnInit {
   }
 
 
- //  Redirect to edit page 
+  //  Redirect to edit page 
   editShop(shop: any) {
     this.router.navigate(['/app-admin/shops/edit', shop.shopId]);
   }
 
-navigateToAddUser(){
-  this.router.navigate(['/app-admin/shops/add']);
-}
-navigateToAddShop(){}
+
+  navigateToAddShop() {
+    this.router.navigate(['/app-admin/shops/add']);
+  }
 
 
   confirmDelete(shopId: number) {
-    Swal.fire({
+    CustomSwal.fire({
       title: 'Are you sure?',
       text: 'You are about to delete this shop!',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#6C63FF',
-      cancelButtonColor: '#FF6B6B',
+
       confirmButtonText: 'Yes, delete it!',
       background: '#fff',
     }).then((result) => {
@@ -124,31 +130,33 @@ navigateToAddShop(){}
   }
 
   deleteShop(shopId: number) {
-  Swal.fire({
-    title: 'Are you sure?',
-    text: 'Do you really want to delete this shop?',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Yes, delete it!',
-    cancelButtonText: 'Cancel',
-    confirmButtonColor: '#6C63FF',
-      cancelButtonColor: '#FF6B6B',
-    reverseButtons: true
-  }).then((result) => {
-    if (result.isConfirmed) {
-      this.http.delete(`${this.apiUrl}/${shopId}`)
-        .subscribe({
+    const adminId = this.authService.getRoleId();
+    CustomSwal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to delete this shop?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, delete it!',
+      cancelButtonText: 'Cancel',
+      reverseButtons: true
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.shopService.deleteShop(shopId).subscribe({
           next: () => {
             Swal.fire({
               icon: 'success',
               title: 'Deleted!',
-              text: 'The shop has been deleted.',
+              text: 'The shop has been marked as inactive.',
               timer: 1500,
               showConfirmButton: false
             });
+
+            // UI se remove karo
             this.shops = this.shops.filter(s => s.shopId !== shopId);
             this.totalPages = Math.ceil(this.shops.length / this.pageSize);
-            if (this.currentPage > this.totalPages) this.currentPage = this.totalPages || 1;
+            if (this.currentPage > this.totalPages) {
+              this.currentPage = this.totalPages || 1;
+            }
             this.setPaginatedData();
           },
           error: (err) => {
@@ -160,8 +168,9 @@ navigateToAddShop(){}
             console.error(err);
           }
         });
-    }
-  });
-}
+      }
+    });
+  }
+
 
 }

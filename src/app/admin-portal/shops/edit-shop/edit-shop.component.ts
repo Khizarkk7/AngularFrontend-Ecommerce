@@ -4,13 +4,16 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import Swal from 'sweetalert2';
 import { CommonModule } from '@angular/common';
+import { ShopService } from '../../../core/services/shops.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { CustomSwal } from '../../../core/services/custom-swal.service';
 
 interface Shop {
   shopId: number;
   shopName: string;
   description: string;
   contactInfo: string;
-  logoPath: string;
+  logo: string;
   creatorId: number;
 }
 
@@ -25,7 +28,7 @@ interface Shop {
 })
 export class EditShopComponent implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef;
-  
+
   shopForm: FormGroup;
   isSubmitting = false;
   successMessage = '';
@@ -35,14 +38,16 @@ export class EditShopComponent implements OnInit {
   shopId: number = 0;
 
 
-  private apiUrl = 'https://localhost:7058/api/Shop'
-  private baseUrl = 'https://localhost:7058'
+  // private apiUrl = 'https://localhost:7058/api/Shop'
+  // private baseUrl = 'https://localhost:7058'
 
 
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
+    private authService: AuthService,
+    private shopService: ShopService,
     private http: HttpClient
   ) {
     this.shopForm = this.fb.group({
@@ -60,9 +65,10 @@ export class EditShopComponent implements OnInit {
     this.loadShopData();
   }
 
+  //  Load Shop Data from API (via Service)
   loadShopData(): void {
-    this.http.get<Shop>(`/api/Shop/GetShopDetails/${this.shopId}`).subscribe({
-      next: (shop) => {
+    this.shopService.getShopDetails(this.shopId).subscribe({
+      next: (shop: Shop) => {
         this.shopForm.patchValue({
           shopId: shop.shopId,
           shopName: shop.shopName,
@@ -70,15 +76,15 @@ export class EditShopComponent implements OnInit {
           contactInfo: shop.contactInfo,
           creatorId: shop.creatorId
         });
-        
-        this.currentLogoPath = shop.logoPath;
-        this.logoPreview = shop.logoPath ? 
-          `https://localhost:7058/${shop.logoPath}` : 
-          'assets/images/default-shop.png';
+
+        this.currentLogoPath = shop.logo;
+        this.logoPreview = shop.logo
+          ? `https://localhost:7058/${shop.logo}`
+          : 'assets/images/default-shop.png';
       },
-      error: (error) => {
+      error: () => {
         Swal.fire('Error', 'Failed to load shop data', 'error');
-        this.router.navigate(['/shops']);
+        this.router.navigate(['/app-admin/shops/view']);
       }
     });
   }
@@ -99,7 +105,7 @@ export class EditShopComponent implements OnInit {
       }
 
       this.selectedLogoFile = file;
-      
+
       // Preview image
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -113,8 +119,8 @@ export class EditShopComponent implements OnInit {
     this.selectedLogoFile = null;
     this.fileInput.nativeElement.value = '';
     // Revert to original logo preview
-    this.logoPreview = this.currentLogoPath ? 
-      `https://localhost:7058/${this.currentLogoPath}` : 
+    this.logoPreview = this.currentLogoPath ?
+      `https://localhost:7058/${this.currentLogoPath}` :
       'assets/images/default-shop.png';
   }
 
@@ -124,50 +130,76 @@ export class EditShopComponent implements OnInit {
   }
 
   onSubmit(): void {
+    console.log("Submit button clicked ");
     if (this.shopForm.invalid) {
+      console.log("Form Invalid ", this.shopForm.value);
       this.markFormGroupTouched();
       return;
     }
 
-    this.isSubmitting = true;
 
-    const formData = new FormData();
-    formData.append('ShopId', this.shopForm.value.shopId.toString());
-    formData.append('ShopName', this.shopForm.value.shopName);
-    formData.append('Description', this.shopForm.value.description);
-    formData.append('ContactInfo', this.shopForm.value.contactInfo);
-    formData.append('CreatorId', this.shopForm.value.creatorId.toString());
-    
-    if (this.selectedLogoFile) {
-      formData.append('Logo', this.selectedLogoFile);
-    }
+    CustomSwal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to update this shop?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, update it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
 
-    this.http.put('https://localhost:7058/api/Shop/EditShop', formData).subscribe({
-      next: (response: any) => {
-        this.isSubmitting = false;
-        this.successMessage = response.message || 'Shop updated successfully!';
-        
-        // Hide success message after 3 seconds
-        setTimeout(() => {
-          this.successMessage = '';
-          this.router.navigate(['/shops']);
-        }, 3000);
-      },
-      error: (error) => {
-        this.isSubmitting = false;
-        const errorMsg = error.error?.message || 'Failed to update shop. Please try again.';
-        Swal.fire('Error', errorMsg, 'error');
+        this.isSubmitting = true;
+
+        const shopData = new FormData();
+        shopData.append('ShopId', this.shopForm.value.shopId.toString());
+        shopData.append('ShopName', this.shopForm.value.shopName);
+        shopData.append('Description', this.shopForm.value.description || '');
+        shopData.append('ContactInfo', this.shopForm.value.contactInfo || '');
+        shopData.append('CreatorId', this.shopForm.value.creatorId.toString());
+
+        if (this.selectedLogoFile) {
+          shopData.append('Logo', this.selectedLogoFile, this.selectedLogoFile.name);
+        }
+        // CreatedAt bhejo (agar API me required hai)
+        shopData.append('CreatedAt', new Date().toISOString());
+
+
+        console.log('Submitting shopData:', shopData);
+
+        this.shopService.editShop(shopData).subscribe({
+          next: (response: any) => {
+            console.log(" Shop updated:", response);
+            this.isSubmitting = false;
+            Swal.fire({
+              icon: 'success',
+              title: 'Updated!',
+              text: response.message || 'Shop updated successfully!',
+              timer: 2000,
+              showConfirmButton: false
+            });
+
+            this.router.navigate(['/shops']);
+          },
+          error: (error) => {
+            console.error(" Update failed:", error);
+            this.isSubmitting = false;
+            const errorMsg =
+              error.error?.message || 'Failed to update shop. Please try again.';
+            Swal.fire('Error', errorMsg, 'error');
+          }
+        });
       }
     });
   }
 
   private markFormGroupTouched(): void {
-    Object.keys(this.shopForm.controls).forEach(key => {
+    Object.keys(this.shopForm.controls).forEach((key) => {
       this.shopForm.get(key)?.markAsTouched();
     });
   }
 
+
   goBack(): void {
-    this.router.navigate(['/shops']);
+    this.router.navigate(['/app-admin/shops/view']);
   }
 }

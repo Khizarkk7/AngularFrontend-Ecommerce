@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import { UserService } from '../../../core/services/user.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { CustomSwal } from '../../../core/services/custom-swal.service';
 
 @Component({
   selector: 'app-edit-user',
@@ -78,36 +79,48 @@ export class EditUserComponent implements OnInit {
     return !!(control && control.invalid && (control.dirty || control.touched));
   }
 
-  onSubmit() {
-    if (this.editForm.invalid) {
-      Swal.fire('Invalid', 'Please fix validation errors.', 'warning');
-      return;
-    }
-
-    this.isSubmitting = true;
-    const payload = {
-      username: this.editForm.get('userName')?.value,
-      password: this.editForm.get('newPassword')?.value,
-      roleId: this.editForm.get('roleId')?.value,
-      shopId: this.editForm.get('shopId')?.value,
-      isActive: this.editForm.get('status')?.value === 'active' ? 1 : 0
-    };
-
-    this.userService.updateUser(this.userId, payload).subscribe({
-      next: () => {
-        this.isSubmitting = false;
-        this.successMessage = 'User updated successfully!';
-        Swal.fire('Success', 'User updated successfully!', 'success').then(() => {
-          this.router.navigate(['/app-admin/users/all']);
-        });
-      },
-      error: (err) => {
-        this.isSubmitting = false;
-        Swal.fire('Error', 'Failed to update user.', 'error');
-        console.error(err);
-      }
-    });
+ onSubmit() {
+  if (this.editForm.invalid) {
+    Swal.fire('Invalid', 'Please fix validation errors.', 'warning');
+    return;
   }
+
+  CustomSwal.fire({
+    title: 'Are you sure?',
+    text: 'Do you really want to update this user?',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, update it!',
+    cancelButtonText: 'Cancel',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      this.isSubmitting = true;
+
+      const payload = {
+        username: this.editForm.get('userName')?.value,
+        password: this.editForm.get('newPassword')?.value,
+        roleId: this.editForm.get('roleId')?.value,
+        shopId: this.editForm.get('shopId')?.value,
+        isActive: this.editForm.get('status')?.value === 'active' ? 1 : 0
+      };
+
+      this.userService.updateUser(this.userId, payload).subscribe({
+        next: () => {
+          this.isSubmitting = false;
+          this.successMessage = 'User updated successfully!';
+          Swal.fire('Success', 'User updated successfully!', 'success').then(() => {
+            this.router.navigate(['/app-admin/users/all']);
+          });
+        },
+        error: (err) => {
+          this.isSubmitting = false;
+          Swal.fire('Error', 'Failed to update user.', 'error');
+          console.error(err);
+        }
+      });
+    }
+  });
+}
 
   goBack() {
     this.router.navigate(['/app-admin/users/all']);

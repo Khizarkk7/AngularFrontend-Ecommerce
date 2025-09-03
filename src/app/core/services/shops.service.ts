@@ -27,20 +27,27 @@ export class ShopService {
   getShops(): Observable<Shop[]> {
     return this.http.get<Shop[]>(`${this.baseUrl}/GetAllShops`);
   }
+
   //Helper function to get full logo URL from filename
   getFullLogoUrl(fileName: string): string {
     return this.uploadsUrl + fileName;
   }
+
   createShop(shop: FormData): Observable<any> {
     return this.http.post(`${this.baseUrl}/CreateShop`, shop);
   }
 
-  updateShop(id: number, shop: FormData): Observable<any> {
-    return this.http.put(`${this.baseUrl}/EditShop`, shop);
+  getShopDetails(shopId: number): Observable<any> {
+    return this.http.get<any>(`${this.baseUrl}/GetShopDetails/${shopId}`);
   }
 
-  deleteShop(id: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`);
-  }
-  
+  editShop(formData: FormData): Observable<any> {
+  return this.http.put(`${this.baseUrl}/EditShop`, formData);
+}
+
+
+  deleteShop(shopId: number): Observable<any> {
+  return this.http.put(`${this.baseUrl}/SoftDeleteShop/${shopId}`, {});
+}
+
 }

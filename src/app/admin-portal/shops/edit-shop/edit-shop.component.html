@@ -9,27 +9,24 @@
 
         <div class="card-body p-4 p-md-5">
           <form [formGroup]="shopForm" (ngSubmit)="onSubmit()" novalidate class="row g-3" enctype="multipart/form-data">
-            
+
             <!-- Shop Logo Section -->
             <div class="col-12 text-center mb-4">
               <div class="position-relative d-inline-block">
-                <img [src]="logoPreview || 'assets/images/default-shop.png'" 
-                     class="rounded-circle shadow shop-logo" 
-                     width="150" 
-                     height="150"
-                     alt="Shop Logo">
-                <label for="logoUpload" class="btn btn-primary btn-sm rounded-circle position-absolute" 
-                       style="bottom: 10px; right: 10px;">
+                <img [src]="logoPreview || 'assets/images/default-shop.png'" class="rounded-circle shadow shop-logo"
+                  width="150" height="150" alt="Shop Logo">
+                <label for="logoUpload" class="btn btn-primary btn-sm rounded-circle position-absolute"
+                  style="bottom: 10px; right: 10px;">
                   <i class="fas fa-camera"></i>
                 </label>
-                <input #fileInput type="file" id="logoUpload" class="d-none" 
-                       accept="image/*" (change)="onLogoSelected($event)">
+                <input #fileInput type="file" id="logoUpload" class="d-none" accept="image/*"
+                  (change)="onLogoSelected($event)">
               </div>
               <div class="mt-2">
                 <small class="text-muted">Click the camera icon to change shop logo</small>
-                <div *ngIf="currentLogoPath" class="text-info small mt-1">
+                <!-- <div *ngIf="currentLogoPath" class="text-info small mt-1">
                   Current logo: {{currentLogoPath.split('/').pop()}}
-                </div>
+                </div> -->
               </div>
               <div *ngIf="selectedLogoFile" class="mt-2">
                 <span class="badge bg-info">{{selectedLogoFile.name}}</span>
@@ -53,11 +50,8 @@
               <label class="form-label fw-semibold">
                 Shop Name <span class="text-danger">*</span>
               </label>
-              <input type="text"
-                     class="form-control rounded-pill px-3"
-                     formControlName="shopName"
-                     placeholder="Enter shop name"
-                     [ngClass]="{'is-invalid': hasFieldError('shopName')}">
+              <input type="text" class="form-control rounded-pill px-3" formControlName="shopName"
+                placeholder="Enter shop name" [ngClass]="{'is-invalid': hasFieldError('shopName')}">
               <div class="invalid-feedback" *ngIf="hasFieldError('shopName')">
                 <div *ngIf="shopForm.get('shopName')?.errors?.['required']">Shop name is required.</div>
                 <div *ngIf="shopForm.get('shopName')?.errors?.['minlength']">Must have at least 3 characters.</div>
@@ -69,11 +63,8 @@
               <label class="form-label fw-semibold">
                 Contact Info <span class="text-danger">*</span>
               </label>
-              <input type="text"
-                     class="form-control rounded-pill px-3"
-                     formControlName="contactInfo"
-                     placeholder="Enter contact information"
-                     [ngClass]="{'is-invalid': hasFieldError('contactInfo')}">
+              <input type="text" class="form-control rounded-pill px-3" formControlName="contactInfo"
+                placeholder="Enter contact information" [ngClass]="{'is-invalid': hasFieldError('contactInfo')}">
               <div class="invalid-feedback" *ngIf="hasFieldError('contactInfo')">
                 Contact information is required.
               </div>
@@ -82,27 +73,22 @@
             <!-- Description -->
             <div class="col-12">
               <label class="form-label fw-semibold">Description</label>
-              <textarea rows="4"
-                        class="form-control rounded-3 px-3"
-                        formControlName="description"
-                        placeholder="Enter shop description (optional)"></textarea>
+              <textarea rows="4" class="form-control rounded-3 px-3" formControlName="description"
+                placeholder="Enter shop description (optional)"></textarea>
               <small class="text-muted">Maximum 500 characters</small>
             </div>
 
             <!-- Buttons -->
             <div class="col-12 mt-4">
               <div class="d-flex justify-content-end gap-2">
-                <button type="button" 
-                        class="btn btn-outline-secondary px-4 rounded-pill"
-                        (click)="goBack()">
+                <button type="button" class="btn btn-outline-secondary px-4 rounded-pill" (click)="goBack()">
                   <i class="fas fa-times me-1"></i> Cancel
                 </button>
-                <button type="submit"
-                        class="btn btn-primary px-4 rounded-pill"
-                        [disabled]="shopForm.invalid || isSubmitting">
+                <button type="submit" class="btn btn-primary px-4 rounded-pill">
                   <i class="fas fa-save me-1"></i>
                   {{ isSubmitting ? 'Updating...' : 'Update Shop' }}
                 </button>
+
               </div>
             </div>
           </form>
@@ -114,7 +100,8 @@
 
 <!-- Success Toast -->
 <div *ngIf="successMessage" class="toast-container position-fixed top-0 end-0 p-3">
-  <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+  <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive"
+    aria-atomic="true">
     <div class="d-flex">
       <div class="toast-body">
         <i class="fas fa-check-circle me-2"></i> {{ successMessage }}

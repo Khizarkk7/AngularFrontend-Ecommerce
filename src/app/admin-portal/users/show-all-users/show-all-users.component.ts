@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { CustomSwal } from '../../../core/services/custom-swal.service';
 
 @Component({
   selector: 'app-show-all-users',
@@ -76,13 +77,13 @@ export class ShowAllUsersComponent implements OnInit {
 
 
   deleteUser(userId: number) {
-    Swal.fire({
+    CustomSwal.fire({
       title: 'Are you sure?',
       text: 'You are about to delete this user!',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#6C63FF',
-      cancelButtonColor: '#FF6B6B',
+      //confirmButtonColor: '#6C63FF',
+      //cancelButtonColor: '#FF6B6B',
       confirmButtonText: 'Yes, delete it!',
       background: '#fff',
     }).then((result) => {
