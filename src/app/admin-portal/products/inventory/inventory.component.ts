@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterModule, ActivatedRoute } from '@angular/router';
+import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { NgbDropdownModule, NgbModalModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
-import { InventoryService } from '../../core/services/inventory.service';
+import { InventoryService } from '../../../core/services/inventory.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 interface Product {
   productId: number;
@@ -43,21 +44,26 @@ export class InventoryComponent implements OnInit {
   // UI Controls
   searchTerm = '';
   page = 1;
-  pageSize = 10;
+  pageSize = 4;
   selectedProduct: Product | null = null;
   newProduct: Partial<Product> = this.getEmptyProduct();
 
   constructor(
     private inventoryService: InventoryService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private authService: AuthService,
+    private router: Router,
   ) {}
 
-  ngOnInit(): void {
-    this.route.parent?.params.subscribe(params => {
-      this.shopId = +params['shopId'];
-      this.shopName = params['shopName'];
+ ngOnInit(): void {
+    //  ShopId directly from token
+    const id = this.authService.getCurrentShopId();
+    if (id) {
+      this.shopId = id;
       this.loadProducts();
-    });
+    } else {
+      this.errorMessage = 'Unauthorized: Shop ID not found in token';
+    }
   }
 
   loadProducts(): void {
@@ -80,7 +86,11 @@ export class InventoryComponent implements OnInit {
   }
 
   // CRUD Operations
-  addProduct(): void {
+  addProduct() {
+    this.router.navigate(['/app-admin/shops', this.shopId, 'products', 'add']);
+  }
+
+  //addProduct(): void {
     // if (this.validateProductForm()) {
     //   this.isLoading = true;
     //   const productToAdd = {
@@ -101,7 +111,7 @@ export class InventoryComponent implements OnInit {
     //     error: (err) => this.handleError('Failed to add product', err)
     //   });
     // }
-  }
+  //}
 
   updateProduct(): void {
     // if (this.selectedProduct && this.validateProductForm()) {

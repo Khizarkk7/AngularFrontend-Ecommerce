@@ -2,16 +2,6 @@ import { inject } from '@angular/core';
 import { CanActivateFn,Router} from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 
-// export const authGuard: CanActivateFn = (route, state) => {
-// const authService = inject(AuthService);
-// const router = inject(Router);
-//   if(authService.isLogedIn())
-//   return true;
-// else{
-//   router.navigateByUrl('/login')
-//   return false;
-// }
-//};
 export const authGuard: CanActivateFn = (route, state) => {
   const authService = inject(AuthService);
   const router = inject(Router);
@@ -31,6 +21,21 @@ console.log(userRole);
     router.navigate(['/unauthorized']); 
     return false;
   }
+
+  //  //  role check
+  // if (expectedRoles && !expectedRoles.includes(userRole!)) {
+  //   router.navigate(['/unauthorized']); 
+  //   return false;
+  // }
+
+  //  shopId check
+  const currentShopId = authService.getCurrentShopId();
+  const routeShopId = route.params?.['shopId'];  // yaha URL ka :shopId milega
+
+  // if (routeShopId && currentShopId && parseInt(routeShopId) !== currentShopId) {
+  //   router.navigate(['/unauthorized']);
+  //   return false;
+  // }
 
   return true;
 };

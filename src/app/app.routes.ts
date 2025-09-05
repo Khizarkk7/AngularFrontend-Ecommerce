@@ -6,7 +6,7 @@ import { ForgotPassComponent } from './core/forgot-pass/forgot-pass.component';
 import { AdminPortalComponent } from './admin-portal/admin-portal.component';
 import { authGuard } from './core/guards/auth.guard';
 import { UnauthorizedComponent } from './core/unauthorized/unauthorized.component';
-import { InventoryComponent } from './shared/inventory/inventory.component';
+import { InventoryComponent } from './admin-portal/products/inventory/inventory.component';
 import { AddUserComponent } from './admin-portal/users/add-user/add-user.component';
 import { ShowAllUsersComponent } from './admin-portal/users/show-all-users/show-all-users.component';
 import { DashboardComponent } from './admin-portal/dashboard/dashboard.component';
@@ -45,10 +45,11 @@ export const routes: Routes = [
       { path: 'shops/add', component: AddShopComponent , canActivate: [authGuard], data: { roles: ['systemAdmin'] }},
       { path: 'shops/view', component: AllShopsComponent , canActivate: [authGuard], data: { roles: ['systemAdmin'] }},
       { path: 'shops/edit/:id', component: EditShopComponent , canActivate: [authGuard], data: { roles: ['systemAdmin'] }},
-      { path: 'stock/view', component: ViewStockComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
-      { path: 'stock/add', component: AddStockComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
-      { path: 'products/add', component: AddProductComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
-      { path: 'inventory', component: InventoryComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
+
+      { path: 'shops/:shopId/stock/view', component: ViewStockComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
+      { path: 'shops/:shopId/stock/add', component: AddStockComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
+      { path: 'shops/:shopId/products/add', component: AddProductComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
+      { path: 'shops/:shopId/products/view', component: InventoryComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
 
 
 

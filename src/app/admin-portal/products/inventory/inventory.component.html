@@ -34,7 +34,7 @@
             <div class="d-flex justify-content-between align-items-center">
               <div>
                 <h5 class="card-title text-muted">Total Products</h5>
-                <h2 class="mb-0">{{ products.length }}</h2>
+                <h2 class="mb-0 text-muted">{{ products.length }}</h2>
               </div>
               <i class="bi bi-box-seam fs-1 text-primary"></i>
             </div>
@@ -48,7 +48,7 @@
             <div class="d-flex justify-content-between align-items-center">
               <div>
                 <h5 class="card-title text-muted">Active Products</h5>
-                <h2 class="mb-0">{{ activeProductsCount }}</h2>
+                <h2 class="mb-0 text-muted">{{ activeProductsCount }}</h2>
               </div>
               <div class="bg-success rounded-circle" style="width: 20px; height: 20px;"></div>
             </div>
@@ -62,7 +62,7 @@
             <div class="d-flex justify-content-between align-items-center">
               <div>
                 <h5 class="card-title text-muted">Low Stock</h5>
-                <h2 class="mb-0">{{ lowStockCount }}</h2>
+                <h2 class="mb-0 text-muted">{{ lowStockCount }}</h2>
               </div>
               <i class="bi bi-exclamation-triangle fs-1 text-warning"></i>
             </div>
@@ -76,7 +76,7 @@
             <div class="d-flex justify-content-between align-items-center">
               <div>
                 <h5 class="card-title text-muted">Out of Stock</h5>
-                <h2 class="mb-0">{{ outOfStockCount }}</h2>
+                <h2 class="mb-0 text-muted">{{ outOfStockCount }}</h2>
               </div>
               <div class="bg-danger rounded-circle" style="width: 20px; height: 20px;"></div>
             </div>
@@ -92,8 +92,8 @@
           <h5 class="mb-0">Products</h5>
           <p class="mb-0 text-muted">Showing {{ filteredProducts.length }} of {{ products.length }} products</p>
         </div>
-        <button class="btn btn-primary" (click)="openEditModal(null)" data-bs-toggle="modal" data-bs-target="#productModal">
-          <i class="bi bi-plus-lg me-1"></i> Add Product
+        <button class="btn btn-primary" (click)="addProduct()" >
+          <i class="bi bi-plus-lg me-1" ></i> Add Product
         </button>
       </div>
       

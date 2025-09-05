@@ -27,16 +27,18 @@ export class InventoryService {
     return this.http.get<Product[]>(`${this.baseUrl}/GetProductsByShop/${shopId}`);
   }
 
-  addProduct(shopId: number, product: Partial<Product>): Observable<Product> {
-    return this.http.post<Product>(`${this.baseUrl}?shopId=${shopId}`, product);
+  addProduct(product: FormData): Observable<any> {
+    return this.http.post(`${this.baseUrl}/AddProduct`, product);
   }
 
-  // updateProduct(product: Product): Observable<Product> {
-  //   return this.http.put<Product>(`${this.baseUrl}/${product.id}`, product);
-  // }
+  //  Edit Product
+  editProduct(productId: number, product: FormData): Observable<any> {
+    return this.http.put(`${this.baseUrl}/EditProduct/${productId}`, product);
+  }
 
-  deleteProduct(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+
+ deleteProduct(productId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/SoftDeleteProduct/${productId}`);
   }
 
 
