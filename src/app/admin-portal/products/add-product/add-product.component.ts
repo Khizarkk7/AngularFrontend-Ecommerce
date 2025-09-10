@@ -5,6 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { InventoryService } from '../../../core/services/inventory.service';
+import Swal from 'sweetalert2';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-add-product',
@@ -21,6 +23,7 @@ export class AddProductComponent implements OnInit {
   successMessage: string | null = null;
 
   constructor(
+    private location: Location ,
     private fb: FormBuilder,
     private authService: AuthService,
     private inventoryService: InventoryService,
@@ -39,15 +42,14 @@ export class AddProductComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const currentUser = this.authService.currentUserValue;
-    if (currentUser?.shopId) {
-      this.productForm.patchValue({
-        shopId: currentUser.shopId
-      });
+    const shopId = this.authService.getCurrentShopId();
+    if (shopId) {
+      this.productForm.patchValue({ shopId });
     } else {
       this.errorMessage = 'No shop associated with your account.';
     }
   }
+
 
   onImageSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -98,21 +100,38 @@ export class AddProductComponent implements OnInit {
     this.inventoryService.addProduct(formData).subscribe({
       next: (response) => {
         this.isSubmitting = false;
-        console.log(" Product added", response);
-        this.successMessage = 'Product added successfully!';
+        console.log("Product added", response);
+
+        Swal.fire({
+          icon: 'success',
+          title: 'Added!',
+          text: 'Product added successfully!',
+          timer: 1500,
+          showConfirmButton: false,
+          willClose: () => {
+            this.location.back();
+          }
+        });
+
         this.productForm.reset();
         this.productForm.patchValue({
-          shopId: this.authService.currentUserValue?.shopId
+          shopId: this.authService.getCurrentShopId()
         });
-        setTimeout(() => this.router.navigate(['/products']), 2000);
       },
       error: (error) => {
         this.isSubmitting = false;
-        this.errorMessage = error.error?.message || 'Failed to add product. Please try again.';
         console.error('Error adding product:', error);
+
+        // ✅ SweetAlert error
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: error.error?.message || 'Failed to add product. Please try again.'
+        });
       }
     });
   }
+
 
   private markAllAsTouched(): void {
     Object.values(this.productForm.controls).forEach(control => {
