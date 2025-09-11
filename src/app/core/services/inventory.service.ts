@@ -38,7 +38,7 @@ export class InventoryService {
 
 
  deleteProduct(productId: number): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/SoftDeleteProduct/${productId}`);
+    return this.http.delete(`${this.baseUrl}/SoftDeleteProduct/${productId}`,{ responseType: 'text' });
   }
 
 

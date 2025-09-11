@@ -5,6 +5,8 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { NgbDropdownModule, NgbModalModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
 import { InventoryService } from '../../../core/services/inventory.service';
 import { AuthService } from '../../../core/services/auth.service';
+import Swal from 'sweetalert2';
+import { CustomSwal } from '../../../core/services/custom-swal.service';
 
 interface Product {
   productId: number;
@@ -12,6 +14,7 @@ interface Product {
   description?: string | null;
   price: number;
   imageUrl?: string | null;
+  imageFile?: File;
   stockQuantity?: number | null;
   shopId: number;
   createdAt?: Date | null;
@@ -40,7 +43,7 @@ export class InventoryComponent implements OnInit {
   isLoading = false;
   errorMessage = '';
   successMessage = '';
-  
+
   // UI Controls
   searchTerm = '';
   page = 1;
@@ -53,9 +56,9 @@ export class InventoryComponent implements OnInit {
     private route: ActivatedRoute,
     private authService: AuthService,
     private router: Router,
-  ) {}
+  ) { }
 
- ngOnInit(): void {
+  ngOnInit(): void {
     //  ShopId directly from token
     const id = this.authService.getCurrentShopId();
     if (id) {
@@ -69,7 +72,7 @@ export class InventoryComponent implements OnInit {
   loadProducts(): void {
     this.isLoading = true;
     this.errorMessage = '';
-    
+
     this.inventoryService.getProductsByShop(this.shopId).subscribe({
       next: (products: Product[]) => {
         this.products = products.map(p => ({
@@ -79,7 +82,7 @@ export class InventoryComponent implements OnInit {
         }));
         this.isLoading = false;
       },
-      error: (err:any) => {
+      error: (err: any) => {
         this.handleError('Failed to load products', err);
       }
     });
@@ -90,67 +93,105 @@ export class InventoryComponent implements OnInit {
     this.router.navigate(['/app-admin/shops', this.shopId, 'products', 'add']);
   }
 
-  //addProduct(): void {
-    // if (this.validateProductForm()) {
-    //   this.isLoading = true;
-    //   const productToAdd = {
-    //     ...this.newProduct,
-    //     shopId: this.shopId
-    //   } as Product;
-      
-    //   this.inventoryService.addProduct(productToAdd).subscribe({
-    //     next: (product: Product) => {
-    //       this.products = [...this.products, {
-    //         ...product,
-    //         status: this.calculateStatus(product.stockQuantity),
-    //         createdAt: product.createdAt ? new Date(product.createdAt) : new Date()
-    //       }];
-    //       this.showSuccess('Product added successfully');
-    //       this.resetForm();
-    //     },
-    //     error: (err) => this.handleError('Failed to add product', err)
-    //   });
-    // }
-  //}
+  selectedFile: File | null = null;
+  previewUrl: string | ArrayBuffer | null = null;
 
-  updateProduct(): void {
-    // if (this.selectedProduct && this.validateProductForm()) {
-    //   this.isLoading = true;
-    //   const updatedProduct = {
-    //     ...this.selectedProduct,
-    //     ...this.newProduct,
-    //     productId: this.selectedProduct.productId
-    //   } as Product;
-      
-    //   this.inventoryService.updateProduct(updatedProduct).subscribe({
-    //     next: (product: Product) => {
-    //       this.products = this.products.map(p => 
-    //         p.productId === product.productId ? {
-    //           ...product,
-    //           status: this.calculateStatus(product.stockQuantity),
-    //           createdAt: p.createdAt // Preserve original created date
-    //         } : p
-    //       );
-    //       this.showSuccess('Product updated successfully');
-    //       this.resetForm();
-    //     },
-    //     error: (err) => this.handleError('Failed to update product', err)
-    //   });
-    // }
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.newProduct.imageFile = input.files[0];
+      const reader = new FileReader();
+      reader.onload = e => this.previewUrl = reader.result;
+      reader.readAsDataURL(this.newProduct.imageFile!);
+    }
   }
 
-  deleteProduct(id: number): void {
-    if (confirm('Are you sure you want to delete this product?')) {
+
+
+
+updateProduct() {
+ if (!this.selectedProduct) return;
+
+  const formData = new FormData();
+
+  // Required fields
+  formData.append('ProductName', this.newProduct.productName || '');
+  formData.append('Price', (this.newProduct.price ?? 0).toString());
+  formData.append('StockQuantity', (this.newProduct.stockQuantity ?? 0).toString());
+  formData.append('ShopId', this.authService.getCurrentShopId()?.toString() || '0');
+
+  // Optional fields (append only if present)
+  if (this.newProduct.description) {
+    formData.append('Description', this.newProduct.description);
+  }
+
+  if (this.newProduct.imageFile instanceof File) {
+    formData.append('imageUrl', this.newProduct.imageFile);
+  }
+
+  this.inventoryService.editProduct(this.selectedProduct.productId, formData).subscribe({
+    next: (res) => {
+      Swal.fire({
+        icon: 'success',
+        title: 'Updated!',
+        text: 'Product updated successfully!',
+        timer: 1500,
+        showConfirmButton: false
+      });
+
+      //  Refresh product list after update
+      this.loadProducts();
+
+      //  Reset modal state
+      this.selectedProduct = null;
+      this.newProduct = {};
+      this.previewUrl = null;
+    },
+    error: (err) => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: err.error?.message || 'Failed to update product.'
+      });
+    }
+  });
+}
+
+deleteProduct(id: number): void {
+  CustomSwal.fire({
+    title: 'Are you sure?',
+    text: 'This action will permanently delete the product!',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel'
+  }).then((result) => {
+    if (result.isConfirmed) {
       this.isLoading = true;
       this.inventoryService.deleteProduct(id).subscribe({
         next: () => {
           this.products = this.products.filter(p => p.productId !== id);
-          this.showSuccess('Product deleted successfully');
+          CustomSwal.fire({
+            icon: 'success',
+            title: 'Deleted!',
+            text: 'Product deleted successfully',
+            timer: 1500,
+            showConfirmButton: false
+          });
         },
-        error: (err) => this.handleError('Failed to delete product', err)
+        error: (err) => {
+          CustomSwal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: 'Failed to delete product',
+          });
+          this.handleError('Failed to delete product', err);
+        }
       });
     }
-  }
+  });
+}
+
 
   // Helper Methods
   private calculateStatus(stockQuantity?: number | null): string {
@@ -179,7 +220,8 @@ export class InventoryComponent implements OnInit {
       description: null,
       price: 0,
       stockQuantity: null,
-      imageUrl: null
+      imageUrl: null,
+      imageFile: undefined 
     };
   }
 

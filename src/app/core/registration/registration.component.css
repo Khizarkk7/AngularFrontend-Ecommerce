@@ -10,4 +10,28 @@
     background-position: center;   background-repeat: no-repeat;
     height: 100vh; 
   } */
-  
+  /* Full-page gradient background */
+.login-wrapper {
+  min-height: 100vh;
+  /* display: flex; */
+  /* align-items: center; */
+  justify-content: center;
+  background: linear-gradient(135deg, #6C63FF, #5A54D6, #4ECDC4);
+  background-size: 300% 300%;
+  animation: gradientMove 12s ease infinite;
+}
+
+/* Glass effect card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Gradient animation */
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
