@@ -21,10 +21,16 @@
         <ul class="nav flex-column ps-3" *ngIf="menu.expanded && !sidebarCollapsed()">
           <li *ngFor="let child of menu.children">
             <a class="nav-link text-white"
+   href="#"
+   (click)="goTo(child); $event.preventDefault()">
+  <i class="{{ child.icon }} me-2"></i> {{ child.title }}
+</a>
+
+            <!-- <a class="nav-link text-white"
                [routerLink]="'/app-admin/' + child.route"
                routerLinkActive="active">
               <i class="{{ child.icon }} me-2"></i> {{ child.title }}
-            </a>
+            </a> -->
           </li>
         </ul>
       </div>

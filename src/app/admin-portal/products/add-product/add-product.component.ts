@@ -88,7 +88,7 @@ export class AddProductComponent implements OnInit {
 
     this.isSubmitting = true;
 
-    // 👇 Backend ke liye FormData create karte hain
+    // Backend ke liye FormData create karte hain
     const formData = new FormData();
     formData.append('ProductName', this.productForm.value.productName);
     formData.append('Description', this.productForm.value.description);
@@ -122,7 +122,7 @@ export class AddProductComponent implements OnInit {
         this.isSubmitting = false;
         console.error('Error adding product:', error);
 
-        // ✅ SweetAlert error
+        //  SweetAlert error
         Swal.fire({
           icon: 'error',
           title: 'Error!',

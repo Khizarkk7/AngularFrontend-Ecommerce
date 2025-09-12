@@ -8,7 +8,7 @@ import { isPlatformBrowser } from '@angular/common';
 @Component({
   selector: 'app-aside-bar',
   standalone: true,
-  imports: [RouterLink, CommonModule, RouterOutlet],
+  imports: [RouterLink, CommonModule,],
   templateUrl: './aside-bar.component.html',
   styleUrl: './aside-bar.component.css'
 })
@@ -93,4 +93,21 @@ export class AsideBarComponent {
       }
     }
   }
+
+ goTo(menu: any) {
+  const shopId = this.authService.getCurrentShopId(); // token/service se id
+  if (!shopId) {
+    console.error("No shopId found in token");
+    return;
+  }
+
+  // Agar route me :shopId hai to replace karo
+  let route = menu.route;
+  if (route.includes(':shopid')) {
+    route = route.replace(':shopid', shopId.toString());
+  }
+
+  this.router.navigate([`/app-admin${route}`]);
+}
+
 }
