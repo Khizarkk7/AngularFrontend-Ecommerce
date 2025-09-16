@@ -12,7 +12,7 @@ import { ShowAllUsersComponent } from './admin-portal/users/show-all-users/show-
 import { DashboardComponent } from './admin-portal/dashboard/dashboard.component';
 import { AddShopComponent } from './admin-portal/shops/add-shop/add-shop.component';
 import { AllShopsComponent } from './admin-portal/shops/all-shops/all-shops.component';
-import { ViewStockComponent } from './admin-portal/stocks/view-stock/view-stock.component';
+import { StockComponent } from './admin-portal/stocks/view-stock/view-stock.component';
 import { AddStockComponent } from './admin-portal/stocks/add-stock/add-stock.component';
 import { AddProductComponent } from './admin-portal/products/add-product/add-product.component';
 import { EditUserComponent } from './admin-portal/users/edit-user/edit-user.component';
@@ -47,8 +47,8 @@ export const routes: Routes = [
       { path: 'shops/view', component: AllShopsComponent , canActivate: [authGuard], data: { roles: ['systemAdmin'] }},
       { path: 'shops/edit/:id', component: EditShopComponent , canActivate: [authGuard], data: { roles: ['systemAdmin'] }},
 
-      { path: 'shops/:shopid/stock/all', component: ViewStockComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
-      { path: 'shops/:shopid/stock/add', component: AddStockComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
+      { path: 'shops/:shopid/stock/all', component: StockComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
+      //{ path: 'shops/:shopid/stock/add', component: AddStockComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
       { path: 'shops/:shopid/products/add', component: AddProductComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
       { path: 'shops/:shopid/products/all', component: InventoryComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
       //{ path: 'myshop', component: DetailShopComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},

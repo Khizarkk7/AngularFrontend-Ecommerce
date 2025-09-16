@@ -1,67 +1,97 @@
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { StockService, Stock } from '../../../core/services/stock.service';
+import { AuthService } from '../../../core/services/auth.service';
+import Swal from 'sweetalert2';
 
-interface Stock {
-  productId: number;
-  productName: string;
-  description: string;
-  price: number;
-  imageUrl: string;
-  stockQuantity: number;
-  shopId: number;
-}
 @Component({
-  selector: 'app-view-stock',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './view-stock.component.html',
-  styleUrl: './view-stock.component.css'
+  styleUrls: ['./view-stock.component.scss']
 })
-export class ViewStockComponent {
+export class StockComponent implements OnInit {
+  stocks: Stock[] = [];
+  shopId!: number;
+  errorMessage: string = '';
 
-stocks: Stock[] = [];
+  constructor(private stockService: StockService,
+    private authService: AuthService
+  ) { }
 
   ngOnInit(): void {
-    // Dummy data, baad me API se call karna hai
-    this.stocks = [
-      {
-        productId: 1,
-        productName: 'Desert Boot',
-        description: 'Desert boot with dust protection',
-        price: 300,
-        imageUrl: 'https://placehold.co/600x400/000000/FFFH',
-        stockQuantity: 20,
-        shopId: 5
-      },
-      {
-        productId: 2,
-        productName: 'Running Shoes',
-        description: 'Lightweight running shoes',
-        price: 150,
-        imageUrl: 'https://placehold.co/600x400@2x.png',
-        stockQuantity: 5,
-        shopId: 5
-      },
-      {
-        productId: 3,
-        productName: 'Leather Jacket',
-        description: 'Black premium leather jacket',
-        price: 500,
-        imageUrl: 'https://placehold.co/600x400/png',
-        stockQuantity: 0,
-        shopId: 5
-      }
-    ];
+    //this.loadStocks();
+    const id = this.authService.getCurrentShopId();
+    if (id) {
+      this.shopId = id;
+      this.loadStocks();
+    } else {
+      this.errorMessage = 'Unauthorized: Shop ID not found in token';
+    }
   }
 
-viewHistory(_t13: any) {
-throw new Error('Method not implemented.');
-}
-openRemoveStock(_t13: any) {
-throw new Error('Method not implemented.');
-}
-openAddStock(_t13: any) {
-throw new Error('Method not implemented.');
-}
+  // Load all stocks
+  loadStocks(): void {
+    this.stockService.getStocksByShop(this.shopId).subscribe({
+      next: (res) => this.stocks = res,
+      error: (err) => Swal.fire('Error', 'Failed to fetch stocks', 'error')
+    });
 
+  }
+
+  // Add stock quantity
+  addStock(stock: Stock): void {
+    const quantity = 1; // Default increment
+    Swal.fire({
+      title: 'Add Stock',
+      text: `Do you want to add ${quantity} to ${stock.productName}?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, add it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.stockService.addQuantity(stock.stockId, quantity).subscribe({
+          next: () => {
+            stock.stockQuantity += quantity;
+            Swal.fire('Success', 'Stock added successfully', 'success');
+          },
+          error: () => Swal.fire('Error', 'Failed to add stock', 'error')
+        });
+      }
+    });
+  }
+
+  // Reduce stock quantity
+  reduceStock(stock: Stock): void {
+    if (stock.stockQuantity <= 0) {
+      Swal.fire('Warning', 'Stock is already zero', 'warning');
+      return;
+    }
+
+    const quantity = 1; // Default decrement
+    Swal.fire({
+      title: 'Reduce Stock',
+      text: `Do you want to reduce ${quantity} from ${stock.productName}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, reduce it!',
+      cancelButtonText: 'Cancel'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.stockService.reduceQuantity(stock.stockId, quantity).subscribe({
+          next: () => {
+            stock.stockQuantity -= quantity;
+            Swal.fire('Success', 'Stock reduced successfully', 'success');
+          },
+          error: () => Swal.fire('Error', 'Failed to reduce stock', 'error')
+        });
+      }
+    });
+  }
+
+  // Optional: View stock history (implement backend API first)
+  viewHistory(stock: Stock): void {
+    Swal.fire('Info', `View history for ${stock.productName} coming soon!`, 'info');
+  }
 }
