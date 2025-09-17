@@ -12,3 +12,32 @@
   height: 180px;
   object-fit: cover;
 }
+.btn-float-add {
+  background: #6C63FF;
+  border: none;
+  color: white;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(108, 99, 255, 0.3);
+}
+
+.btn-float-add:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 15px rgba(108, 99, 255, 0.4);
+}
+
+.btn-float-reduce {
+  background: #FF6B6B;
+  border: none;
+  color: white;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(255, 107, 107, 0.3);
+}
+
+.btn-float-reduce:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 15px rgba(255, 107, 107, 0.4);
+}

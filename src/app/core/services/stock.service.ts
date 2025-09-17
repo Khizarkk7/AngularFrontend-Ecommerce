@@ -6,15 +6,28 @@ export interface Stock {
   stockId: number;
   productId: number;
   productName: string;
+   price: number;
   shopId: number;
   shopName: string;
   quantity: number;
-  stockQuantity: number;
-  price: number;
+//stockQuantity: number;
   description: string;
   imageUrl: string;
   lastUpdated: Date;
   createdAt: Date;
+}
+
+export interface StockHistory {
+  historyId: number;
+  stockId: number;
+  productId: number;
+  shopId: number;
+  changeType: string;
+  quantityChanged: number;
+  previousQuantity: number;
+  newQuantity: number;
+  changedBy: string;
+  changedAt: string;
 }
 
 @Injectable({
@@ -22,6 +35,7 @@ export interface Stock {
 })
 export class StockService {
   private baseUrl = 'https://localhost:7058/api/Stock';
+  private imageBaseUrl = 'https://localhost:7058/'
 
   constructor(private http: HttpClient) { }
 
@@ -37,4 +51,9 @@ export class StockService {
   reduceQuantity(stockId: number, quantity: number): Observable<any> {
     return this.http.post(`${this.baseUrl}/ReduceQuantity`, { stockId, quantity });
   }
+
+ getStockHistory(stockId: number): Observable<StockHistory[]> {
+    return this.http.get<StockHistory[]>(`${this.baseUrl}/GetStockHistory/${stockId}`);
+  }
+
 }

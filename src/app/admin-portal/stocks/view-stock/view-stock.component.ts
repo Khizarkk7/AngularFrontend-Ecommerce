@@ -30,68 +30,140 @@ export class StockComponent implements OnInit {
     }
   }
 
-  // Load all stocks
-  loadStocks(): void {
-    this.stockService.getStocksByShop(this.shopId).subscribe({
-      next: (res) => this.stocks = res,
-      error: (err) => Swal.fire('Error', 'Failed to fetch stocks', 'error')
-    });
+ // Load all stocks
+loadStocks(): void {
+  this.stockService.getStocksByShop(this.shopId).subscribe({
+    next: (res) => {
+      console.log("API Response:", res);  // <-- yahan check karo kya aa raha h
+      this.stocks = res;
+    },
+    error: (err) => {
+      console.error("API Error:", err);   // <-- error bhi log karo
+      Swal.fire('Error', 'Failed to fetch stocks', 'error');
+    }
+  });
+}
 
-  }
 
   // Add stock quantity
   addStock(stock: Stock): void {
-    const quantity = 1; // Default increment
-    Swal.fire({
-      title: 'Add Stock',
-      text: `Do you want to add ${quantity} to ${stock.productName}?`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, add it!',
-      cancelButtonText: 'Cancel'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.stockService.addQuantity(stock.stockId, quantity).subscribe({
-          next: () => {
-            stock.stockQuantity += quantity;
-            Swal.fire('Success', 'Stock added successfully', 'success');
-          },
-          error: () => Swal.fire('Error', 'Failed to add stock', 'error')
-        });
-      }
-    });
-  }
+  Swal.fire({
+    title: 'Add Stock',
+    input: 'number',
+    inputLabel: `Enter quantity to add for ${stock.productName}`,
+    inputAttributes: {
+      min: '1'
+    },
+    showCancelButton: true,
+    confirmButtonText: 'Add'
+  }).then((result) => {
+    if (result.isConfirmed && result.value) {
+      const quantity = parseInt(result.value, 10);
+
+      this.stockService.addQuantity(stock.stockId, quantity).subscribe({
+        next: (updatedStock) => {
+          stock.quantity = updatedStock.quantity; // backend se updated value lo
+          Swal.fire('Success', `Added ${quantity} to stock`, 'success');
+        },
+        error: () => Swal.fire('Error', 'Failed to add stock', 'error')
+      });
+    }
+  });
+}
+
 
   // Reduce stock quantity
   reduceStock(stock: Stock): void {
-    if (stock.stockQuantity <= 0) {
-      Swal.fire('Warning', 'Stock is already zero', 'warning');
-      return;
-    }
+  Swal.fire({
+    title: 'Reduce Stock',
+    input: 'number',
+    inputLabel: `Enter quantity to reduce from ${stock.productName}`,
+    inputAttributes: {
+      min: '1',
+      max: stock.quantity.toString()
+    },
+    showCancelButton: true,
+    confirmButtonText: 'Reduce'
+  }).then((result) => {
+    if (result.isConfirmed && result.value) {
+      const quantity = parseInt(result.value, 10);
 
-    const quantity = 1; // Default decrement
-    Swal.fire({
-      title: 'Reduce Stock',
-      text: `Do you want to reduce ${quantity} from ${stock.productName}?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Yes, reduce it!',
-      cancelButtonText: 'Cancel'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.stockService.reduceQuantity(stock.stockId, quantity).subscribe({
-          next: () => {
-            stock.stockQuantity -= quantity;
-            Swal.fire('Success', 'Stock reduced successfully', 'success');
-          },
-          error: () => Swal.fire('Error', 'Failed to reduce stock', 'error')
-        });
+      if (quantity > stock.quantity) {
+        Swal.fire('Error', 'Quantity exceeds available stock', 'error');
+        return;
       }
-    });
-  }
 
-  // Optional: View stock history (implement backend API first)
-  viewHistory(stock: Stock): void {
-    Swal.fire('Info', `View history for ${stock.productName} coming soon!`, 'info');
-  }
+      this.stockService.reduceQuantity(stock.stockId, quantity).subscribe({
+        next: (updatedStock) => {
+          stock.quantity = updatedStock.quantity;
+          Swal.fire('Success', `Reduced ${quantity} from stock`, 'success');
+        },
+        error: () => Swal.fire('Error', 'Failed to reduce stock', 'error')
+      });
+    }
+  });
+}
+
+
+ viewHistory(stockId: number): void {
+  this.stockService.getStockHistory(stockId).subscribe({
+    next: (res) => {
+      //console.log('Stock History:', res)
+      if (!res || res.length === 0) {
+        Swal.fire('Info', 'No history found for this stock.', 'info');
+        return;
+      }
+
+      // build HTML table dynamically
+      let tableHtml = `
+        <div style="max-height:300px; overflow-y:auto;">
+        <table border="1" cellspacing="0" cellpadding="5" style="width:100%; text-align:center; border-collapse:collapse;">
+          <thead style="background:#f4f4f4;">
+            <tr>
+              <th>Change Type</th>
+              <th>Qty Changed</th>
+              <th>Previous</th>
+              <th>New</th>
+              <th>Changed By</th>
+              <th>Changed At</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      res.forEach(item => {
+        tableHtml += `
+          <tr>
+            <td>${item.changeType}</td>
+            <td>${item.quantityChanged}</td>
+            <td>${item.previousQuantity}</td>
+            <td>${item.newQuantity}</td>
+            <td>${item.changedBy}</td>
+            <td>${new Date(item.changedAt).toLocaleString()}</td>
+          </tr>
+        `;
+      });
+
+      tableHtml += `
+          </tbody>
+        </table>
+        </div>
+      `;
+
+      // show Swal modal
+      Swal.fire({
+        title: 'Stock History',
+        html: tableHtml,
+        width: 800,
+        showCloseButton: true,
+        confirmButtonText: 'Close'
+      });
+    },
+    error: (err) => {
+      console.error('Error fetching stock history:', err);
+      Swal.fire('Error', 'Failed to fetch stock history', 'error');
+    }
+  });
+}
+
 }
