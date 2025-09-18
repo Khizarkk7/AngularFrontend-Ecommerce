@@ -1,0 +1,98 @@
+<!-- 
+<div *ngIf="shop" class="shop-container">
+
+ 
+  <header class="shop-header">
+    <img class="shop-logo" [src]="shop.logo" alt="{{ shop.shopName }}">
+    <div class="shop-info">
+      <h1>{{ shop.shopName }}</h1>
+      <p class="desc">{{ shop.description }}</p>
+      <p class="contact"><strong>Contact:</strong> {{ shop.contactInfo }}</p>
+    </div>
+  </header>
+
+  
+  <section *ngIf="shop.products?.length" class="products-section">
+    <h2 class="section-title">Available Products</h2>
+
+    <div class="products-grid">
+      <div *ngFor="let product of shop.products" class="product-card">
+        <img [src]="product.imageUrl" alt="{{ product.name }}">
+        <h3>{{ product.name }}</h3>
+        <p class="price">Rs. {{ product.price | number:'1.0-0' }}</p>
+        <button class="btn-add">Add to Cart</button>
+      </div>
+    </div>
+  </section>
+
+  <section *ngIf="!shop.products?.length">
+    <p class="no-products">No products available in this shop yet.</p>
+  </section>
+</div> -->
+
+<div *ngIf="shop" class="shop-container">
+
+  <!-- Shop Header -->
+  <header class="shop-header">
+    <div class="shop-header-content">
+      <img class="shop-logo" [src]="shop.logo" alt="{{ shop.shopName }}">
+      <div class="shop-info">
+        <h1 class="shop-title">{{ shop.shopName }}</h1>
+        <p class="shop-desc">{{ shop.description }}</p>
+        <p class="shop-contact"><i class="fas fa-phone-alt"></i> {{ shop.contactInfo }}</p>
+      </div>
+    </div>
+
+    <!-- Cart Button -->
+    <div class="cart-btn" (click)="toggleCart()">
+      <i class="fas fa-shopping-cart"></i>
+      <span class="cart-count">{{ cart.length }}</span>
+    </div>
+  </header>
+
+  <!-- Products Section -->
+  <section *ngIf="shop.products?.length" class="products-section">
+    <h2 class="section-title">🛍️ Available Products</h2>
+
+    <div class="products-grid">
+      <div *ngFor="let product of shop.products" class="product-card">
+        <div class="product-image">
+          <img [src]="product.imageUrl" alt="{{ product.name }}">
+          <span class="badge" *ngIf="product.discount">-{{ product.discount }}%</span>
+        </div>
+        <div class="product-body">
+          <h3 class="product-name">{{ product.name }}</h3>
+          <div class="product-rating">
+            <i class="fas fa-star" *ngFor="let star of [1,2,3,4,5]"></i>
+          </div>
+          <p class="price">Rs. {{ product.price | number:'1.0-0' }}</p>
+          <button class="btn-add" (click)="addToCart(product)">
+            <i class="fas fa-cart-plus"></i> Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section *ngIf="!shop.products?.length" class="no-products">
+    <i class="fas fa-box-open"></i> No products available yet.
+  </section>
+
+  <!-- Cart Sidebar -->
+  <div class="cart-sidebar" [class.open]="cartOpen">
+    <h3><i class="fas fa-shopping-cart"></i> Your Cart</h3>
+    <div *ngIf="cart.length; else emptyCart">
+      <div *ngFor="let item of cart" class="cart-item">
+        <img [src]="item.imageUrl" alt="{{ item.name }}">
+        <div>
+          <p>{{ item.name }}</p>
+          <small>Rs. {{ item.price }}</small>
+        </div>
+      </div>
+      <button class="btn-checkout">Checkout</button>
+    </div>
+    <ng-template #emptyCart>
+      <p>No items in cart.</p>
+    </ng-template>
+  </div>
+</div>

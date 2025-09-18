@@ -107,6 +107,26 @@ getCurrentShopId(): number | null {
   return payload?.shopId ? parseInt(payload.shopId) : null;
 }
 
+  //  Role getter
+  getCurrentUserRole(): string | null {
+    const payload = this.getDecodedToken();
+
+    // Microsoft claim se role nikaalna
+    return (
+      payload?.["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] ||
+      payload?.role ||
+      null
+    );
+  }
+
+  //  Role check helper
+  hasRole(role: string): boolean {
+    const currentRole = this.getCurrentUserRole();
+    return currentRole?.toLowerCase() === role.toLowerCase();
+  }
+
+
+
 getUserName(): string | null {
   const payload = this.getDecodedToken();
   return payload?.name || null;

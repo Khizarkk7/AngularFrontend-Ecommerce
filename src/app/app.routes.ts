@@ -13,11 +13,11 @@ import { DashboardComponent } from './admin-portal/dashboard/dashboard.component
 import { AddShopComponent } from './admin-portal/shops/add-shop/add-shop.component';
 import { AllShopsComponent } from './admin-portal/shops/all-shops/all-shops.component';
 import { StockComponent } from './admin-portal/stocks/view-stock/view-stock.component';
-import { AddStockComponent } from './admin-portal/stocks/add-stock/add-stock.component';
 import { AddProductComponent } from './admin-portal/products/add-product/add-product.component';
 import { EditUserComponent } from './admin-portal/users/edit-user/edit-user.component';
 import { EditShopComponent } from './admin-portal/shops/edit-shop/edit-shop.component';
 import { DetailShopComponent } from './admin-portal/shops/detail-shop/detail-shop.component';
+import { ShopPublicComponent } from './shop-public/shop-public/shop-public.component';
 
 
 export const routes: Routes = [
@@ -30,6 +30,14 @@ export const routes: Routes = [
   { path: 'signup', component: RegistrationComponent },
   { path: 'login', component: LoginComponent },
   { path: 'forgotpass', component: ForgotPassComponent },
+
+  //lazy loading for public shop view
+ {
+  path: 'shop/:slug',
+  loadComponent: () =>
+    import('./shop-public/shop-public/shop-public.component').then(m => m.ShopPublicComponent)
+},
+
 
   {
     path: 'app-admin',

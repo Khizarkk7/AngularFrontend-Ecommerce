@@ -94,17 +94,40 @@ export class AsideBarComponent {
     }
   }
 
- goTo(menu: any) {
-  const shopId = this.authService.getCurrentShopId(); // token/service se id
-  if (!shopId) {
-    console.error("No shopId found in token");
-    return;
-  }
+//  goTo(menu: any) {
+//   const shopId = this.authService.getCurrentShopId(); // token/service se id
+//   if (!shopId) {
+//     console.error("No shopId found in token");
+//     return;
+//   }
 
-  // Agar route me :shopId hai to replace karo
+//   // Agar route me :shopId hai to replace karo
+//   let route = menu.route;
+//   if (route.includes(':shopid')) {
+//     route = route.replace(':shopid', shopId.toString());
+//   }
+
+//   this.router.navigate([`/app-admin${route}`]);
+// }
+goTo(menu: any) {
+  const role = this.authService.getCurrentUserRole();
+  const shopId = this.authService.getCurrentShopId();
+
   let route = menu.route;
-  if (route.includes(':shopid')) {
-    route = route.replace(':shopid', shopId.toString());
+
+  // Agar route me :shopId hai to
+  if (route.includes(':shopId')) {
+    if (role?.toLowerCase() === 'systemadmin') {
+      // SystemAdmin ke liye :shopId hata do
+      route = route.replace('/:shopId', '');
+    } else {
+      // ShopAdmin ke liye shopId zaroori hai
+      if (!shopId) {
+        console.error("No shopId found in token");
+        return;
+      }
+      route = route.replace(':shopId', shopId.toString());
+    }
   }
 
   this.router.navigate([`/app-admin${route}`]);
