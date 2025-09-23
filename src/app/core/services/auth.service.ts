@@ -11,7 +11,8 @@ export class AuthService {
   currentUserValue: any;
   constructor(private http: HttpClient) { }
 
-  baseURL = 'https://localhost:7058/api';
+  //baseURL = 'https://localhost:7058/api';
+  private baseURL= 'https://192.168.70.94:7058/api'
 
   createUser(formData: any) {
     return this.http.post(this.baseURL + '/Login/register', formData);

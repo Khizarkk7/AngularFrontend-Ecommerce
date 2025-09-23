@@ -34,8 +34,9 @@ export interface StockHistory {
   providedIn: 'root'
 })
 export class StockService {
-  private baseUrl = 'https://localhost:7058/api/Stock';
-  private imageBaseUrl = 'https://localhost:7058/'
+  //private baseUrl = 'https://localhost:7058/api/Stock';
+  private baseUrl= 'https://192.168.70.94:7058/api/Stock'
+  //private imageBaseUrl = 'https://localhost:7058/'
 
   constructor(private http: HttpClient) { }
 

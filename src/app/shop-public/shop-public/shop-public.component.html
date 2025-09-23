@@ -1,98 +1,293 @@
-<!-- 
-<div *ngIf="shop" class="shop-container">
+<div class="shop-public-container" [class.dark-mode]="isDarkMode">
 
- 
-  <header class="shop-header">
-    <img class="shop-logo" [src]="shop.logo" alt="{{ shop.shopName }}">
-    <div class="shop-info">
-      <h1>{{ shop.shopName }}</h1>
-      <p class="desc">{{ shop.description }}</p>
-      <p class="contact"><strong>Contact:</strong> {{ shop.contactInfo }}</p>
-    </div>
-  </header>
-
-  
-  <section *ngIf="shop.products?.length" class="products-section">
-    <h2 class="section-title">Available Products</h2>
-
-    <div class="products-grid">
-      <div *ngFor="let product of shop.products" class="product-card">
-        <img [src]="product.imageUrl" alt="{{ product.name }}">
-        <h3>{{ product.name }}</h3>
-        <p class="price">Rs. {{ product.price | number:'1.0-0' }}</p>
-        <button class="btn-add">Add to Cart</button>
+  <!-- Announcement Bar -->
+  <div class="announcement-bar">
+    <div class="announcement-content">
+      <div class="announcement-item active">
+        <i class="fas fa-bolt"></i>
+        <span> Flash Sale - Up to 50% off on selected items!</span>
+      </div>
+      <div class="announcement-item">
+        <i class="fas fa-shipping-fast"></i>
+        <span> Free delivery for orders above Rs. 2000</span>
+      </div>
+      <div class="announcement-item">
+        <i class="fas fa-gift"></i>
+        <span> Special discounts for new customers</span>
       </div>
     </div>
-  </section>
-
-  <section *ngIf="!shop.products?.length">
-    <p class="no-products">No products available in this shop yet.</p>
-  </section>
-</div> -->
-
-<div *ngIf="shop" class="shop-container">
+    <button class="theme-toggle" (click)="toggleTheme()">
+      <i class="fas" [class.fa-moon]="!isDarkMode" [class.fa-sun]="isDarkMode"></i>
+    </button>
+  </div>
 
   <!-- Shop Header -->
   <header class="shop-header">
-    <div class="shop-header-content">
-      <img class="shop-logo" [src]="shop.logo" alt="{{ shop.shopName }}">
-      <div class="shop-info">
-        <h1 class="shop-title">{{ shop.shopName }}</h1>
-        <p class="shop-desc">{{ shop.description }}</p>
-        <p class="shop-contact"><i class="fas fa-phone-alt"></i> {{ shop.contactInfo }}</p>
-      </div>
-    </div>
-
-    <!-- Cart Button -->
-    <div class="cart-btn" (click)="toggleCart()">
-      <i class="fas fa-shopping-cart"></i>
-      <span class="cart-count">{{ cart.length }}</span>
-    </div>
-  </header>
-
-  <!-- Products Section -->
-  <section *ngIf="shop.products?.length" class="products-section">
-    <h2 class="section-title">🛍️ Available Products</h2>
-
-    <div class="products-grid">
-      <div *ngFor="let product of shop.products" class="product-card">
-        <div class="product-image">
-          <img [src]="product.imageUrl" alt="{{ product.name }}">
-          <span class="badge" *ngIf="product.discount">-{{ product.discount }}%</span>
-        </div>
-        <div class="product-body">
-          <h3 class="product-name">{{ product.name }}</h3>
-          <div class="product-rating">
-            <i class="fas fa-star" *ngFor="let star of [1,2,3,4,5]"></i>
+    <div class="container">
+      <div class="header-content">
+        <div class="shop-brand">
+          <img [src]="shop?.logo || 'assets/shop-default-logo.png'" alt="{{ shop?.shopName }}" class="shop-logo">
+          <div class="shop-info">
+            <h1 class="shop-title">{{ shop?.shopName }}</h1>
+            <p class="shop-description">{{ shop?.description }}</p>
+            <div class="shop-meta">
+              <span class="rating">
+                <i class="fas fa-star"></i> 4.8 (256 reviews)
+              </span>
+              <span class="contact">
+                <i class="fas fa-phone"></i> {{ shop?.contactInfo }}
+              </span>
+            </div>
           </div>
-          <p class="price">Rs. {{ product.price | number:'1.0-0' }}</p>
-          <button class="btn-add" (click)="addToCart(product)">
-            <i class="fas fa-cart-plus"></i> Add to Cart
+        </div>
+
+        <div class="header-actions">
+          <button class="action-btn wishlist-btn" title="Wishlist">
+            <i class="fas fa-heart"></i>
+          </button>
+          <button class="action-btn cart-btn" (click)="toggleCart()" title="Cart">
+            <i class="fas fa-shopping-bag"></i>
+            <span class="cart-badge" *ngIf="cart.length > 0">{{ cart.length }}</span>
+          </button>
+          <button class="action-btn user-btn" title="Account">
+            <i class="fas fa-user"></i>
           </button>
         </div>
       </div>
     </div>
-  </section>
+  </header>
 
-  <section *ngIf="!shop.products?.length" class="no-products">
-    <i class="fas fa-box-open"></i> No products available yet.
-  </section>
+  <!-- Navigation -->
+  <nav class="shop-navigation">
+    <div class="container">
+      <ul class="nav-menu">
+        <li><a href="#featured" class="nav-link active">Featured</a></li>
+        <li><a href="#categories" class="nav-link">Categories</a></li>
+        <li><a href="#new-arrivals" class="nav-link">New Arrivals</a></li>
+        <li><a href="#deals" class="nav-link">Hot Deals</a></li>
+        <li><a href="#about" class="nav-link">About Shop</a></li>
+      </ul>
+      <div class="search-bar">
+        <input type="text" placeholder="Search products..." class="search-input">
+        <button class="search-btn">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
 
-  <!-- Cart Sidebar -->
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container">
+
+      <!-- Featured Products -->
+      <section class="products-section">
+        <div class="section-header">
+          <h2 class="section-title">Featured Products</h2>
+          <div class="view-controls">
+            <button class="view-btn active" data-view="grid">
+              <i class="fas fa-th"></i>
+            </button>
+            <button class="view-btn" data-view="list">
+              <i class="fas fa-list"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Loading State -->
+        <div *ngIf="loading" class="loading-state">
+          <div class="spinner"></div>
+          <p>Loading amazing products for you...</p>
+        </div>
+
+        <!-- Error State -->
+        <div *ngIf="error && !loading" class="error-state">
+          <i class="fas fa-exclamation-triangle"></i>
+          <h3>Oops! Something went wrong</h3>
+          <p>{{ error }}</p>
+          <button class="retry-btn" (click)="retryLoading()">Try Again</button>
+        </div>
+
+        <!-- Products Grid -->
+        <div *ngIf="!loading && products?.length" class="products-grid" id="productsView">
+          <div *ngFor="let product of products" class="product-card">
+            <div class="product-image">
+              <img [src]="product.imageUrl" [alt]="product.name" (error)="handleImageError($event)">
+              <div class="product-overlay">
+                <button class="quick-view-btn" (click)="quickView(product)">
+                  <i class="fas fa-eye"></i>
+                </button>
+                <button class="wishlist-btn" (click)="toggleWishlist(product)">
+                  <i class="fas fa-heart"></i>
+                </button>
+              </div>
+              <span class="product-badge" *ngIf="product.discount">
+                -{{ product.discount }}%
+              </span>
+            </div>
+
+            <div class="product-info">
+              <h3 class="product-name">{{ product.name }}</h3>
+              <p class="product-description">
+                {{ product.description?.length > 60 ? (product.description | slice:0:60) + '...' : product.description
+                }}
+              </p>
+
+              <div class="product-rating">
+                <div class="stars">
+                  <i class="fas fa-star" *ngFor="let star of [1,2,3,4,5]"></i>
+                </div>
+                <span class="rating-count">({{ product.ratingCount || 0 }})</span>
+              </div>
+
+              <div class="product-price">
+                <span class="current-price">Rs. {{ product.price | number:'1.0-0' }}</span>
+                <span class="original-price" *ngIf="product.originalPrice">
+                  Rs. {{ product.originalPrice | number:'1.0-0' }}
+                </span>
+              </div>
+
+              <button class="add-to-cart-btn" (click)="addToCart(product)">
+                <i class="fas fa-shopping-cart"></i>
+                Add to Cart
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Empty State -->
+        <div *ngIf="!loading && !products?.length" class="empty-state">
+          <i class="fas fa-box-open"></i>
+          <h3>No products available yet</h3>
+          <p>Check back later for amazing products!</p>
+        </div>
+
+        <!-- Pagination -->
+        <div *ngIf="totalCount > pageSize" class="pagination-container">
+          <div class="pagination-info">
+            Showing {{ (page - 1) * pageSize + 1 }} to
+            {{ getMin(page * pageSize, totalCount) }} of {{ totalCount }} products
+          </div>
+
+          <nav class="pagination">
+            <button class="pagination-btn" [disabled]="page === 1" (click)="changePage(page - 1)">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+
+            <button *ngFor="let pageNum of getPaginationPages()" class="pagination-btn"
+              [class.active]="page === pageNum" (click)="changePage(pageNum)">
+              {{ pageNum }}
+            </button>
+
+            <button class="pagination-btn" [disabled]="page === totalPages" (click)="changePage(page + 1)">
+              <i class="fas fa-chevron-right"></i>
+            </button>
+          </nav>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Shopping Cart Sidebar -->
   <div class="cart-sidebar" [class.open]="cartOpen">
-    <h3><i class="fas fa-shopping-cart"></i> Your Cart</h3>
-    <div *ngIf="cart.length; else emptyCart">
-      <div *ngFor="let item of cart" class="cart-item">
-        <img [src]="item.imageUrl" alt="{{ item.name }}">
-        <div>
-          <p>{{ item.name }}</p>
-          <small>Rs. {{ item.price }}</small>
+    <div class="cart-header">
+      <h3>Your Shopping Cart</h3>
+      <button class="close-cart" (click)="toggleCart()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="cart-content">
+      <div *ngIf="cart.length > 0; else emptyCart" class="cart-items">
+        <div *ngFor="let item of cart; let i = index" class="cart-item">
+          <img [src]="item.imageUrl" [alt]="item.name">
+          <div class="item-details">
+            <h4>{{ item.name }}</h4>
+            <p class="item-price">Rs. {{ item.price | number:'1.0-0' }}</p>
+            <div class="quantity-controls">
+              <button (click)="updateQuantity(i, item.quantity - 1)">-</button>
+              <span>{{ item.quantity || 1 }}</span>
+              <button (click)="updateQuantity(i, item.quantity + 1)">+</button>
+            </div>
+          </div>
+          <button class="remove-item" (click)="removeFromCart(i)">
+            <i class="fas fa-trash"></i>
+          </button>
         </div>
       </div>
-      <button class="btn-checkout">Checkout</button>
+
+      <ng-template #emptyCart>
+        <div class="empty-cart">
+          <i class="fas fa-shopping-bag"></i>
+          <p>Your cart is empty</p>
+          <button class="continue-shopping" (click)="toggleCart()">
+            Continue Shopping
+          </button>
+        </div>
+      </ng-template>
     </div>
-    <ng-template #emptyCart>
-      <p>No items in cart.</p>
-    </ng-template>
+
+    <div *ngIf="cart.length > 0" class="cart-footer">
+      <div class="cart-total">
+        <span>Total: Rs. {{ getCartTotal() | number:'1.0-0' }}</span>
+      </div>
+      <button class="checkout-btn">Proceed to Checkout</button>
+    </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="shop-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h4>About {{ shop?.shopName }}</h4>
+          <p>{{ shop?.description }}</p>
+          <div class="social-links">
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-whatsapp"></i></a>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#">Home</a></li>
+            <li><a href="#">Products</a></li>
+            <li><a href="#">Categories</a></li>
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4>Customer Service</h4>
+          <ul>
+            <li><a href="#">Shipping Info</a></li>
+            <li><a href="#">Returns</a></li>
+            <li><a href="#">Size Guide</a></li>
+            <li><a href="#">FAQs</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4>Contact Info</h4>
+          <p><i class="fas fa-phone"></i> {{ shop?.contactInfo }}</p>
+          <p><i class="fas fa-envelope"></i> {{ 'info@' + (shop?.shopName?.toLowerCase() || 'shop') + '.com' }}</p>
+          <p><i class="fas fa-map-marker-alt"></i> Your Shop Address Here</p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2024 {{ shop?.shopName }}. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Back to Top Button -->
+  <button class="back-to-top" (click)="scrollToTop()">
+    <i class="fas fa-chevron-up"></i>
+  </button>
 </div>

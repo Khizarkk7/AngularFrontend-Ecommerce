@@ -19,8 +19,8 @@
     </div>
   
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h1 class="h3">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+      <h1 class="h3 mb-0">
         <i class="bi bi-box-seam me-2"></i>Inventory Management
       </h1>
       <!-- <span class="badge bg-secondary">Shop ID: {{ shopId }}</span> -->
@@ -28,7 +28,7 @@
   
     <!-- Stats Cards -->
     <div class="row mb-4 g-3">
-      <div class="col-md-3">
+      <div class="col-12 col-sm-6 col-lg-3">
         <div class="card h-100">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
@@ -42,7 +42,7 @@
         </div>
       </div>
       
-      <div class="col-md-3">
+      <div class="col-12 col-sm-6 col-lg-3">
         <div class="card h-100">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
@@ -56,7 +56,7 @@
         </div>
       </div>
       
-      <div class="col-md-3">
+      <div class="col-12 col-sm-6 col-lg-3">
         <div class="card h-100">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
@@ -70,7 +70,7 @@
         </div>
       </div>
       
-      <div class="col-md-3">
+      <div class="col-12 col-sm-6 col-lg-3">
         <div class="card h-100">
           <div class="card-body">
             <div class="d-flex justify-content-between align-items-center">
@@ -85,9 +85,9 @@
       </div>
     </div>
   
-    <!-- Products Table -->
+    <!-- Products Card -->
     <div class="card">
-      <div class="card-header d-flex justify-content-between align-items-center">
+      <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div>
           <h5 class="mb-0">Products</h5>
           <p class="mb-0 text-muted">Showing {{ filteredProducts.length }} of {{ products.length }} products</p>
@@ -98,22 +98,23 @@
       </div>
       
       <div class="card-body">
-        <div class="row mb-3">
-          <div class="col-md-6">
+        <div class="row mb-3 g-2 align-items-center">
+          <div class="col-12 col-md-6">
             <div class="input-group">
               <span class="input-group-text"><i class="bi bi-search"></i></span>
               <input type="text" class="form-control" placeholder="Search products..." 
                     [(ngModel)]="searchTerm" (input)="page = 1">
             </div>
           </div>
-          <div class="col-md-6 d-flex justify-content-end align-items-center">
-            <div class="form-text">
+          <div class="col-12 col-md-6 d-flex justify-content-md-end align-items-center">
+            <div class="form-text w-100 w-md-auto text-center text-md-end">
               Showing {{ (page-1)*pageSize+1 }} to {{ Math.min(page*pageSize, filteredProducts.length) }} of {{ filteredProducts.length }} entries
             </div>
           </div>
         </div>
         
-        <div class="table-responsive">
+        <!-- Desktop Table -->
+        <div class="table-responsive d-none d-md-block">
           <table class="table table-hover align-middle">
             <thead class="table-light">
               <tr>
@@ -146,7 +147,7 @@
                   </span>
                 </td>
                 <td class="text-end">{{ product.stockQuantity || 0 }} units</td>
-                <td class="text-end">${{ product.price | number:'1.2-2' }}</td>
+                <td class="text-end">Rs.{{ product.price | number:'1.2-2' }}</td>
                 <td class="text-center">
                   <div class="btn-group" role="group">
                     <button class="btn btn-sm btn-outline-primary" 
@@ -167,20 +168,63 @@
                   <div class="text-muted">
                     <i class="bi bi-exclamation-circle fs-4"></i>
                     <p class="mt-2">No products found</p>
-                    <!-- <button class="btn btn-sm btn-primary mt-2" 
-                            (click)="openEditModal(null)" 
-                            data-bs-toggle="modal" 
-                            data-bs-target="#productModal">
-                      Add your first product
-                    </button> -->
                   </div>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
+
+        <!-- Mobile Cards -->
+        <div class="d-md-none">
+          <div *ngFor="let product of paginatedProducts" class="card mb-2 shadow-sm">
+            <div class="card-body d-flex gap-3 align-items-center">
+              <img [src]="product.imageUrl || 'assets/default-product.png'"
+                   [alt]="product.productName"
+                   class="rounded flex-shrink-0"
+                   style="width: 56px; height: 56px; object-fit: cover;">
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div class="me-2">
+                    <div class="fw-semibold">{{ product.productName }}</div>
+                    <div class="text-muted small text-truncate" style="max-width: 180px;">
+                      {{ product.description || 'No description' }}
+                    </div>
+                    <div *ngIf="product.createdAt" class="text-muted small mt-1">
+                      Added {{ formatDate(product.createdAt) }}
+                    </div>
+                  </div>
+                  <span class="badge rounded-pill align-self-start" [ngClass]="getStatusBadgeClass(product.status)">
+                    {{ product.status }}
+                  </span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-2">
+                  <div class="text-muted small">{{ product.stockQuantity || 0 }} units</div>
+                  <div class="fw-semibold">${{ product.price | number:'1.2-2' }}</div>
+                </div>
+                <div class="d-flex gap-2 mt-2">
+                  <button class="btn btn-sm btn-outline-primary w-100"
+                          (click)="openEditModal(product)"
+                          data-bs-toggle="modal"
+                          data-bs-target="#productModal">
+                    <i class="bi bi-pencil me-1"></i> Edit
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger w-100"
+                          (click)="deleteProduct(product.productId)">
+                    <i class="bi bi-trash me-1"></i> Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="filteredProducts.length === 0 && !isLoading" class="text-center py-4 text-muted">
+            <i class="bi bi-exclamation-circle fs-4"></i>
+            <p class="mt-2 mb-0">No products found</p>
+          </div>
+        </div>
         
-        <div *ngIf="filteredProducts.length > pageSize" class="d-flex justify-content-between align-items-center mt-3">
+        <div *ngIf="filteredProducts.length > pageSize" class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
           <div class="form-text">
             Showing {{ (page-1)*pageSize+1 }} to {{ Math.min(page*pageSize, filteredProducts.length) }} of {{ filteredProducts.length }} entries
           </div>
@@ -199,9 +243,9 @@
     </div>
   </div>
   
- <!-- Product Modal -->
+<!-- Product Modal -->
 <div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true" (hidden.bs.modal)="resetForm()">
-  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable modal-fullscreen-sm-down">
     <div class="modal-content shadow-lg border-0 rounded-4">
       
       <!-- Header -->
@@ -218,14 +262,14 @@
       <div class="modal-body p-4">
         <form (submit)="selectedProduct ? updateProduct() : addProduct(); $event.preventDefault()">
           <div class="row g-3">
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
               <label class="form-label fw-semibold">Product Name <span class="text-danger">*</span></label>
               <input type="text" class="form-control rounded-3 shadow-sm"
                      [(ngModel)]="newProduct.productName" 
                      name="productName" required>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
               <label class="form-label fw-semibold">Price ($) <span class="text-danger">*</span></label>
               <input type="number" step="0.01" class="form-control rounded-3 shadow-sm"
                      [(ngModel)]="newProduct.price" 
@@ -239,13 +283,13 @@
                         name="description"></textarea>
             </div>
 
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
               <label class="form-label fw-semibold">Stock Quantity</label>
               <input type="number" class="form-control rounded-3 shadow-sm"
                      [(ngModel)]="newProduct.stockQuantity" 
                      name="stockQuantity">
             </div>
-            <div class="col-md-6">
+            <div class="col-12 col-md-6">
   <label class="form-label fw-semibold">Product Image</label>
 
   <!-- Preview Image -->
@@ -266,7 +310,7 @@
       </div>
       
       <!-- Footer -->
-      <div class="modal-footer border-0 d-flex justify-content-between">
+      <div class="modal-footer border-0 d-flex justify-content-between flex-wrap gap-2">
         <button type="button" class="btn btn-light px-4 rounded-3" data-bs-dismiss="modal">
           <i class="bi bi-x-circle me-1"></i> Cancel
         </button>

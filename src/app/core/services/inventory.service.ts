@@ -19,7 +19,8 @@ interface Product {
 })
 export class InventoryService {
   
-  private baseUrl =    'https://localhost:7058/api/Product';
+  //private baseUrl =    'https://localhost:7058/api/Product';
+  private baseUrl= 'https://192.168.70.94:7058/api/Product'
   
   constructor(private http: HttpClient) { }
 

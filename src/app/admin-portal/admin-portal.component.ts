@@ -1,13 +1,13 @@
-import { Component, OnInit, signal, Input, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup } from '@angular/forms';
-import { Router, RouterModule, RouterLink, RouterOutlet } from '@angular/router';
+import { Router, RouterModule, RouterOutlet } from '@angular/router';
 import { AuthService } from '../core/services/auth.service';
 import { ShopService } from '../core/services/shops.service';
 import Swal from 'sweetalert2';
 import { AsideBarComponent } from '../shared/ui/aside-bar/aside-bar.component';
-import { AllShopsTableComponent } from '../shared/ui/all-shops/all-shops-table.component';
 import { AdminHeaderComponent } from '../shared/ui/admin-header/admin-header.component';
+
 
 
 declare var bootstrap: any; // For Bootstrap Modal
@@ -16,16 +16,14 @@ declare var bootstrap: any; // For Bootstrap Modal
   standalone: true,
   imports: [
     RouterOutlet,
-    RouterLink,
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
     AsideBarComponent,
-    AllShopsTableComponent,
     AdminHeaderComponent
   ],
   templateUrl: './admin-portal.component.html',
-  styleUrl: './admin-portal.component.css'
+  styleUrls: ['./admin-portal.component.css']
 })
 export class AdminPortalComponent implements OnInit {
 

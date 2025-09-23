@@ -5,7 +5,7 @@
     </app-admin-header>
     <div class="d-flex flex-grow-1">
 
-        <app-aside-bar (shopInfoClick)="showShopTable = true" (dashboardClick)="showShopTable = false">
+        <app-aside-bar *ngIf="sidebarVisible" (shopInfoClick)="showShopTable = true" (dashboardClick)="showShopTable = false">
         </app-aside-bar>
         <div id="layoutSidenav_content">
 

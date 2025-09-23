@@ -1,0 +1,33 @@
+/* Inventory responsive styles */
+
+@media (max-width: 575.98px) {
+  .card .input-group .form-control {
+    font-size: 0.95rem;
+  }
+
+  .table {
+    font-size: 0.95rem;
+  }
+
+  .btn {
+    padding-top: 0.45rem;
+    padding-bottom: 0.45rem;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+  .btn {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+}
+
+.card.shadow-sm {
+  box-shadow: 0 .25rem .5rem rgba(0,0,0,.05)!important;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -19,8 +19,9 @@ export interface Shop {
   providedIn: 'root'
 })
 export class ShopService {
-  private baseUrl =    'https://localhost:7058/api/Shop';
-  private uploadsUrl = 'https://localhost:7058/'; // image uploads base URL
+  //private baseUrl =    'https://localhost:7058/api/Shop';
+  private baseUrl= 'https://192.168.70.94:7058/api/shop'
+ // private uploadsUrl = 'https://localhost:7058/'; // image uploads base URL
 
   constructor(private http: HttpClient) { }
 
