@@ -59,6 +59,7 @@ export class AdminPortalComponent implements OnInit {
 
   sidebarVisible: boolean = true; 
 
+  //This one is calling when toggle button is clicked in header component
   toggleSidebar() {
     this.sidebarVisible = !this.sidebarVisible;
   }
@@ -92,7 +93,7 @@ export class AdminPortalComponent implements OnInit {
       }
     });
 
-    //added on monday
+    
   }
 
 

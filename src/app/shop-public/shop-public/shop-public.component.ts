@@ -1,5 +1,5 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { ShopPublicService } from '../../core/services/shop-public.service';
+import { Product, ShopPublicService } from '../../core/services/shop-public.service';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -23,11 +23,13 @@ export class ShopPublicComponent implements OnInit {
   pageCount: number = 0;
   isDarkMode: boolean = false;
   showBackToTop: boolean = false;
+  wishlist: Product[] = [];
+  wishlistPopupOpen = false;
 
   constructor(
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
     private shopPublicService: ShopPublicService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.loadThemePreference();
@@ -37,6 +39,10 @@ export class ShopPublicComponent implements OnInit {
       this.getProducts(slug);
     }
     this.loadCartFromStorage();
+
+    this.shopPublicService.wishlist$.subscribe(list => {
+      this.wishlist = list;
+    });
   }
 
   @HostListener('window:scroll', [])
@@ -78,7 +84,7 @@ export class ShopPublicComponent implements OnInit {
   getProducts(slug: string) {
     this.loading = true;
     this.error = null;
-    
+
     this.shopPublicService.getProductsBySlug(slug, this.page, this.pageSize).subscribe({
       next: (res) => {
         this.products = res.products || [];
@@ -95,7 +101,7 @@ export class ShopPublicComponent implements OnInit {
   }
 
   addToCart(product: any) {
-    const existingItem = this.cart.find(item => item.id === product.id);
+    const existingItem = this.cart.find(item => item.productId === product.productId);
     if (existingItem) {
       existingItem.quantity = (existingItem.quantity || 1) + 1;
     } else {
@@ -140,15 +146,15 @@ export class ShopPublicComponent implements OnInit {
     const maxVisiblePages = 5;
     let startPage = Math.max(1, this.page - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
-    
+
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
-    
+
     for (let i = startPage; i <= endPage; i++) {
       pages.push(i);
     }
-    
+
     return pages;
   }
 
@@ -174,10 +180,22 @@ export class ShopPublicComponent implements OnInit {
     console.log('Quick view:', product);
   }
 
-  toggleWishlist(product: any) {
-    // Implement wishlist functionality
-    console.log('Toggle wishlist:', product);
+  toggleWishlist(product: Product) {
+    this.shopPublicService.toggleWishlist(product);
   }
+
+  isInWishlist(product: Product): boolean {
+    return this.shopPublicService.isInWishlist(product.productId);
+  }
+  toggleWishlistPopup() {
+    this.wishlistPopupOpen = !this.wishlistPopupOpen;
+  }
+
+  removeFromWishlist(product: Product) {
+    this.shopPublicService.toggleWishlist(product);
+    this.wishlist = this.shopPublicService.getWishlist();
+  }
+
 
   private loadCartFromStorage() {
     const savedCart = localStorage.getItem('cart');
@@ -189,8 +207,8 @@ export class ShopPublicComponent implements OnInit {
   private saveCartToStorage() {
     localStorage.setItem('cart', JSON.stringify(this.cart));
   }
-getMin(a: number, b: number): number {
-  return Math.min(a, b);
-}
+  getMin(a: number, b: number): number {
+    return Math.min(a, b);
+  }
 
 }

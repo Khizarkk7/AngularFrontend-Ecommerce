@@ -1,5 +1,6 @@
-<aside class="sidebar bg-dark text-white" [class.sidebar-collapsed]="sidebarCollapsed()"
-  [class.sidebar-hidden]="isMobile && !isSidebarOpen">
+<aside class="sidebar bg-dark text-white"
+       [class.sidebar-collapsed]="sidebarCollapsed()"
+       [class.sidebar-hidden]="isMobile && !isSidebarOpen">
 
   <ul class="nav flex-column">
     <li class="nav-item" *ngFor="let menu of structuredMenu">
@@ -7,32 +8,29 @@
       <!-- Menu with children -->
       <div *ngIf="menu.children?.length > 0; else simpleLink">
         <a href="#" class="nav-link text-white d-flex justify-content-between align-items-center"
-          (click)="toggleMenu(menu); $event.preventDefault()">
+           (click)="toggleMenu(menu); $event.preventDefault()">
           <span class="d-flex align-items-center">
             <i class="{{ menu.icon }} me-2"></i>
             <span class="menu-text" *ngIf="!sidebarCollapsed()">{{ menu.title }}</span>
           </span>
-          <i class="bi" [ngClass]="menu.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"
-            *ngIf="!sidebarCollapsed()"></i>
+          <i class="bi"
+             [ngClass]="menu.expanded ? 'bi-chevron-down' : 'bi-chevron-right'"
+             *ngIf="!sidebarCollapsed()"></i>
         </a>
+
         <ul class="nav flex-column ps-3" *ngIf="menu.expanded && !sidebarCollapsed()">
           <li *ngFor="let child of menu.children">
             <a class="nav-link text-white" href="#" (click)="goTo(child); $event.preventDefault()">
-              <i class="{{ child.icon }} me-2"></i> {{ child.title }}
+              <i class="{{ child.icon }} me-2"></i>
+              <span class="menu-text">{{ child.title }}</span>
             </a>
-
-            <!-- <a class="nav-link text-white"
-               [routerLink]="'/app-admin/' + child.route"
-               routerLinkActive="active">
-              <i class="{{ child.icon }} me-2"></i> {{ child.title }}
-            </a> -->
           </li>
         </ul>
       </div>
 
       <!-- Menu without children -->
       <ng-template #simpleLink>
-        <a class="nav-link text-white" [routerLink]="menu.route" routerLinkActive="active">
+        <a class="nav-link text-white" href="#" (click)="goTo(menu); $event.preventDefault()">
           <i class="{{ menu.icon }} me-2"></i>
           <span class="menu-text" *ngIf="!sidebarCollapsed()">{{ menu.title }}</span>
         </a>

@@ -16,56 +16,92 @@
         <span> Special discounts for new customers</span>
       </div>
     </div>
-    <button class="theme-toggle" (click)="toggleTheme()">
+    <button class="theme-toggle btn" (click)="toggleTheme()">
       <i class="fas" [class.fa-moon]="!isDarkMode" [class.fa-sun]="isDarkMode"></i>
     </button>
   </div>
 
-  <!-- Shop Header -->
-  <header class="shop-header">
-    <div class="container">
-      <div class="header-content">
-        <div class="shop-brand">
-          <img [src]="shop?.logo || 'assets/shop-default-logo.png'" alt="{{ shop?.shopName }}" class="shop-logo">
-          <div class="shop-info">
-            <h1 class="shop-title">{{ shop?.shopName }}</h1>
-            <p class="shop-description">{{ shop?.description }}</p>
-            <div class="shop-meta">
-              <span class="rating">
-                <i class="fas fa-star"></i> 4.8 (256 reviews)
-              </span>
-              <span class="contact">
-                <i class="fas fa-phone"></i> {{ shop?.contactInfo }}
-              </span>
+ <!-- Shop Header -->
+<header class="shop-header">
+  <div class="container">
+    <div class="header-content">
+      <div class="shop-brand">
+        <img [src]="shop?.logo || 'assets/shop-default-logo.png'" 
+             alt="{{ shop?.shopName }}" 
+             class="shop-logo">
+
+        <div class="shop-info">
+          <h1 class="shop-title">{{ shop?.shopName }}</h1>
+          <p class="shop-description">{{ shop?.description }}</p>
+          <div class="shop-meta">
+            <span class="rating">
+              <i class="fas fa-star"></i> 4.8 (256 reviews)
+            </span>
+            <span class="contact">
+              <i class="fas fa-phone"></i> {{ shop?.contactInfo }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="header-actions">
+
+        <!-- Wishlist -->
+        <div class="wishlist-container">
+          <button class="action-btn wishlist-btn" (click)="toggleWishlistPopup()" title="Wishlist">
+            <i class="fas fa-heart"></i>
+            <span class="wishlist-badge" *ngIf="wishlist.length > 0">{{ wishlist.length }}</span>
+          </button>
+
+          <!-- Wishlist Popup -->
+          <div class="wishlist-popup" *ngIf="wishlistPopupOpen">
+            <h3>My Wishlist</h3>
+
+            <div *ngIf="wishlist.length > 0; else emptyWishlist">
+              <div *ngFor="let item of wishlist" class="wishlist-item">
+                <img [src]="item.imageUrl" alt="{{item.name}}" class="wishlist-img">
+                <div class="wishlist-info">
+                  <p class="wishlist-name">{{ item.name }}</p>
+                  <span class="wishlist-price">Rs. {{ item.price | number:'1.0-0' }}</span>
+                </div>
+                <button class="remove-btn" (click)="removeFromWishlist(item)">
+                  <i class="fas fa-times"></i>
+                </button>
+              </div>
+              <button class="view-all-btn">View All Wishlist</button>
             </div>
+
+            <ng-template #emptyWishlist>
+              <p class="empty-msg">No items in wishlist</p>
+            </ng-template>
           </div>
         </div>
 
-        <div class="header-actions">
-          <button class="action-btn wishlist-btn" title="Wishlist">
-            <i class="fas fa-heart"></i>
-          </button>
-          <button class="action-btn cart-btn" (click)="toggleCart()" title="Cart">
-            <i class="fas fa-shopping-bag"></i>
-            <span class="cart-badge" *ngIf="cart.length > 0">{{ cart.length }}</span>
-          </button>
-          <button class="action-btn user-btn" title="Account">
-            <i class="fas fa-user"></i>
-          </button>
-        </div>
+        <!-- Cart -->
+        <button class="action-btn cart-btn" (click)="toggleCart()" title="Cart">
+          <i class="fas fa-shopping-bag"></i>
+          <span class="cart-badge" *ngIf="cart.length > 0">{{ cart.length }}</span>
+        </button>
+
+        <!-- User -->
+        <button class="action-btn user-btn" title="Account">
+          <i class="fas fa-user"></i>
+        </button>
       </div>
     </div>
-  </header>
+  </div>
+</header>
+
 
   <!-- Navigation -->
   <nav class="shop-navigation">
     <div class="container">
       <ul class="nav-menu">
-        <li><a href="#featured" class="nav-link active">Featured</a></li>
-        <li><a href="#categories" class="nav-link">Categories</a></li>
-        <li><a href="#new-arrivals" class="nav-link">New Arrivals</a></li>
-        <li><a href="#deals" class="nav-link">Hot Deals</a></li>
-        <li><a href="#about" class="nav-link">About Shop</a></li>
+        <li><a class="nav-link active">Featured</a></li>
+        <li><a class="nav-link">Categories</a></li>
+        <li><a class="nav-link">New Arrivals</a></li>
+        <li><a class="nav-link">Hot Deals</a></li>
+        <li><a class="nav-link">About Shop</a></li>
       </ul>
       <div class="search-bar">
         <input type="text" placeholder="Search products..." class="search-input">
@@ -117,8 +153,9 @@
                 <button class="quick-view-btn" (click)="quickView(product)">
                   <i class="fas fa-eye"></i>
                 </button>
+                <!-- Product Card -->
                 <button class="wishlist-btn" (click)="toggleWishlist(product)">
-                  <i class="fas fa-heart"></i>
+                  <i class="fas fa-heart" [class.active]="isInWishlist(product)"></i>
                 </button>
               </div>
               <span class="product-badge" *ngIf="product.discount">
@@ -243,32 +280,32 @@
           <h4>About {{ shop?.shopName }}</h4>
           <p>{{ shop?.description }}</p>
           <div class="social-links">
-            <a href="#"><i class="fab fa-facebook"></i></a>
-            <a href="#"><i class="fab fa-instagram"></i></a>
-            <a href="#"><i class="fab fa-twitter"></i></a>
-            <a href="#"><i class="fab fa-whatsapp"></i></a>
+            <a><i class="fab fa-facebook"></i></a>
+            <a><i class="fab fa-instagram"></i></a>
+            <a><i class="fab fa-twitter"></i></a>
+            <a><i class="fab fa-whatsapp"></i></a>
           </div>
         </div>
 
         <div class="footer-section">
           <h4>Quick Links</h4>
           <ul>
-            <li><a href="#">Home</a></li>
-            <li><a href="#">Products</a></li>
-            <li><a href="#">Categories</a></li>
-            <li><a href="#">About Us</a></li>
-            <li><a href="#">Contact</a></li>
+            <li><a>Home</a></li>
+            <li><a>Products</a></li>
+            <li><a>Categories</a></li>
+            <li><a>About Us</a></li>
+            <li><a>Contact</a></li>
           </ul>
         </div>
 
         <div class="footer-section">
           <h4>Customer Service</h4>
           <ul>
-            <li><a href="#">Shipping Info</a></li>
-            <li><a href="#">Returns</a></li>
-            <li><a href="#">Size Guide</a></li>
-            <li><a href="#">FAQs</a></li>
-            <li><a href="#">Privacy Policy</a></li>
+            <li><a>Shipping Info</a></li>
+            <li><a>Returns</a></li>
+            <li><a>Size Guide</a></li>
+            <li><a>FAQs</a></li>
+            <li><a>Privacy Policy</a></li>
           </ul>
         </div>
 

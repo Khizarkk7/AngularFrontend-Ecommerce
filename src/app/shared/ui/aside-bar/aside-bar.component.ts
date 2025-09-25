@@ -1,14 +1,13 @@
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Component, Inject, PLATFORM_ID, signal, EventEmitter, Output, HostListener } from '@angular/core';
-import { Router, RouterLink, RouterOutlet, ActivatedRoute } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { MenuService } from '../../../core/services/menu.service';
-import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-aside-bar',
   standalone: true,
-  imports: [RouterLink, CommonModule,],
+  imports: [ CommonModule,],
   templateUrl: './aside-bar.component.html',
   styleUrl: './aside-bar.component.css'
 })
@@ -23,7 +22,6 @@ export class AsideBarComponent {
   @Output() shopInfoClick = new EventEmitter<void>();
 
   constructor(
-    private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService,
     private menuService: MenuService,
@@ -74,6 +72,27 @@ export class AsideBarComponent {
     menu.expanded = !menu.expanded;
   }
 
+  goTo(menu: any) {
+    const role = this.authService.getCurrentUserRole();
+    const shopId = this.authService.getCurrentShopId();
+
+    let route = menu.route;
+
+    if (route.includes(':shopid')) {
+      if (role?.toLowerCase() === 'systemdmin') {
+        route = route.replace('/:shopid', '');
+      } else {
+        if (!shopId) {
+          console.error("No shopId found in token");
+          return;
+        }
+        route = route.replace(':shopid', shopId.toString());
+      }
+    }
+
+    this.router.navigate([`/app-admin${route}`]);
+  }
+
   toggleSidebar() {
     if (this.isMobile) {
       this.isSidebarOpen = !this.isSidebarOpen;
@@ -86,51 +105,7 @@ export class AsideBarComponent {
   checkScreenSize() {
     if (isPlatformBrowser(this.platformId)) {
       this.isMobile = window.innerWidth < 992;
-      if (this.isMobile) {
-        this.isSidebarOpen = false;
-      } else {
-        this.isSidebarOpen = true;
-      }
+      this.isSidebarOpen = !this.isMobile;
     }
   }
-
-//  goTo(menu: any) {
-//   const shopId = this.authService.getCurrentShopId(); // token/service se id
-//   if (!shopId) {
-//     console.error("No shopId found in token");
-//     return;
-//   }
-
-//   // Agar route me :shopId hai to replace karo
-//   let route = menu.route;
-//   if (route.includes(':shopid')) {
-//     route = route.replace(':shopid', shopId.toString());
-//   }
-
-//   this.router.navigate([`/app-admin${route}`]);
-// }
-goTo(menu: any) {
-  const role = this.authService.getCurrentUserRole();
-  const shopId = this.authService.getCurrentShopId();
-
-  let route = menu.route;
-
-  // Agar route me :shopId hai to
-  if (route.includes(':shopId')) {
-    if (role?.toLowerCase() === 'systemadmin') {
-      // SystemAdmin ke liye :shopId hata do
-      route = route.replace('/:shopId', '');
-    } else {
-      // ShopAdmin ke liye shopId zaroori hai
-      if (!shopId) {
-        console.error("No shopId found in token");
-        return;
-      }
-      route = route.replace(':shopId', shopId.toString());
-    }
-  }
-
-  this.router.navigate([`/app-admin${route}`]);
-}
-
 }
