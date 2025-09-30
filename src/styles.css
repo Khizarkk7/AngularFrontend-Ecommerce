@@ -10,6 +10,8 @@
   --color-border: #E5E7EB;          /* Light Gray */
   --color-success: #10B981;         /* Mint Green */
   --color-warning: #F59E0B;         /* Amber Gold */
+   --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
 
 html, body {
