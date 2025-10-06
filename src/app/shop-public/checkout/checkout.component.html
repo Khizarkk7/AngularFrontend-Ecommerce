@@ -1,0 +1,356 @@
+<div class="checkout-container">
+  <!-- Header -->
+  <header class="checkout-header">
+    <div class="container">
+      <div class="header-content">
+        <a routerLink="/" class="back-link">
+          <i class="fas fa-arrow-left"></i>
+          Continue Shopping
+        </a>
+        <h1 class="page-title">Checkout</h1>
+        <div class="checkout-steps">
+          <div class="step active">
+            <span class="step-number">1</span>
+            <span class="step-text">Cart</span>
+          </div>
+          <div class="step active">
+            <span class="step-number">2</span>
+            <span class="step-text">Details</span>
+          </div>
+          <div class="step">
+            <span class="step-number">3</span>
+            <span class="step-text">Payment</span>
+          </div>
+          <div class="step">
+            <span class="step-number">4</span>
+            <span class="step-text">Complete</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <div class="checkout-content">
+      <!-- Left Column - Checkout Form -->
+      <div class="checkout-form-section">
+        
+        <!-- Contact Information -->
+        <section class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-user-circle"></i>
+            Contact Information
+          </h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label required">Full Name</label>
+              <input type="text" 
+                     class="form-control" 
+                     placeholder="Enter your full name"
+                     [(ngModel)]="checkoutData.fullName">
+            </div>
+            <div class="form-group">
+              <label class="form-label required">Email Address</label>
+              <input type="email" 
+                     class="form-control" 
+                     placeholder="your@email.com"
+                     [(ngModel)]="checkoutData.email">
+            </div>
+            <div class="form-group">
+              <label class="form-label required">Phone Number</label>
+              <input type="tel" 
+                     class="form-control" 
+                     placeholder="+92 XXX XXXXXXX"
+                     [(ngModel)]="checkoutData.phone">
+            </div>
+          </div>
+        </section>
+
+        <!-- Shipping Address -->
+        <section class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-map-marker-alt"></i>
+            Shipping Address
+          </h2>
+          
+          <!-- Address Form -->
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label required">Street Address</label>
+              <input type="text" 
+                     class="form-control" 
+                     placeholder="House #, Street, Area"
+                     [(ngModel)]="checkoutData.address.street">
+            </div>
+            <div class="form-group">
+              <label class="form-label required">City</label>
+              <input type="text" 
+                     class="form-control" 
+                     placeholder="Enter your city"
+                     [(ngModel)]="checkoutData.address.city">
+            </div>
+            <div class="form-group">
+              <label class="form-label required">Province/State</label>
+              <select class="form-control" [(ngModel)]="checkoutData.address.province">
+                <option value="">Select Province</option>
+                <option value="punjab">Punjab</option>
+                <option value="sindh">Sindh</option>
+                <option value="kpk">Khyber Pakhtunkhwa</option>
+                <option value="balochistan">Balochistan</option>
+                <option value="islamabad">Islamabad Capital Territory</option>
+                <option value="gilgit">Gilgit-Baltistan</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label required">Postal Code</label>
+              <input type="text" 
+                     class="form-control" 
+                     placeholder="XXXXX"
+                     [(ngModel)]="checkoutData.address.postalCode">
+            </div>
+          </div>
+
+          <!-- Map Location Picker -->
+          <div class="map-section">
+            <label class="form-label">
+              <i class="fas fa-map-pin"></i>
+              Pin Your Location (Optional)
+            </label>
+            <div class="map-container">
+              <div class="map-placeholder" (click)="openMapModal()">
+                <i class="fas fa-map-marked-alt"></i>
+                <p>Click to select your location on map</p>
+                <small>Drag and drop the pin to your exact location</small>
+              </div>
+              <div *ngIf="checkoutData.address.coordinates" class="selected-location">
+                <i class="fas fa-check-circle"></i>
+                Location selected
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Payment Method -->
+        <section class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-credit-card"></i>
+            Payment Method
+          </h2>
+          
+          <div class="payment-options">
+            <label class="payment-option" [class.selected]="checkoutData.paymentMethod === 'cod'">
+              <input type="radio" 
+                     name="payment" 
+                     value="cod" 
+                     [(ngModel)]="checkoutData.paymentMethod">
+              <div class="payment-content">
+                <div class="payment-icon">
+                  <i class="fas fa-money-bill-wave"></i>
+                </div>
+                <div class="payment-info">
+                  <h4>Cash on Delivery</h4>
+                  <p>Pay when you receive your order</p>
+                </div>
+              </div>
+            </label>
+
+            <label class="payment-option" [class.selected]="checkoutData.paymentMethod === 'card'">
+              <input type="radio" 
+                     name="payment" 
+                     value="card" 
+                     [(ngModel)]="checkoutData.paymentMethod">
+              <div class="payment-content">
+                <div class="payment-icon">
+                  <i class="fas fa-credit-card"></i>
+                </div>
+                <div class="payment-info">
+                  <h4>Credit/Debit Card</h4>
+                  <p>Pay securely with your card</p>
+                </div>
+              </div>
+            </label>
+
+            <label class="payment-option" [class.selected]="checkoutData.paymentMethod === 'jazzcash'">
+              <input type="radio" 
+                     name="payment" 
+                     value="jazzcash" 
+                     [(ngModel)]="checkoutData.paymentMethod">
+              <div class="payment-content">
+                <div class="payment-icon">
+                  <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="payment-info">
+                  <h4>JazzCash</h4>
+                  <p>Pay via JazzCash wallet</p>
+                </div>
+              </div>
+            </label>
+
+            <label class="payment-option" [class.selected]="checkoutData.paymentMethod === 'easypaisa'">
+              <input type="radio" 
+                     name="payment" 
+                     value="easypaisa" 
+                     [(ngModel)]="checkoutData.paymentMethod">
+              <div class="payment-content">
+                <div class="payment-icon">
+                  <i class="fas fa-wallet"></i>
+                </div>
+                <div class="payment-info">
+                  <h4>EasyPaisa</h4>
+                  <p>Pay via EasyPaisa account</p>
+                </div>
+              </div>
+            </label>
+          </div>
+
+          <!-- COD Instructions -->
+          <div *ngIf="checkoutData.paymentMethod === 'cod'" class="cod-instructions">
+            <div class="info-box">
+              <i class="fas fa-info-circle"></i>
+              <div>
+                <h4>Cash on Delivery Instructions</h4>
+                <p>Please keep exact change ready. Delivery charges may apply for COD orders.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Order Notes -->
+        <section class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-sticky-note"></i>
+            Order Notes (Optional)
+          </h2>
+          <textarea class="form-control notes-textarea" 
+                    placeholder="Any special instructions for your order..."
+                    rows="4"
+                    [(ngModel)]="checkoutData.notes"></textarea>
+        </section>
+      </div>
+
+      <!-- Right Column - Order Summary -->
+      <div class="order-summary-section">
+        <div class="order-summary-card">
+          <h3 class="summary-title">Order Summary</h3>
+          
+          <!-- Order Items -->
+          <div class="order-items">
+            <div *ngFor="let item of cartItems" class="order-item">
+              <img [src]="item.imageUrl" [alt]="item.name" class="item-image">
+              <div class="item-details">
+                <h4 class="item-name">{{ item.name }}</h4>
+                <p class="item-price">Rs. {{ item.price | number }}</p>
+                <div class="item-quantity">Qty: {{ item.quantity }}</div>
+              </div>
+              <div class="item-total">Rs. {{ (item.price * item.quantity) | number }}</div>
+            </div>
+          </div>
+
+          <!-- Order Totals -->
+          <div class="order-totals">
+            <div class="total-row">
+              <span>Subtotal</span>
+              <span>Rs. {{ subtotal | number }}</span>
+            </div>
+            <div class="total-row">
+              <span>Shipping</span>
+              <span>{{ shippingCost === 0 ? 'Free' : 'Rs. ' + shippingCost }}</span>
+            </div>
+            <div class="total-row">
+              <span>Tax</span>
+              <span>Rs. {{ tax | number }}</span>
+            </div>
+            <div *ngIf="discount > 0" class="total-row discount">
+              <span>Discount</span>
+              <span>- Rs. {{ discount | number }}</span>
+            </div>
+            <div class="total-row grand-total">
+              <span>Total</span>
+              <span>Rs. {{ grandTotal | number }}</span>
+            </div>
+          </div>
+
+          <!-- Promo Code -->
+          <div class="promo-section">
+            <div class="promo-input-group">
+              <input type="text" 
+                     class="form-control" 
+                     placeholder="Enter promo code"
+                     [(ngModel)]="promoCode">
+              <button class="apply-promo-btn" (click)="applyPromoCode()">Apply</button>
+            </div>
+            <div *ngIf="appliedPromo" class="promo-success">
+              <i class="fas fa-check-circle"></i>
+              Promo code applied successfully!
+            </div>
+          </div>
+
+          <!-- Place Order Button -->
+          <button class="place-order-btn" (click)="placeOrder()" [disabled]="isPlacingOrder">
+            <i class="fas fa-shopping-bag" *ngIf="!isPlacingOrder"></i>
+            <i class="fas fa-spinner fa-spin" *ngIf="isPlacingOrder"></i>
+            {{ isPlacingOrder ? 'Placing Order...' : 'Place Order' }}
+          </button>
+
+          <!-- Security Badges -->
+          <div class="security-badges">
+            <div class="security-item">
+              <i class="fas fa-shield-alt"></i>
+              <span>Secure Checkout</span>
+            </div>
+            <div class="security-item">
+              <i class="fas fa-lock"></i> 
+              <span>SSL Encrypted</span>
+            </div>
+            <div class="security-item">
+              <i class="fas fa-undo"></i>
+              <span>Easy Returns</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+<!-- Map Modal -->
+<div class="modal-backdrop" [class.show]="showMapModal" (click)="closeMapModal()">
+  <div class="map-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Select Your Location</h3>
+      <button class="close-modal" (click)="closeMapModal()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="map-instructions">
+        <i class="fas fa-info-circle"></i>
+        <p>Search your address or drag the pin to your exact location</p>
+      </div>
+
+      <!-- ✅ Search Bar -->
+      <div class="search-bar">
+        <input
+          id="locationSearch"
+          type="text"
+          class="form-control"
+          placeholder="Search your location..."
+        />
+        <button class="btn btn-outline-primary" (click)="useCurrentLocation()">
+          <i class="fas fa-location-crosshairs"></i> Use Current Location
+        </button>
+      </div>
+
+      <!-- ✅ Actual Map -->
+      <div id="map" style="height: 400px; border-radius: 10px; margin-top: 10px;"></div>
+
+      <button class="confirm-location-btn mt-3" (click)="confirmLocation()">
+        <i class="fas fa-check"></i> Confirm Location
+      </button>
+    </div>
+  </div>
+</div>
+
+
+</div>

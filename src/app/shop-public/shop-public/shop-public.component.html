@@ -124,9 +124,9 @@
             <button class="view-btn active" data-view="grid">
               <i class="fas fa-th"></i>
             </button>
-            <button class="view-btn" data-view="list">
+            <!-- <button class="view-btn" data-view="list">
               <i class="fas fa-list"></i>
-            </button>
+            </button> -->
           </div>
         </div>
 
@@ -268,7 +268,8 @@
       <div class="cart-total">
         <span>Total: Rs. {{ getCartTotal() | number:'1.0-0' }}</span>
       </div>
-      <button class="checkout-btn">Proceed to Checkout</button>
+      <button class="checkout-btn" (click)="proceedToCheckout()"
+       >Proceed to Checkout</button>
     </div>
   </div>
 
@@ -318,13 +319,14 @@
       </div>
 
       <div class="footer-bottom">
-        <p>&copy; 2024 {{ shop?.shopName }}. All rights reserved.</p>
+        <p>&copy; 2025 {{ shop?.shopName }}. All rights reserved.</p>
       </div>
     </div>
+    
   </footer>
 
   <!-- Back to Top Button -->
-  <button class="back-to-top" (click)="scrollToTop()">
+  <button class="back-to-top " (click)="scrollToTop()">
     <i class="fas fa-chevron-up"></i>
   </button>
 </div>

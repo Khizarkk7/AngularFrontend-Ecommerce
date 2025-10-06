@@ -2,6 +2,8 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { Product, ShopPublicService } from '../../core/services/shop-public.service';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { routes } from '../../app.routes';
 
 @Component({
   selector: 'app-shop-public',
@@ -25,16 +27,19 @@ export class ShopPublicComponent implements OnInit {
   showBackToTop: boolean = false;
   wishlist: Product[] = [];
   wishlistPopupOpen = false;
+  shopSlug!: string;
 
   constructor(
     private route: ActivatedRoute,
-    private shopPublicService: ShopPublicService
+    private shopPublicService: ShopPublicService,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
     this.loadThemePreference();
     const slug = this.route.snapshot.paramMap.get('slug');
     if (slug) {
+       this.shopSlug = slug;
       this.loadShopData(slug);
       this.getProducts(slug);
     }
@@ -131,6 +136,29 @@ export class ShopPublicComponent implements OnInit {
   toggleCart() {
     this.cartOpen = !this.cartOpen;
   }
+
+  proceedToCheckout() {
+    if (this.cart.length === 0) {
+      alert('Your cart is empty!');
+      return;
+    }
+
+    // Validate all items belong to same shop
+    const uniqueShops = new Set(this.cart.map(i => i.shopId));
+    if (uniqueShops.size > 1) {
+      alert('You can only checkout products from one shop at a time.');
+      return;
+    }
+
+    this.toggleCart(); // Close sidebar
+
+    // Navigate to checkout page with cart data (optional)
+    this.router.navigate([`/shop/${this.shopSlug}/checkout`], {
+      state: { cart: this.cart, shop: this.shop }
+    });
+  }
+
+
 
   changePage(newPage: number) {
     if (newPage >= 1 && newPage <= this.totalPages) {
