@@ -39,7 +39,7 @@ export class ShopPublicComponent implements OnInit {
     this.loadThemePreference();
     const slug = this.route.snapshot.paramMap.get('slug');
     if (slug) {
-       this.shopSlug = slug;
+      this.shopSlug = slug;
       this.loadShopData(slug);
       this.getProducts(slug);
     }
@@ -226,15 +226,19 @@ export class ShopPublicComponent implements OnInit {
 
 
   private loadCartFromStorage() {
-    const savedCart = localStorage.getItem('cart');
+    const savedCart = localStorage.getItem('cart-' + this.shopSlug);
     if (savedCart) {
       this.cart = JSON.parse(savedCart);
     }
   }
 
   private saveCartToStorage() {
-    localStorage.setItem('cart', JSON.stringify(this.cart));
+    // Key per shop:
+    const cartKey = `cart-${this.shopSlug}`;
+    localStorage.setItem(cartKey, JSON.stringify(this.cart));
+
   }
+
   getMin(a: number, b: number): number {
     return Math.min(a, b);
   }

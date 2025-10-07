@@ -16,81 +16,81 @@
         <span> Special discounts for new customers</span>
       </div>
     </div>
-    <button class="theme-toggle btn" (click)="toggleTheme()">
-      <i class="fas" [class.fa-moon]="!isDarkMode" [class.fa-sun]="isDarkMode"></i>
-    </button>
+
   </div>
 
- <!-- Shop Header -->
-<header class="shop-header">
-  <div class="container">
-    <div class="header-content">
-      <div class="shop-brand">
-        <img [src]="shop?.logo || 'assets/shop-default-logo.png'" 
-             alt="{{ shop?.shopName }}" 
-             class="shop-logo">
+  <!-- Shop Header -->
+  <header class="shop-header">
+    <div class="container">
+      <div class="header-content">
 
-        <div class="shop-info">
-          <h1 class="shop-title">{{ shop?.shopName }}</h1>
-          <p class="shop-description">{{ shop?.description }}</p>
-          <div class="shop-meta">
-            <span class="rating">
-              <i class="fas fa-star"></i> 4.8 (256 reviews)
-            </span>
-            <span class="contact">
-              <i class="fas fa-phone"></i> {{ shop?.contactInfo }}
-            </span>
+        <div class="shop-brand">
+          <img [src]="shop?.logo || 'assets/shop-default-logo.png'" alt="{{ shop?.shopName }}" class="shop-logo">
+
+          <div class="shop-info">
+            <h1 class="shop-title">{{ shop?.shopName }}</h1>
+            <p class="shop-description">{{ shop?.description }}</p>
+            <div class="shop-meta">
+              <span class="rating">
+                <i class="fas fa-star"></i> 4.8 (256 reviews)
+              </span>
+              <span class="contact">
+                <i class="fas fa-phone"></i> {{ shop?.contactInfo }}
+              </span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="header-actions">
+        <div class="header-actions">
+    
+          <!-- Wishlist -->
+          <div class="wishlist-container">
+            <button class="action-btn wishlist-btn" (click)="toggleWishlistPopup()" title="Wishlist">
+              <i class="fas fa-heart"></i>
+              <span class="wishlist-badge" *ngIf="wishlist.length > 0">{{ wishlist.length }}</span>
+            </button>
 
-        <!-- Wishlist -->
-        <div class="wishlist-container">
-          <button class="action-btn wishlist-btn" (click)="toggleWishlistPopup()" title="Wishlist">
-            <i class="fas fa-heart"></i>
-            <span class="wishlist-badge" *ngIf="wishlist.length > 0">{{ wishlist.length }}</span>
+            <!-- Wishlist Popup -->
+            <div class="wishlist-popup" *ngIf="wishlistPopupOpen">
+              <h3>My Wishlist</h3>
+
+              <div *ngIf="wishlist.length > 0; else emptyWishlist">
+                <div *ngFor="let item of wishlist" class="wishlist-item">
+                  <img [src]="item.imageUrl" alt="{{item.name}}" class="wishlist-img">
+                  <div class="wishlist-info">
+                    <p class="wishlist-name">{{ item.name }}</p>
+                    <span class="wishlist-price">Rs. {{ item.price | number:'1.0-0' }}</span>
+                  </div>
+                  <button class="remove-btn" (click)="removeFromWishlist(item)">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+                <button class="view-all-btn">View All Wishlist</button>
+              </div>
+
+              <ng-template #emptyWishlist>
+                <p class="empty-msg">No items in wishlist</p>
+              </ng-template>
+            </div>
+          </div>
+
+          <!-- Cart -->
+          <button class="action-btn cart-btn" (click)="toggleCart()" title="Cart">
+            <i class="fas fa-shopping-bag"></i>
+            <span class="cart-badge" *ngIf="cart.length > 0">{{ cart.length }}</span>
           </button>
 
-          <!-- Wishlist Popup -->
-          <div class="wishlist-popup" *ngIf="wishlistPopupOpen">
-            <h3>My Wishlist</h3>
-
-            <div *ngIf="wishlist.length > 0; else emptyWishlist">
-              <div *ngFor="let item of wishlist" class="wishlist-item">
-                <img [src]="item.imageUrl" alt="{{item.name}}" class="wishlist-img">
-                <div class="wishlist-info">
-                  <p class="wishlist-name">{{ item.name }}</p>
-                  <span class="wishlist-price">Rs. {{ item.price | number:'1.0-0' }}</span>
-                </div>
-                <button class="remove-btn" (click)="removeFromWishlist(item)">
-                  <i class="fas fa-times"></i>
-                </button>
-              </div>
-              <button class="view-all-btn">View All Wishlist</button>
-            </div>
-
-            <ng-template #emptyWishlist>
-              <p class="empty-msg">No items in wishlist</p>
-            </ng-template>
-          </div>
+          <!-- User -->
+          <button class="action-btn user-btn" title="Account">
+            <i class="fas fa-user"></i>
+          </button>
+          <button class="action-btn user-btn " (click)="toggleTheme()">
+            <i class="fas" [class.fa-moon]="!isDarkMode" [class.fa-sun]="isDarkMode"></i>
+          </button>
         </div>
-
-        <!-- Cart -->
-        <button class="action-btn cart-btn" (click)="toggleCart()" title="Cart">
-          <i class="fas fa-shopping-bag"></i>
-          <span class="cart-badge" *ngIf="cart.length > 0">{{ cart.length }}</span>
-        </button>
-
-        <!-- User -->
-        <button class="action-btn user-btn" title="Account">
-          <i class="fas fa-user"></i>
-        </button>
       </div>
     </div>
-  </div>
-</header>
+  </header>
 
 
   <!-- Navigation -->
@@ -268,8 +268,7 @@
       <div class="cart-total">
         <span>Total: Rs. {{ getCartTotal() | number:'1.0-0' }}</span>
       </div>
-      <button class="checkout-btn" (click)="proceedToCheckout()"
-       >Proceed to Checkout</button>
+      <button class="checkout-btn" (click)="proceedToCheckout()">Proceed to Checkout</button>
     </div>
   </div>
 
@@ -322,7 +321,7 @@
         <p>&copy; 2025 {{ shop?.shopName }}. All rights reserved.</p>
       </div>
     </div>
-    
+
   </footer>
 
   <!-- Back to Top Button -->

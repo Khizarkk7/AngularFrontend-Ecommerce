@@ -1,9 +1,10 @@
 import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-
-declare const google: any;
+import { ActivatedRoute, Router } from '@angular/router';
+import Swal from 'sweetalert2';
+import { CustomSwal } from '../../core/services/custom-swal.service';
+import * as L from 'leaflet';
 
 interface Coordinates {
   lat: number;
@@ -44,18 +45,17 @@ interface CartItem {
   styleUrls: ['./checkout.component.css']
 })
 export class CheckoutComponent implements OnInit, AfterViewInit {
+  shopSlug = '';
 
-  // ✅ Form model
   checkoutData: CheckoutData = {
     fullName: '',
     email: '',
     phone: '',
     address: { street: '', city: '', province: '', postalCode: '' },
-    paymentMethod: 'cod',
+    paymentMethod: '',
     notes: ''
   };
 
-  // ✅ Cart variables
   cartItems: CartItem[] = [];
   subtotal = 0;
   shippingCost = 0;
@@ -63,165 +63,219 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
   discount = 0;
   grandTotal = 0;
 
-  // ✅ Promo
   promoCode = '';
   appliedPromo = false;
 
-  // ✅ Flags
   isPlacingOrder = false;
   showMapModal = false;
 
-  // ✅ Google Maps variables
-  private map!: google.maps.Map;
-  private marker!: google.maps.Marker;
-  private autocomplete!: google.maps.places.Autocomplete;
+  //  Leaflet map variables
+  private map!: L.Map;
+  private marker!: L.Marker;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit(): void {
+    this.shopSlug = this.route.snapshot.paramMap.get('slug') || '';
     this.loadCartItems();
     this.calculateTotals();
   }
 
-  ngAfterViewInit(): void {
-    // map initializes dynamically when modal opens
-  }
+  ngAfterViewInit(): void {}
 
-  /** ------------------ 🛒 CART METHODS ------------------ **/
+  /** ------------------🛒 CART METHODS ------------------ **/
   loadCartItems(): void {
-    const savedCart = localStorage.getItem('cart');
-    this.cartItems = savedCart ? JSON.parse(savedCart) : [];
+    const cartKey = `cart-${this.shopSlug}`;
+    try {
+      this.cartItems = JSON.parse(localStorage.getItem(cartKey) || '[]');
+    } catch {
+      this.cartItems = [];
+    }
   }
 
   calculateTotals(): void {
     this.subtotal = this.cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
     this.shippingCost = this.subtotal > 2000 ? 0 : 200;
-    //this.tax = this.subtotal * 0.16;
     this.grandTotal = this.subtotal + this.shippingCost - this.discount;
   }
 
   applyPromoCode(): void {
     const validPromos = ['WELCOME10', 'SAVE20', 'FIRSTORDER'];
-
     if (this.promoCode.trim() && !this.appliedPromo) {
       if (validPromos.includes(this.promoCode.toUpperCase())) {
         this.discount = this.subtotal * 0.1;
         this.appliedPromo = true;
         this.calculateTotals();
       } else {
-        alert('❌ Invalid promo code.');
+        alert('Invalid promo code.');
       }
     }
   }
 
-  /** ------------------ 🗺 MAP HANDLING ------------------ **/
+  /** ------------------  LEAFLET MAP ------------------ **/
   openMapModal(): void {
     this.showMapModal = true;
-    setTimeout(() => this.initMap(), 300);
+    setTimeout(() => this.initLeafletMap(), 300);
   }
 
   closeMapModal(): void {
     this.showMapModal = false;
+    if (this.map) this.map.remove();
   }
 
-  private initMap(): void {
-    const mapEl = document.getElementById('map') as HTMLElement;
+  private initLeafletMap(): void {
+    const mapEl = document.getElementById('map');
     if (!mapEl) return;
 
     const defaultCenter: Coordinates = { lat: 31.5204, lng: 74.3587 };
 
-    this.map = new google.maps.Map(mapEl, {
-      center: defaultCenter,
-      zoom: 13,
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: false
-    });
+    this.map = L.map(mapEl).setView([defaultCenter.lat, defaultCenter.lng], 13);
 
-    this.marker = new google.maps.Marker({
-      position: defaultCenter,
-      map: this.map,
-      draggable: true,
-      title: 'Drag to select your location'
-    });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(this.map);
 
-    const input = document.getElementById('locationSearch') as HTMLInputElement;
-    this.autocomplete = new google.maps.places.Autocomplete(input, {
-      fields: ['geometry', 'formatted_address'],
-      types: ['geocode']
-    });
-    this.autocomplete.bindTo('bounds', this.map);
+    this.marker = L.marker([defaultCenter.lat, defaultCenter.lng], {
+      draggable: true
+    }).addTo(this.map);
 
-    // When user selects a location
-    this.autocomplete.addListener('place_changed', () => {
-      const place = this.autocomplete.getPlace();
-      if (!place.geometry || !place.geometry.location) return;
-
-      const loc = place.geometry.location;
-      this.map.setCenter(loc);
-      this.marker.setPosition(loc);
-
-      this.checkoutData.address.formatted = place.formatted_address || '';
-      this.checkoutData.address.coordinates = { lat: loc.lat(), lng: loc.lng() };
-    });
-
-    // Marker drag event
-    this.marker.addListener('dragend', () => {
-      const pos = this.marker.getPosition();
-      if (pos) this.checkoutData.address.coordinates = { lat: pos.lat(), lng: pos.lng() };
+    this.marker.on('dragend', () => {
+      const pos = this.marker.getLatLng();
+      this.checkoutData.address.coordinates = { lat: pos.lat, lng: pos.lng };
     });
   }
 
-  useCurrentLocation(): void {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        ({ coords }) => {
-          const loc = { lat: coords.latitude, lng: coords.longitude };
-          this.map.setCenter(loc);
-          this.marker.setPosition(loc);
-          this.checkoutData.address.coordinates = loc;
-        },
-        () => alert('Unable to get your location.')
-      );
-    } else {
-      alert('Your browser does not support geolocation.');
-    }
+useCurrentLocation(): void {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const loc = { lat: coords.latitude, lng: coords.longitude };
+        this.map.setView(loc, 13);
+        this.marker.setLatLng(loc);
+        this.checkoutData.address.coordinates = loc;
+
+        // ✅ Success alert
+        CustomSwal.fire({
+          icon: 'success',
+          title: 'Location Found!',
+          text: 'Your current location has been set on the map.',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      },
+      (error) => {
+        console.error('Geolocation error:', error);
+        //  Error alert
+        CustomSwal.fire({
+          icon: 'error',
+          title: 'Unable to get your location',
+          text: 'Please allow location access or use the map manually.'
+        });
+
+        // Optional fallback location
+        const defaultLoc = { lat: 31.5204, lng: 74.3587 }; // Lahore
+        this.map.setView(defaultLoc, 13);
+        this.marker.setLatLng(defaultLoc);
+        this.checkoutData.address.coordinates = defaultLoc;
+      }
+    );
+  } else {
+    CustomSwal.fire({
+      icon: 'warning',
+      title: 'Unsupported',
+      text: 'Your browser does not support geolocation.'
+    });
   }
+}
+
 
   confirmLocation(): void {
-    console.log('✅ Location confirmed:', this.checkoutData.address);
+    const pos = this.marker.getLatLng();
+    this.checkoutData.address.coordinates = { lat: pos.lat, lng: pos.lng };
+    this.checkoutData.address.formatted = `Lat: ${pos.lat.toFixed(5)}, Lng: ${pos.lng.toFixed(5)}`;
+    console.log(' Location confirmed:', this.checkoutData.address);
     this.closeMapModal();
   }
 
-  /** ------------------ ✅ PLACE ORDER ------------------ **/
-  placeOrder(): void {
-    if (!this.validateForm()) return;
+  /** ------------------  PLACE ORDER ------------------ **/
+  async placeOrder(): Promise<void> {
+    const isValid = await this.validateForm();
+    if (!isValid) return;
+
+    const result = await CustomSwal.fire({
+      icon: 'question',
+      title: 'Confirm Order',
+      text: 'Are you sure you want to place this order?',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, place order',
+      cancelButtonText: 'Cancel'
+    });
+
+    if (!result.isConfirmed) return;
 
     this.isPlacingOrder = true;
+
+    const orderData = {
+      customer: this.checkoutData,
+      cartItems: this.cartItems,
+      totals: {
+        subtotal: this.subtotal,
+        shippingCost: this.shippingCost,
+        tax: this.tax,
+        discount: this.discount,
+        grandTotal: this.grandTotal
+      },
+      orderId: this.generateOrderId(),
+      date: new Date().toISOString(),
+      shopSlug: this.shopSlug
+    };
+
+    console.log('🧾 Order Placed:', orderData);
+
     setTimeout(() => {
       this.isPlacingOrder = false;
-      localStorage.removeItem('shop-cart');
+      localStorage.removeItem(`cart-${this.shopSlug}`);
+
+      CustomSwal.fire({
+        icon: 'success',
+        title: 'Order Placed!',
+        text: 'Your order has been placed successfully.',
+        timer: 2000,
+        showConfirmButton: false
+      });
+
       this.router.navigate(['/order-confirmation'], {
-        queryParams: { orderId: this.generateOrderId() }
+        queryParams: { orderId: orderData.orderId }
       });
     }, 2000);
   }
 
-  private validateForm(): boolean {
+  private async validateForm(): Promise<boolean> {
     const { fullName, email, phone, address } = this.checkoutData;
-
     if (!fullName || !email || !phone || !address.street || !address.city || !address.province || !address.postalCode) {
-      alert('Please fill all required fields.');
+      await CustomSwal.fire({
+        icon: 'warning',
+        title: 'Missing Information',
+        text: 'Please fill in all required fields before proceeding.',
+      });
       return false;
     }
 
     if (!this.isValidEmail(email)) {
-      alert('Invalid email format.');
+      await CustomSwal.fire({
+        icon: 'error',
+        title: 'Invalid Email',
+        text: 'Please enter a valid email address.',
+      });
       return false;
     }
 
     if (!this.isValidPhone(phone)) {
-      alert('Invalid phone number.');
+      await CustomSwal.fire({
+        icon: 'error',
+        title: 'Invalid Phone',
+        text: 'Please enter a valid phone number.',
+      });
       return false;
     }
 
