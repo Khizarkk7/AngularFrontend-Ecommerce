@@ -37,6 +37,7 @@ export const routes: Routes = [
   loadComponent: () =>
     import('./shop-public/shop-public/shop-public.component').then(m => m.ShopPublicComponent)
 },
+
 {
   path: 'shop/:slug/checkout',
   loadComponent: () =>
