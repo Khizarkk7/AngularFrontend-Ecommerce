@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -38,6 +38,48 @@ interface CartItem {
   imageUrl: string;
 }
 
+// Backend compatible interfaces
+interface OrderRequest {
+  shopId: number;
+  customer: CustomerDto;
+  shipping: ShippingDto;
+  payment: PaymentDto;
+  cartItems: CartItemDto[];
+}
+
+interface CustomerDto {
+  fullName: string;
+  email: string;
+  phone: string;
+}
+
+interface ShippingDto {
+  address: string;
+  city: string;
+  province: string;
+  postalCode: string;
+}
+
+interface PaymentDto {
+  method: string;
+}
+
+interface CartItemDto {
+  productId: number;
+  name: string;
+  quantity: number;
+  price: number;
+}
+
+interface OrderResponse {
+  success: boolean;
+  message: string;
+  orderId: number;
+  orderStatus: string;
+  paymentStatus: string;
+  requiresPayment: boolean;
+}
+
 @Component({
   selector: 'app-checkout',
   standalone: true,
@@ -46,15 +88,20 @@ interface CartItem {
   styleUrls: ['./checkout.component.css']
 })
 export class CheckoutComponent implements OnInit, AfterViewInit {
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+  private checkoutService = inject(CheckoutService);
+  private shopService = inject(ShopPublicService);
+
   shopSlug = '';
-  shopId!: number; //  dynamically mapping shopId from slug
+  shopId!: number;
 
   checkoutData: CheckoutData = {
     fullName: '',
     email: '',
     phone: '',
     address: { street: '', city: '', province: '', postalCode: '' },
-    paymentMethod: '',
+    paymentMethod: 'credit_card',
     notes: ''
   };
 
@@ -62,7 +109,7 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
   subtotal = 0;
   shippingCost = 0;
   discount = 0;
-  tax= 0;
+  tax = 0;
   grandTotal = 0;
   promoCode = '';
   appliedPromo = false;
@@ -70,15 +117,17 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
   isPlacingOrder = false;
   showMapModal = false;
 
+  // Payment methods based on backend
+  paymentMethods = [
+    { value: 'credit_card', label: 'Credit Card', icon: '💳' },
+    { value: 'debit_card', label: 'Debit Card', icon: '💳' },
+    { value: 'jazzcash', label: 'JazzCash', icon: '📱' },
+    { value: 'easypaisa', label: 'EasyPaisa', icon: '📱' },
+    { value: 'cod', label: 'Cash on Delivery', icon: '💰' }
+  ];
+
   private map!: L.Map;
   private marker!: L.Marker;
-
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private checkoutService: CheckoutService,
-    private shopService: ShopPublicService
-  ) {}
 
   ngOnInit(): void {
     this.shopSlug = this.route.snapshot.paramMap.get('slug') || '';
@@ -92,17 +141,21 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {}
 
-
-    /** Get shopId from slug dynamically */
+  /** Get shopId from slug dynamically */
   private loadShopBySlug(): void {
     this.shopService.getShopBySlug(this.shopSlug).subscribe({
       next: (shop) => {
         this.shopId = shop.shopId;
-        console.log(' Shop Loaded:', shop);
-        console.log(' Extracted shopId:', this.shopId);
+        console.log('Shop Loaded:', shop);
+        console.log('Extracted shopId:', this.shopId);
       },
       error: (err) => {
-        console.error(' Error fetching shop by slug:', err);
+        console.error('Error fetching shop by slug:', err);
+        CustomSwal.fire({
+          icon: 'error',
+          title: 'Shop Not Found',
+          text: 'Unable to load shop information. Please try again.'
+        });
       }
     });
   }
@@ -112,6 +165,9 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
     const cartKey = `cart-${this.shopSlug}`;
     try {
       this.cartItems = JSON.parse(localStorage.getItem(cartKey) || '[]');
+      if (this.cartItems.length === 0) {
+        this.router.navigate(['/shop', this.shopSlug]);
+      }
     } catch {
       this.cartItems = [];
     }
@@ -120,7 +176,8 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
   calculateTotals(): void {
     this.subtotal = this.cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
     this.shippingCost = this.subtotal > 2000 ? 0 : 200;
-    this.grandTotal = this.subtotal + this.shippingCost - this.discount;
+    this.tax = this.subtotal * 0.13; // 13% tax
+    this.grandTotal = this.subtotal + this.shippingCost + this.tax - this.discount;
   }
 
   applyPromoCode(): void {
@@ -221,12 +278,19 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
     const isValid = await this.validateForm();
     if (!isValid) return;
 
+    const paymentMethod = this.checkoutData.paymentMethod;
+    const isCOD = paymentMethod === 'cod';
+    
+    const confirmMessage = isCOD 
+      ? 'COD order will be confirmed immediately. Do you want to proceed?'
+      : 'Do you want to place this order?';
+
     const confirm = await CustomSwal.fire({
       icon: 'question',
       title: 'Confirm Order',
-      text: 'Do you want to place this order?',
+      text: confirmMessage,
       showCancelButton: true,
-      confirmButtonText: 'Yes, place order',
+      confirmButtonText: isCOD ? 'Yes, place COD order' : 'Yes, place order',
       cancelButtonText: 'Cancel'
     });
 
@@ -234,8 +298,8 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
 
     this.isPlacingOrder = true;
 
-    //  Build backend-compatible payload
-    const orderPayload = {
+    // Build backend-compatible payload
+    const orderPayload: OrderRequest = {
       shopId: this.shopId,
       customer: {
         fullName: this.checkoutData.fullName,
@@ -249,44 +313,85 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
         postalCode: this.checkoutData.address.postalCode
       },
       payment: {
-        method: this.checkoutData.paymentMethod
+        method: paymentMethod
       },
       cartItems: this.cartItems.map(i => ({
         productId: i.productId,
+        name: i.name,
         quantity: i.quantity,
         price: i.price
       }))
     };
-  console.log(' Sending order payload to backend:', orderPayload);
+
+    console.log('Sending order payload to backend:', orderPayload);
 
     try {
-      const res = await this.checkoutService.placeOrder(orderPayload);
-      CustomSwal.fire({
-        icon: 'success',
-        title: 'Order Placed!',
-        text: `Order #${res.orderId} placed successfully.`,
-        timer: 2000,
-        showConfirmButton: false
-      });
+      const res: OrderResponse = await this.checkoutService.createOrder(orderPayload).toPromise() as OrderResponse;
+      
+      if (res.success) {
+        await this.handleOrderSuccess(res);
+      } else {
+        throw new Error(res.message);
+      }
 
-      localStorage.removeItem(`cart-${this.shopSlug}`);
-      this.router.navigate(['/order-confirmation'], { queryParams: { orderId: res.orderId } });
     } catch (err: any) {
       console.error('Order Error:', err);
-      CustomSwal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: err?.error?.message || 'Something went wrong while placing the order.'
-      });
+      await this.handleOrderError(err);
     } finally {
       this.isPlacingOrder = false;
     }
   }
 
+  private async handleOrderSuccess(res: OrderResponse): Promise<void> {
+    // Clear cart
+    localStorage.removeItem(`cart-${this.shopSlug}`);
+
+    // Show success message
+    await CustomSwal.fire({
+      icon: 'success',
+      title: 'Order Created!',
+      text: `Order #${res.orderId} created successfully.`,
+      timer: 3000,
+      showConfirmButton: false
+    });
+
+    // Navigate based on payment requirement
+    if (res.requiresPayment) {
+      // Redirect to payment page for online payments
+      this.router.navigate(['/shop', this.shopSlug, 'payment', res.orderId]);
+    } else {
+      // Redirect to success page for COD
+      this.router.navigate(['/shop', this.shopSlug, 'order-success', res.orderId], {
+        queryParams: { 
+          status: res.orderStatus,
+          paymentStatus: res.paymentStatus 
+        }
+      });
+    }
+  }
+
+  private async handleOrderError(err: any): Promise<void> {
+    const errorMessage = err?.error?.message || 
+                        err?.message || 
+                        'Something went wrong while placing the order.';
+
+    await CustomSwal.fire({
+      icon: 'error',
+      title: 'Order Failed',
+      text: errorMessage,
+      confirmButtonText: 'Try Again'
+    });
+  }
+
   /** ------------------ VALIDATION ------------------ **/
   private async validateForm(): Promise<boolean> {
-    const { fullName, email, phone, address } = this.checkoutData;
-    if (!fullName || !email || !phone || !address.street || !address.city || !address.province || !address.postalCode) {
+    const { fullName, email, phone, address, paymentMethod } = this.checkoutData;
+    
+    // Basic required fields validation
+    if (!fullName?.trim() || !email?.trim() || !phone?.trim() || 
+        !address.street?.trim() || !address.city?.trim() || 
+        !address.province?.trim() || !address.postalCode?.trim() ||
+        !paymentMethod) {
       await CustomSwal.fire({
         icon: 'warning',
         title: 'Missing Information',
@@ -295,13 +400,33 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
       return false;
     }
 
+    // Email validation
     if (!this.isValidEmail(email)) {
-      await CustomSwal.fire({ icon: 'error', title: 'Invalid Email', text: 'Please enter a valid email.' });
+      await CustomSwal.fire({ 
+        icon: 'error', 
+        title: 'Invalid Email', 
+        text: 'Please enter a valid email address.' 
+      });
       return false;
     }
 
+    // Phone validation
     if (!this.isValidPhone(phone)) {
-      await CustomSwal.fire({ icon: 'error', title: 'Invalid Phone', text: 'Enter a valid phone number.' });
+      await CustomSwal.fire({ 
+        icon: 'error', 
+        title: 'Invalid Phone', 
+        text: 'Please enter a valid phone number.' 
+      });
+      return false;
+    }
+
+    // Cart validation
+    if (this.cartItems.length === 0) {
+      await CustomSwal.fire({
+        icon: 'warning',
+        title: 'Empty Cart',
+        text: 'Your cart is empty. Please add items before checkout.'
+      });
       return false;
     }
 
@@ -314,5 +439,11 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
 
   private isValidPhone(phone: string): boolean {
     return /^[\+]?[0-9\s\-\(\)]{10,}$/.test(phone);
+  }
+
+  // Helper method to get payment method label
+  getPaymentMethodLabel(method: string): string {
+    const found = this.paymentMethods.find(p => p.value === method);
+    return found ? `${found.icon} ${found.label}` : method;
   }
 }

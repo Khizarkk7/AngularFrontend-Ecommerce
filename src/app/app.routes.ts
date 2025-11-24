@@ -31,6 +31,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'forgotpass', component: ForgotPassComponent },
 
+  
   //lazy loading for public shop view
  {
   path: 'shop/:slug',
@@ -43,6 +44,18 @@ export const routes: Routes = [
   loadComponent: () =>
     import('./shop-public/checkout/checkout.component').then(m => m.CheckoutComponent)
 },
+ {
+    path: 'shop/:slug/payment/:orderId',
+    loadComponent: () =>
+      import('./shop-public/payment/payment.component').then(m => m.PaymentComponent)
+  },
+  {
+    path: 'shop/:slug/order-success/:orderId',
+    loadComponent: () =>
+      import('./shop-public/order-success/order-success.component').then(m => m.OrderSuccessComponent)
+  },
+
+
 
 
   {
