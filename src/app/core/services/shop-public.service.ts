@@ -14,6 +14,10 @@ export interface Shop {
 }
 
 export interface Product {
+discount: any;
+originalPrice: number;
+reviewCount: any;
+rating: number;
   productId: number;
   name: string;
   price: number;
@@ -33,6 +37,15 @@ export interface Product {
   providedIn: 'root'
 })
 export class ShopPublicService {
+  getTrendingProducts(shopSlug: string) {
+    throw new Error('Method not implemented.');
+  }
+  getFeaturedProducts(shopSlug: string) {
+    throw new Error('Method not implemented.');
+  }
+  getCategories(shopSlug: string) {
+    throw new Error('Method not implemented.');
+  }
 
   //private apiUrl = 'https://localhost:7058/api/Shop';
   private apiUrl = 'https://192.168.70.94:7058/api/Shop'

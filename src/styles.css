@@ -1,14 +1,14 @@
 /* Color Palette Variables */
 :root {
-  --color-primary: #6C63FF;         /* Electric Indigo */
-  --color-secondary: #00D1B2;       /* Aqua Sky */
-  --color-accent: #FF6B6B;          /* Neon Coral */
+  --color-primary: #0b3d91;         /* Electric Indigo */
+  --color-secondary: #e86a2f;       /* Aqua Sky */
+  --color-accent: #14b8a6;          /* Neon Coral */
   --color-bg-light: #F9FAFB;        /* Ghost White */
   --color-bg-dark: #2D2D2D;         /* Charcoal Gray */
   --color-text-primary: #212121;    /* Jet Black */
   --color-text-secondary: #6B7280;  /* Cool Gray */
   --color-border: #E5E7EB;          /* Light Gray */
-  --color-success: #10B981;         /* Mint Green */
+  --color-success: #07c97e;         /* Mint Green */
   --color-warning: #F59E0B;         /* Amber Gold */
    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
@@ -157,12 +157,12 @@ input:focus, textarea:focus, select:focus, .form-control:focus {
 }
 
 .card-header {
-  background-color: #6C63FF !important; /* Primary from your palette */
+  background-color: #0b3d91 !important; /* Primary from your palette */
 }
 
 .btn-primary {
-  background-color: #6C63FF;
-  border-color: #6C63FF;
+  background-color: #0b3d91;
+  border-color: #0b3d91;
 
 }
 
@@ -179,7 +179,7 @@ input:focus, textarea:focus, select:focus, .form-control:focus {
 
 .form-control:focus,
 .form-select:focus {
-  border-color: #6C63FF;
+  border-color: #0b3d91;
   box-shadow: 0 0 0 0.2rem rgba(108, 99, 255, 0.25);
 }
 

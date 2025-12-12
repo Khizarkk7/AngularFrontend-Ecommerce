@@ -51,4 +51,7 @@ export class ShopService {
   return this.http.put(`${this.baseUrl}/SoftDeleteShop/${shopId}`, {});
 }
 
+  getCategories(shopId: number): Observable<any> {
+  return this.http.put(`${this.baseUrl}/SoftDeleteShop/${shopId}`, {});
+}
 }
