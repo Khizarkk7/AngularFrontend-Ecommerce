@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CheckoutService } from '../../core/services/checkout.service';
+import { PaymentService } from '../../core/services/payment.service';
 import { CustomSwal } from '../../core/services/custom-swal.service';
 import * as L from 'leaflet';
 import { ShopPublicService } from '../../core/services/shop-public.service';
@@ -91,6 +92,7 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
   private checkoutService = inject(CheckoutService);
+  private paymentService = inject(PaymentService);
   private shopService = inject(ShopPublicService);
 
   shopSlug = '';
@@ -137,6 +139,11 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
     if (this.shopSlug) {
       this.loadShopBySlug();
     }
+    const paymentStatus = this.route.snapshot.queryParamMap.get('status');
+
+  if (paymentStatus === 'success') {
+    localStorage.removeItem(`cart-${this.shopSlug}`);
+  }
   }
 
   ngAfterViewInit(): void {}
@@ -274,101 +281,130 @@ export class CheckoutComponent implements OnInit, AfterViewInit {
   }
 
   /** ------------------ PLACE ORDER ------------------ **/
-  async placeOrder(): Promise<void> {
-    const isValid = await this.validateForm();
-    if (!isValid) return;
 
-    const paymentMethod = this.checkoutData.paymentMethod;
-    const isCOD = paymentMethod === 'cod';
-    
-    const confirmMessage = isCOD 
-      ? 'COD order will be confirmed immediately. Do you want to proceed?'
-      : 'Do you want to place this order?';
+async placeOrder(): Promise<void> {
+  const isValid = await this.validateForm();
+  if (!isValid) return;
 
-    const confirm = await CustomSwal.fire({
-      icon: 'question',
-      title: 'Confirm Order',
-      text: confirmMessage,
-      showCancelButton: true,
-      confirmButtonText: isCOD ? 'Yes, place COD order' : 'Yes, place order',
-      cancelButtonText: 'Cancel'
-    });
+  const paymentMethod = this.checkoutData.paymentMethod;
+  const isCOD = paymentMethod === 'cod';
 
-    if (!confirm.isConfirmed) return;
+  const confirm = await CustomSwal.fire({
+    icon: 'question',
+    title: 'Confirm Order',
+    text: isCOD
+      ? 'COD order will be confirmed immediately.'
+      : 'You will be redirected to payment gateway.',
+    showCancelButton: true,
+    confirmButtonText: 'Proceed',
+    cancelButtonText: 'Cancel'
+  });
 
-    this.isPlacingOrder = true;
+  if (!confirm.isConfirmed) return;
 
-    // Build backend-compatible payload
-    const orderPayload: OrderRequest = {
-      shopId: this.shopId,
-      customer: {
-        fullName: this.checkoutData.fullName,
-        email: this.checkoutData.email,
-        phone: this.checkoutData.phone
-      },
-      shipping: {
-        address: this.checkoutData.address.street,
-        city: this.checkoutData.address.city,
-        province: this.checkoutData.address.province,
-        postalCode: this.checkoutData.address.postalCode
-      },
-      payment: {
-        method: paymentMethod
-      },
-      cartItems: this.cartItems.map(i => ({
-        productId: i.productId,
-        name: i.name,
-        quantity: i.quantity,
-        price: i.price
-      }))
-    };
+  this.isPlacingOrder = true;
 
-    console.log('Sending order payload to backend:', orderPayload);
+  const orderPayload: OrderRequest = {
+    shopId: this.shopId,
+    customer: {
+      fullName: this.checkoutData.fullName,
+      email: this.checkoutData.email,
+      phone: this.checkoutData.phone
+    },
+    shipping: {
+      address: this.checkoutData.address.street,
+      city: this.checkoutData.address.city,
+      province: this.checkoutData.address.province,
+      postalCode: this.checkoutData.address.postalCode
+    },
+    payment: { method: paymentMethod },
+    cartItems: this.cartItems.map(i => ({
+      productId: i.productId,
+      name: i.name,
+      quantity: i.quantity,
+      price: i.price
+    }))
+  };
 
-    try {
-      const res: OrderResponse = await this.checkoutService.createOrder(orderPayload).toPromise() as OrderResponse;
-      
-      if (res.success) {
-        await this.handleOrderSuccess(res);
-      } else {
-        throw new Error(res.message);
-      }
+  console.log(' Order Payload:', orderPayload);
 
-    } catch (err: any) {
-      console.error('Order Error:', err);
-      await this.handleOrderError(err);
-    } finally {
-      this.isPlacingOrder = false;
+  try {
+    const res = await this.checkoutService.createOrder(orderPayload).toPromise();
+
+    if (!res) throw new Error('No response from server');
+    if (!res.success) throw new Error(res.message);
+
+    //  COD FLOW
+    if (!res.requiresPayment) {
+      await this.handleOrderSuccess(res);
+      return;
     }
+
+    //  ONLINE PAYMENT FLOW
+    await this.initiateOnlinePayment(res.orderId);
+
+  } catch (err) {
+
+    console.error(' Order Error:', err);
+
+    await this.handleOrderError(err);
+  } finally {
+    this.isPlacingOrder = false;
   }
+}
+
 
   private async handleOrderSuccess(res: OrderResponse): Promise<void> {
-    // Clear cart
-    localStorage.removeItem(`cart-${this.shopSlug}`);
 
-    // Show success message
-    await CustomSwal.fire({
-      icon: 'success',
-      title: 'Order Created!',
-      text: `Order #${res.orderId} created successfully.`,
-      timer: 3000,
-      showConfirmButton: false
-    });
+  await CustomSwal.fire({
+    icon: 'success',
+    title: 'Order Created!',
+    text: `Order #${res.orderId} created successfully.`,
+    timer: 2500,
+    showConfirmButton: false
+  });
 
-    // Navigate based on payment requirement
-    if (res.requiresPayment) {
-      // Redirect to payment page for online payments
-      this.router.navigate(['/shop', this.shopSlug, 'payment', res.orderId]);
-    } else {
-      // Redirect to success page for COD
-      this.router.navigate(['/shop', this.shopSlug, 'order-success', res.orderId], {
-        queryParams: { 
-          status: res.orderStatus,
-          paymentStatus: res.paymentStatus 
-        }
-      });
-    }
-  }
+  // COD FLOW → clear cart immediately
+if (!res.requiresPayment) {
+  localStorage.removeItem(`cart-${this.shopSlug}`);
+  this.router.navigate(['/shop', this.shopSlug, 'order-success', res.orderId], {
+    queryParams: { status: res.orderStatus, paymentStatus: res.paymentStatus }
+  });
+  return;
+}
+
+  // ONLINE PAYMENT FLOW → DO NOT clear cart yet
+  await this.initiateOnlinePayment(res.orderId);
+}
+
+
+private async initiateOnlinePayment(orderId: number): Promise<void> {
+
+ const payload = {
+  orderId,
+  returnUrl: `${window.location.origin}/payment-callback`
+};
+
+
+  console.log('💳 Initiating Payment:', payload);
+
+const res: { paymentUrl: string } | undefined = await this.paymentService
+  .initiatePayment(payload)
+  .toPromise();
+
+if (!res || !res.paymentUrl) {
+  await CustomSwal.fire({
+    icon: 'error',
+    title: 'Payment Initialization Failed',
+    text: 'Could not start the payment process. Please try again.'
+  });
+  return;
+}
+
+window.location.href = res.paymentUrl;
+
+}
+
 
   private async handleOrderError(err: any): Promise<void> {
     const errorMessage = err?.error?.message || 
