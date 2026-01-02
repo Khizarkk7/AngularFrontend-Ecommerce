@@ -42,37 +42,41 @@
         </div>
 
         <div class="header-actions">
-    
-          <!-- Wishlist -->
+
           <div class="wishlist-container">
-            <button class="action-btn wishlist-btn" (click)="toggleWishlistPopup()" title="Wishlist">
+            <!-- Wishlist Button -->
+            <button class="action-btn wishlist-btn" (click)="toggleWishlistPopup($event)">
               <i class="fas fa-heart"></i>
-              <span class="wishlist-badge" *ngIf="wishlist.length > 0">{{ wishlist.length }}</span>
+              <span class="wishlist-badge" *ngIf="wishlist.length">{{ wishlist.length }}</span>
             </button>
 
             <!-- Wishlist Popup -->
-            <div class="wishlist-popup" *ngIf="wishlistPopupOpen">
+            <div class="wishlist-popup" *ngIf="wishlistOpen">
               <h3>My Wishlist</h3>
 
-              <div *ngIf="wishlist.length > 0; else emptyWishlist">
+              <div class="wishlist-items-container" *ngIf="wishlist.length; else emptyWishlist">
                 <div *ngFor="let item of wishlist" class="wishlist-item">
-                  <img [src]="item.imageUrl" alt="{{item.name}}" class="wishlist-img">
+                  <img [src]="item.imageUrl || 'assets/product-placeholder.png'" alt="{{item.name}}"
+                    class="wishlist-img">
                   <div class="wishlist-info">
                     <p class="wishlist-name">{{ item.name }}</p>
                     <span class="wishlist-price">Rs. {{ item.price | number:'1.0-0' }}</span>
                   </div>
-                  <button class="remove-btn" (click)="removeFromWishlist(item)">
+                  <button class="remove-btn" (click)="removeFromWishlist(item.productId)">
                     <i class="fas fa-times"></i>
                   </button>
                 </div>
-                <button class="view-all-btn">View All Wishlist</button>
               </div>
 
               <ng-template #emptyWishlist>
                 <p class="empty-msg">No items in wishlist</p>
               </ng-template>
+
+              <button *ngIf="wishlist.length > 0" class="view-all-btn" (click)="viewAllWishlist()">View All
+                Wishlist</button>
             </div>
           </div>
+
 
           <!-- Cart -->
           <button class="action-btn cart-btn" (click)="toggleCart()" title="Cart">
@@ -96,13 +100,11 @@
   <!-- Navigation -->
   <nav class="shop-navigation">
     <div class="container">
-      <ul class="nav-menu">
-        <li><a class="nav-link active">Featured</a></li>
-        <li><a class="nav-link">Categories</a></li>
-        <li><a class="nav-link">New Arrivals</a></li>
-        <li><a class="nav-link">Hot Deals</a></li>
-        <li><a class="nav-link">About Shop</a></li>
-      </ul>
+      <a [routerLink]="['/shop', shopSlug]">Featured</a>
+      <a [routerLink]="['/shop', shopSlug, 'categories']">Categories</a>
+      <a [routerLink]="['/shop', shopSlug, 'new-arrivals']">New Arrivals</a>
+      <a [routerLink]="['/shop', shopSlug, 'hot-deals']">Hot Deals</a>
+      <a [routerLink]="['/shop', shopSlug, 'about']">About</a>
       <div class="search-bar">
         <input type="text" placeholder="Search products..." class="search-input">
         <button class="search-btn">
@@ -116,61 +118,64 @@
   <main class="main-content">
     <div class="container">
 
+      <!-- 👇 CHILD PAGE RENDERS HERE -->
+      <router-outlet></router-outlet>
+
       <!-- Featured Products -->
-      <section class="products-section">
+      <!-- <section class="products-section">
         <div class="section-header">
           <h2 class="section-title">Featured Products</h2>
           <div class="view-controls">
             <button class="view-btn active" data-view="grid">
               <i class="fas fa-th"></i>
-            </button>
-            <!-- <button class="view-btn" data-view="list">
+            </button> -->
+      <!-- <button class="view-btn" data-view="list">
               <i class="fas fa-list"></i>
             </button> -->
-          </div>
-        </div>
+      <!-- </div>
+        </div> -->
 
-        <!-- Loading State -->
-        <div *ngIf="loading" class="loading-state">
+      <!-- Loading State -->
+      <!-- <div *ngIf="loading" class="loading-state">
           <div class="spinner"></div>
           <p>Loading amazing products for you...</p>
-        </div>
+        </div> -->
 
-        <!-- Error State -->
-        <div *ngIf="error && !loading" class="error-state">
+      <!-- Error State -->
+      <!-- <div *ngIf="error && !loading" class="error-state">
           <i class="fas fa-exclamation-triangle"></i>
           <h3>Oops! Something went wrong</h3>
           <p>{{ error }}</p>
           <button class="retry-btn" (click)="retryLoading()">Try Again</button>
-        </div>
+        </div> -->
 
-        <!-- Products Grid -->
-        <div *ngIf="!loading && products?.length" class="products-grid" id="productsView">
+      <!-- Products Grid -->
+      <!-- <div *ngIf="!loading && products?.length" class="products-grid" id="productsView">
           <div *ngFor="let product of products" class="product-card">
             <div class="product-image">
               <img [src]="product.imageUrl" [alt]="product.name" (error)="handleImageError($event)">
               <div class="product-overlay">
                 <button class="quick-view-btn" (click)="quickView(product)">
                   <i class="fas fa-eye"></i>
-                </button>
-                <!-- Product Card -->
-                <button class="wishlist-btn" (click)="toggleWishlist(product)">
+                </button> -->
+      <!-- Product Card -->
+      <!-- <button class="wishlist-btn" (click)="toggleWishlist(product)">
                   <i class="fas fa-heart" [class.active]="isInWishlist(product)"></i>
                 </button>
               </div>
               <span class="product-badge" *ngIf="product.discount">
                 -{{ product.discount }}%
               </span>
-            </div>
+            </div> -->
 
-            <div class="product-info">
+      <!-- <div class="product-info">
               <h3 class="product-name">{{ product.name }}</h3>
               <p class="product-description">
                 {{ product.description?.length > 60 ? (product.description | slice:0:60) + '...' : product.description
                 }}
-              </p>
+              </p> -->
 
-              <div class="product-rating">
+      <!-- <div class="product-rating">
                 <div class="stars">
                   <i class="fas fa-star" *ngFor="let star of [1,2,3,4,5]"></i>
                 </div>
@@ -182,25 +187,25 @@
                 <span class="original-price" *ngIf="product.originalPrice">
                   Rs. {{ product.originalPrice | number:'1.0-0' }}
                 </span>
-              </div>
+              </div> -->
 
-              <button class="add-to-cart-btn" (click)="addToCart(product)">
+      <!-- <button class="add-to-cart-btn" (click)="addToCart(product)">
                 <i class="fas fa-shopping-cart"></i>
                 Add to Cart
               </button>
             </div>
           </div>
-        </div>
+        </div> -->
 
-        <!-- Empty State -->
-        <div *ngIf="!loading && !products?.length" class="empty-state">
+      <!-- Empty State -->
+      <!-- <div *ngIf="!loading && !products?.length" class="empty-state">
           <i class="fas fa-box-open"></i>
           <h3>No products available yet</h3>
           <p>Check back later for amazing products!</p>
-        </div>
+        </div> -->
 
-        <!-- Pagination -->
-        <div *ngIf="totalCount > pageSize" class="pagination-container">
+      <!-- Pagination -->
+      <!-- <div *ngIf="totalCount > pageSize" class="pagination-container">
           <div class="pagination-info">
             Showing {{ (page - 1) * pageSize + 1 }} to
             {{ getMin(page * pageSize, totalCount) }} of {{ totalCount }} products
@@ -209,9 +214,9 @@
           <nav class="pagination">
             <button class="pagination-btn" [disabled]="page === 1" (click)="changePage(page - 1)">
               <i class="fas fa-chevron-left"></i>
-            </button>
+            </button> -->
 
-            <button *ngFor="let pageNum of getPaginationPages()" class="pagination-btn"
+      <!-- <button *ngFor="let pageNum of getPaginationPages()" class="pagination-btn"
               [class.active]="page === pageNum" (click)="changePage(pageNum)">
               {{ pageNum }}
             </button>
@@ -223,109 +228,114 @@
         </div>
       </section>
     </div>
-  </main>
+  </main> -->
 
-  <!-- Shopping Cart Sidebar -->
-  <div class="cart-sidebar" [class.open]="cartOpen">
-    <div class="cart-header">
-      <h3>Your Shopping Cart</h3>
-      <button class="close-cart" (click)="toggleCart()">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
+      <!-- Shopping Cart Sidebar -->
+      <div class="cart-sidebar" [class.open]="cartOpen">
+        <div class="cart-header">
+          <h3>Your Shopping Cart</h3>
+          <button class="close-cart" (click)="toggleCart()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
 
-    <div class="cart-content">
-      <div *ngIf="cart.length > 0; else emptyCart" class="cart-items">
-        <div *ngFor="let item of cart; let i = index" class="cart-item">
-          <img [src]="item.imageUrl" [alt]="item.name">
-          <div class="item-details">
-            <h4>{{ item.name }}</h4>
-            <p class="item-price">Rs. {{ item.price | number:'1.0-0' }}</p>
-            <div class="quantity-controls">
-              <button (click)="updateQuantity(i, item.quantity - 1)">-</button>
-              <span>{{ item.quantity || 1 }}</span>
-              <button (click)="updateQuantity(i, item.quantity + 1)">+</button>
+        <div class="cart-content">
+          <div *ngIf="cart.length > 0; else emptyCart" class="cart-items">
+            <div *ngFor="let item of cart; let i = index" class="cart-item">
+              <img [src]="item.imageUrl" [alt]="item.name">
+              <div class="item-details">
+                <h4>{{ item.name }}</h4>
+                <p class="item-price">Rs. {{ item.price | number:'1.0-0' }}</p>
+                <div class="quantity-controls">
+                  <button (click)="updateQuantity(item.productId, item.quantity - 1)">-</button>
+                  <span>{{ item.quantity }}</span>
+                  <button (click)="updateQuantity(item.productId, item.quantity + 1)">+</button>
+
+                </div>
+              </div>
+              <button class="remove-item" (click)="removeFromCart(item.productId)">
+                <i class="fas fa-trash"></i>
+              </button>
             </div>
           </div>
-          <button class="remove-item" (click)="removeFromCart(i)">
-            <i class="fas fa-trash"></i>
-          </button>
+
+          <ng-template #emptyCart>
+            <div class="empty-cart">
+              <i class="fas fa-shopping-bag"></i>
+              <p>Your cart is empty</p>
+              <button class="continue-shopping" (click)="toggleCart()">
+                Continue Shopping
+              </button>
+            </div>
+          </ng-template>
+        </div>
+
+        <div *ngIf="cart.length > 0" class="cart-footer">
+          <div class="cart-total">
+            <span>Total: Rs. {{ getCartTotal() | number:'1.0-0' }}</span>
+          </div>
+          <button class="checkout-btn"  (click)="proceedToCheckout()">Proceed to Checkout</button>
         </div>
       </div>
 
-      <ng-template #emptyCart>
-        <div class="empty-cart">
-          <i class="fas fa-shopping-bag"></i>
-          <p>Your cart is empty</p>
-          <button class="continue-shopping" (click)="toggleCart()">
-            Continue Shopping
-          </button>
-        </div>
-      </ng-template>
-    </div>
 
-    <div *ngIf="cart.length > 0" class="cart-footer">
-      <div class="cart-total">
-        <span>Total: Rs. {{ getCartTotal() | number:'1.0-0' }}</span>
-      </div>
-      <button class="checkout-btn" (click)="proceedToCheckout()">Proceed to Checkout</button>
-    </div>
-  </div>
 
-  <!-- Footer -->
-  <footer class="shop-footer">
-    <div class="container">
-      <div class="footer-content">
-        <div class="footer-section">
-          <h4>About {{ shop?.shopName }}</h4>
-          <p>{{ shop?.description }}</p>
-          <div class="social-links">
-            <a><i class="fab fa-facebook"></i></a>
-            <a><i class="fab fa-instagram"></i></a>
-            <a><i class="fab fa-twitter"></i></a>
-            <a><i class="fab fa-whatsapp"></i></a>
+
+
+      <!-- Footer -->
+      <footer class="shop-footer">
+        <div class="container">
+          <div class="footer-content">
+            <div class="footer-section">
+              <h4>About {{ shop?.shopName }}</h4>
+              <p>{{ shop?.description }}</p>
+              <div class="social-links">
+                <a><i class="fab fa-facebook"></i></a>
+                <a><i class="fab fa-instagram"></i></a>
+                <a><i class="fab fa-twitter"></i></a>
+                <a><i class="fab fa-whatsapp"></i></a>
+              </div>
+            </div>
+
+            <div class="footer-section">
+              <h4>Quick Links</h4>
+              <ul>
+                <li><a>Home</a></li>
+                <li><a>Products</a></li>
+                <li><a>Categories</a></li>
+                <li><a>About Us</a></li>
+                <li><a>Contact</a></li>
+              </ul>
+            </div>
+
+            <div class="footer-section">
+              <h4>Customer Service</h4>
+              <ul>
+                <li><a>Shipping Info</a></li>
+                <li><a>Returns</a></li>
+                <li><a>Size Guide</a></li>
+                <li><a>FAQs</a></li>
+                <li><a>Privacy Policy</a></li>
+              </ul>
+            </div>
+
+            <div class="footer-section">
+              <h4>Contact Info</h4>
+              <p><i class="fas fa-phone"></i> {{ shop?.contactInfo }}</p>
+              <p><i class="fas fa-envelope"></i> {{ 'info@' + (shop?.shopName?.toLowerCase() || 'shop') + '.com' }}</p>
+              <p><i class="fas fa-map-marker-alt"></i> Your Shop Address Here</p>
+            </div>
+          </div>
+
+          <div class="footer-bottom">
+            <p>&copy; 2025 {{ shop?.shopName }}. All rights reserved.</p>
           </div>
         </div>
 
-        <div class="footer-section">
-          <h4>Quick Links</h4>
-          <ul>
-            <li><a>Home</a></li>
-            <li><a>Products</a></li>
-            <li><a>Categories</a></li>
-            <li><a>About Us</a></li>
-            <li><a>Contact</a></li>
-          </ul>
-        </div>
+      </footer>
 
-        <div class="footer-section">
-          <h4>Customer Service</h4>
-          <ul>
-            <li><a>Shipping Info</a></li>
-            <li><a>Returns</a></li>
-            <li><a>Size Guide</a></li>
-            <li><a>FAQs</a></li>
-            <li><a>Privacy Policy</a></li>
-          </ul>
-        </div>
-
-        <div class="footer-section">
-          <h4>Contact Info</h4>
-          <p><i class="fas fa-phone"></i> {{ shop?.contactInfo }}</p>
-          <p><i class="fas fa-envelope"></i> {{ 'info@' + (shop?.shopName?.toLowerCase() || 'shop') + '.com' }}</p>
-          <p><i class="fas fa-map-marker-alt"></i> Your Shop Address Here</p>
-        </div>
-      </div>
-
-      <div class="footer-bottom">
-        <p>&copy; 2025 {{ shop?.shopName }}. All rights reserved.</p>
-      </div>
+      <!-- Back to Top Button -->
+      <button class="back-to-top " (click)="scrollToTop()">
+        <i class="fas fa-chevron-up"></i>
+      </button>
     </div>
-
-  </footer>
-
-  <!-- Back to Top Button -->
-  <button class="back-to-top " (click)="scrollToTop()">
-    <i class="fas fa-chevron-up"></i>
-  </button>
-</div>

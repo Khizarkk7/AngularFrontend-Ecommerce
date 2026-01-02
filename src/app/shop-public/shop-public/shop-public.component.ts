@@ -1,54 +1,158 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { Product, ShopPublicService } from '../../core/services/shop-public.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { routes } from '../../app.routes';
+import { RouterOutlet } from '@angular/router';
+import { CartService } from '../../core/services/cart.service';
+import { WishlistService } from '../../core/services/wishlist.service';
+import Swal from 'sweetalert2';
+
 
 @Component({
   selector: 'app-shop-public',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterOutlet, RouterLink],
   templateUrl: './shop-public.component.html',
   styleUrls: ['./shop-public.component.css']
 })
 export class ShopPublicComponent implements OnInit {
-  shop: any;
-  products: any[] = [];
-  cart: any[] = [];
-  cartOpen: boolean = false;
-  page: number = 1;
-  pageSize: number = 9;
-  loading: boolean = false;
-  error: string | null = null;
-  totalCount: number = 0;
-  pageCount: number = 0;
+  // shop: any;
+  // products: any[] = [];
+  // cart: any[] = [];
+  // cartOpen: boolean = false;
+  // page: number = 1;
+  // pageSize: number = 9;
+  // loading: boolean = false;
+  // error: string | null = null;
+  // totalCount: number = 0;
+  // pageCount: number = 0;
   isDarkMode: boolean = false;
   showBackToTop: boolean = false;
-  wishlist: Product[] = [];
-  wishlistPopupOpen = false;
+  // wishlist: Product[] = [];
+  // wishlistPopupOpen = false;
+  // shopSlug!: string;
+
+  shop: any;
   shopSlug!: string;
+  cartOpen = false;
+  cart: any[] = [];
+  //wishlist: Product[] = [];
+  wishlist: any[] = [];
+  wishlistOpen: boolean = false;
+
 
   constructor(
     private route: ActivatedRoute,
     private shopPublicService: ShopPublicService,
-    private router: Router
+    private router: Router,
+    private cartService: CartService,
+    private wishlistService: WishlistService
   ) { }
 
-  ngOnInit(): void {
-    this.loadThemePreference();
-    const slug = this.route.snapshot.paramMap.get('slug');
-    if (slug) {
-      this.shopSlug = slug;
-      this.loadShopData(slug);
-      this.getProducts(slug);
-    }
-    this.loadCartFromStorage();
+  ngOnInit() {
+    this.shopSlug = this.route.snapshot.paramMap.get('slug')!;
+    this.shopPublicService.getShopBySlug(this.shopSlug)
+      .subscribe(s => this.shop = s);
 
-    this.shopPublicService.wishlist$.subscribe(list => {
+    //  VERY IMPORTANT 
+    this.cartService.setShop(this.shopSlug);
+    this.cartService.cart$.subscribe(items => {
+      this.cart = items;
+    });
+    this.cartService.cartOpen$.subscribe(open => {
+      this.cartOpen = open;
+    });
+
+    this.wishlistService.setShop(this.shopSlug);
+    this.wishlistService.wishlist$.subscribe(list => {
       this.wishlist = list;
     });
   }
+
+  toggleCart() {
+    this.cartService.toggleCart();
+  }
+
+  updateQuantity(productId: number, qty: number) {
+    this.cartService.updateQuantity(productId, qty);
+  }
+
+  removeFromCart(productId: number) {
+    this.cartService.removeItem(productId);
+  }
+
+  getCartTotal() {
+    return this.cartService.getTotal();
+  }
+
+ proceedToCheckout() {
+  // Close the cart drawer or overlay
+  this.cartService.closeCart();
+
+  // Navigate to checkout
+  // Make sure 'shopSlug' has a valid value
+  if (this.shopSlug) {
+    this.router.navigate(['/shop', this.shopSlug, 'checkout']);
+  } else {
+    console.error('Shop slug is missing! Cannot navigate to checkout.');
+  }
+}
+
+
+// -------wishlist methods
+
+// Toggle popup
+  toggleWishlistPopup(event: Event) {
+    event.stopPropagation(); // prevent outer clicks from interfering
+    this.cartService.closeCart(); // optional: close cart
+    this.wishlistOpen = !this.wishlistOpen;
+  }
+
+  removeFromWishlist(productId: number) {
+    this.wishlistService.remove(productId);
+  }
+
+viewAllWishlist() {
+  if (!this.wishlist.length) {
+    Swal.fire({
+      icon: 'info',
+      title: 'Wishlist is empty',
+      text: 'Add some products to see them here!',
+    });
+    return;
+  }
+
+  const htmlContent = this.wishlist.map(item => `
+    <div style="display:flex; align-items:center; margin-bottom:10px;">
+      <img src="${item.imageUrl || 'assets/product-placeholder.png'}" 
+           alt="${item.name}" 
+           style="width:50px; height:50px; object-fit:cover; margin-right:10px; border-radius:5px;">
+      <div>
+        <p style="margin:0; font-weight:bold;">${item.name}</p>
+        <span>Rs. ${item.price}</span>
+      </div>
+    </div>
+  `).join('');
+
+  Swal.fire({
+    title: 'My Wishlist',
+    html: `<div style="max-height:300px; overflow-y:auto;">${htmlContent}</div>`,
+    showCloseButton: true,
+    showCancelButton: true,
+    confirmButtonText: 'Checkout',
+    cancelButtonText: 'Close',
+    width: '500px',
+  }).then(result => {
+    if (result.isConfirmed) {
+      // Navigate to checkout page
+      this.router.navigate(['/shop', this.shopSlug, 'checkout'], { state: { wishlist: this.wishlist } });
+    }
+  });
+}
+
+
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
@@ -75,172 +179,172 @@ export class ShopPublicComponent implements OnInit {
     }
   }
 
-  loadShopData(slug: string) {
-    this.shopPublicService.getShopBySlug(slug).subscribe({
-      next: (shop) => {
-        this.shop = shop;
-      },
-      error: (err) => {
-        console.error('Error fetching shop details:', err);
-      }
-    });
-  }
+  // loadShopData(slug: string) {
+  //   this.shopPublicService.getShopBySlug(slug).subscribe({
+  //     next: (shop) => {
+  //       this.shop = shop;
+  //     },
+  //     error: (err) => {
+  //       console.error('Error fetching shop details:', err);
+  //     }
+  //   });
+  // }
 
-  getProducts(slug: string) {
-    this.loading = true;
-    this.error = null;
+  // getProducts(slug: string) {
+  //   this.loading = true;
+  //   this.error = null;
 
-    this.shopPublicService.getProductsBySlug(slug, this.page, this.pageSize).subscribe({
-      next: (res) => {
-        this.products = res.products || [];
-        this.totalCount = res.totalCount || 0;
-        this.pageCount = res.pageCount || Math.ceil(this.totalCount / this.pageSize);
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = 'Failed to load products. Please try again.';
-        this.loading = false;
-        console.error('API Error:', err);
-      }
-    });
-  }
+  //   this.shopPublicService.getProductsBySlug(slug, this.page, this.pageSize).subscribe({
+  //     next: (res) => {
+  //       this.products = res.products || [];
+  //       this.totalCount = res.totalCount || 0;
+  //       this.pageCount = res.pageCount || Math.ceil(this.totalCount / this.pageSize);
+  //       this.loading = false;
+  //     },
+  //     error: (err) => {
+  //       this.error = 'Failed to load products. Please try again.';
+  //       this.loading = false;
+  //       console.error('API Error:', err);
+  //     }
+  //   });
+  // }
 
-  addToCart(product: any) {
-    const existingItem = this.cart.find(item => item.productId === product.productId);
-    if (existingItem) {
-      existingItem.quantity = (existingItem.quantity || 1) + 1;
-    } else {
-      this.cart.push({ ...product, quantity: 1 });
-    }
-    this.saveCartToStorage();
-  }
+  // addToCart(product: any) {
+  //   const existingItem = this.cart.find(item => item.productId === product.productId);
+  //   if (existingItem) {
+  //     existingItem.quantity = (existingItem.quantity || 1) + 1;
+  //   } else {
+  //     this.cart.push({ ...product, quantity: 1 });
+  //   }
+  //   this.saveCartToStorage();
+  // }
 
-  removeFromCart(index: number) {
-    this.cart.splice(index, 1);
-    this.saveCartToStorage();
-  }
+  // removeFromCart(index: number) {
+  //   this.cart.splice(index, 1);
+  //   this.saveCartToStorage();
+  // }
 
-  updateQuantity(index: number, newQuantity: number) {
-    if (newQuantity < 1) {
-      this.removeFromCart(index);
-      return;
-    }
-    this.cart[index].quantity = newQuantity;
-    this.saveCartToStorage();
-  }
+  // updateQuantity(index: number, newQuantity: number) {
+  //   if (newQuantity < 1) {
+  //     this.removeFromCart(index);
+  //     return;
+  //   }
+  //   this.cart[index].quantity = newQuantity;
+  //   this.saveCartToStorage();
+  // }
 
-  getCartTotal(): number {
-    return this.cart.reduce((total, item) => total + (item.price * (item.quantity || 1)), 0);
-  }
+  // getCartTotal(): number {
+  //   return this.cart.reduce((total, item) => total + (item.price * (item.quantity || 1)), 0);
+  // }
 
-  toggleCart() {
-    this.cartOpen = !this.cartOpen;
-  }
+  // toggleCart() {
+  //   this.cartOpen = !this.cartOpen;
+  // }
 
-  proceedToCheckout() {
-    if (this.cart.length === 0) {
-      alert('Your cart is empty!');
-      return;
-    }
+  // proceedToCheckout() {
+  //   if (this.cart.length === 0) {
+  //     alert('Your cart is empty!');
+  //     return;
+  //   }
 
-    // Validate all items belong to same shop
-    const uniqueShops = new Set(this.cart.map(i => i.shopId));
-    if (uniqueShops.size > 1) {
-      alert('You can only checkout products from one shop at a time.');
-      return;
-    }
+  //   // Validate all items belong to same shop
+  //   const uniqueShops = new Set(this.cart.map(i => i.shopId));
+  //   if (uniqueShops.size > 1) {
+  //     alert('You can only checkout products from one shop at a time.');
+  //     return;
+  //   }
 
-    this.toggleCart(); // Close sidebar
+  //   this.toggleCart(); // Close sidebar
 
-    // Navigate to checkout page with cart data (optional)
-    this.router.navigate([`/shop/${this.shopSlug}/checkout`], {
-      state: { cart: this.cart, shop: this.shop }
-    });
-  }
+  //   // Navigate to checkout page with cart data (optional)
+  //   this.router.navigate([`/shop/${this.shopSlug}/checkout`], {
+  //     state: { cart: this.cart, shop: this.shop }
+  //   });
+  // }
 
 
 
-  changePage(newPage: number) {
-    if (newPage >= 1 && newPage <= this.totalPages) {
-      this.page = newPage;
-      const slug = this.route.snapshot.paramMap.get('slug')!;
-      this.getProducts(slug);
-      this.scrollToTop();
-    }
-  }
+  // changePage(newPage: number) {
+  //   if (newPage >= 1 && newPage <= this.totalPages) {
+  //     this.page = newPage;
+  //     const slug = this.route.snapshot.paramMap.get('slug')!;
+  //     this.getProducts(slug);
+  //     this.scrollToTop();
+  //   }
+  // }
 
-  getPaginationPages(): number[] {
-    const pages: number[] = [];
-    const maxVisiblePages = 5;
-    let startPage = Math.max(1, this.page - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
+  // getPaginationPages(): number[] {
+  //   const pages: number[] = [];
+  //   const maxVisiblePages = 5;
+  //   let startPage = Math.max(1, this.page - Math.floor(maxVisiblePages / 2));
+  //   let endPage = Math.min(this.totalPages, startPage + maxVisiblePages - 1);
 
-    if (endPage - startPage + 1 < maxVisiblePages) {
-      startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
+  //   if (endPage - startPage + 1 < maxVisiblePages) {
+  //     startPage = Math.max(1, endPage - maxVisiblePages + 1);
+  //   }
 
-    for (let i = startPage; i <= endPage; i++) {
-      pages.push(i);
-    }
+  //   for (let i = startPage; i <= endPage; i++) {
+  //     pages.push(i);
+  //   }
 
-    return pages;
-  }
+  //   return pages;
+  // }
 
-  get totalPages(): number {
-    return Math.ceil(this.totalCount / this.pageSize);
-  }
+  // get totalPages(): number {
+  //   return Math.ceil(this.totalCount / this.pageSize);
+  // }
 
-  retryLoading() {
-    const slug = this.route.snapshot.paramMap.get('slug')!;
-    this.getProducts(slug);
-  }
+  // retryLoading() {
+  //   const slug = this.route.snapshot.paramMap.get('slug')!;
+  //   this.getProducts(slug);
+  // }
 
   scrollToTop() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  handleImageError(event: any) {
-    event.target.src = 'assets/product-placeholder.png';
-  }
+  // handleImageError(event: any) {
+  //   event.target.src = 'assets/product-placeholder.png';
+  // }
 
-  quickView(product: any) {
-    // Implement quick view functionality
-    console.log('Quick view:', product);
-  }
+  // quickView(product: any) {
+  //   // Implement quick view functionality
+  //   console.log('Quick view:', product);
+  // }
 
-  toggleWishlist(product: Product) {
-    this.shopPublicService.toggleWishlist(product);
-  }
+  // toggleWishlist(product: Product) {
+  //   this.shopPublicService.toggleWishlist(product);
+  // }
 
-  isInWishlist(product: Product): boolean {
-    return this.shopPublicService.isInWishlist(product.productId);
-  }
-  toggleWishlistPopup() {
-    this.wishlistPopupOpen = !this.wishlistPopupOpen;
-  }
+  // isInWishlist(product: Product): boolean {
+  //   return this.shopPublicService.isInWishlist(product.productId);
+  // }
+  // toggleWishlistPopup() {
+  //   this.wishlistPopupOpen = !this.wishlistPopupOpen;
+  // }
 
-  removeFromWishlist(product: Product) {
-    this.shopPublicService.toggleWishlist(product);
-    this.wishlist = this.shopPublicService.getWishlist();
-  }
+  // removeFromWishlist(product: Product) {
+  //   this.shopPublicService.toggleWishlist(product);
+  //   this.wishlist = this.shopPublicService.getWishlist();
+  // }
 
 
-  private loadCartFromStorage() {
-    const savedCart = localStorage.getItem('cart-' + this.shopSlug);
-    if (savedCart) {
-      this.cart = JSON.parse(savedCart);
-    }
-  }
+  // private loadCartFromStorage() {
+  //   const savedCart = localStorage.getItem('cart-' + this.shopSlug);
+  //   if (savedCart) {
+  //     this.cart = JSON.parse(savedCart);
+  //   }
+  // }
 
-  private saveCartToStorage() {
-    // Key per shop:
-    const cartKey = `cart-${this.shopSlug}`;
-    localStorage.setItem(cartKey, JSON.stringify(this.cart));
+  // private saveCartToStorage() {
+  //   // Key per shop:
+  //   const cartKey = `cart-${this.shopSlug}`;
+  //   localStorage.setItem(cartKey, JSON.stringify(this.cart));
 
-  }
+  // }
 
-  getMin(a: number, b: number): number {
-    return Math.min(a, b);
-  }
+  // getMin(a: number, b: number): number {
+  //   return Math.min(a, b);
+  // }
 
 }

@@ -1,24 +1,65 @@
 import { Injectable } from '@angular/core';
-import { Product } from './shop-public.service';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WishlistService {
-  removeFromWishlist(productId: number) {
-    throw new Error('Method not implemented.');
+
+  private wishlistSubject = new BehaviorSubject<any[]>([]);
+  wishlist$ = this.wishlistSubject.asObservable();
+
+  private currentShopSlug!: string;
+
+  /* ------------ SHOP CONTEXT ------------ */
+
+  setShop(slug: string) {
+    this.currentShopSlug = slug;
+    const saved = this.loadFromStorage();
+    this.wishlistSubject.next(saved);
   }
-  getWishlist(): Product[] {
-    throw new Error('Method not implemented.');
+
+  private getKey(): string {
+    return `wishlist-${this.currentShopSlug}`;
   }
-  getWishlistCount(): number {
-    throw new Error('Method not implemented.');
+
+  /* ------------ WISHLIST LOGIC ------------ */
+
+  toggleWishlist(product: any) {
+    const list = [...this.wishlistSubject.value];
+    const index = list.findIndex(p => p.productId === product.productId);
+
+    if (index > -1) {
+      list.splice(index, 1); // remove
+    } else {
+      list.push(product); // add
+    }
+
+    this.update(list);
   }
+
+  remove(productId: number) {
+    const list = this.wishlistSubject.value.filter(
+      p => p.productId !== productId
+    );
+    this.update(list);
+  }
+
   isInWishlist(productId: number): boolean {
-    throw new Error('Method not implemented.');
+    return this.wishlistSubject.value.some(
+      p => p.productId === productId
+    );
   }
-  toggleWishlist(product: Product) {
-    throw new Error('Method not implemented.');
+
+  /* ------------ STORAGE ------------ */
+
+  private update(list: any[]) {
+    this.wishlistSubject.next(list);
+    localStorage.setItem(this.getKey(), JSON.stringify(list));
   }
- 
+
+  private loadFromStorage(): any[] {
+    const data = localStorage.getItem(this.getKey());
+    return data ? JSON.parse(data) : [];
+  }
 }

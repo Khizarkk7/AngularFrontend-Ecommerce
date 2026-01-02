@@ -31,28 +31,94 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'forgotpass', component: ForgotPassComponent },
 
-  
-  //lazy loading for public shop view
- {
-  path: 'shop/:slug',
-  loadComponent: () =>
-    import('./shop-public/shop-public/shop-public.component').then(m => m.ShopPublicComponent)
-},
 
-{
-  path: 'shop/:slug/checkout',
-  loadComponent: () =>
-    import('./shop-public/checkout/checkout.component').then(m => m.CheckoutComponent)
-},
- {
-    path: 'shop/:slug/payment/:orderId',
-    loadComponent: () =>
-      import('./shop-public/payment/payment.component').then(m => m.PaymentComponent)
-  },
+  //lazy loading for public shop view
+  //  {
+  //   path: 'shop/:slug',
+  //   loadComponent: () =>
+  //     import('./shop-public/shop-public/shop-public.component').then(m => m.ShopPublicComponent)
+  // },
+
+  // {
+  //   path: 'shop/:slug/checkout',
+  //   loadComponent: () =>
+  //     import('./shop-public/checkout/checkout.component').then(m => m.CheckoutComponent)
+  // },
+  //  {
+  //     path: 'shop/:slug/payment/:orderId',
+  //     loadComponent: () =>
+  //       import('./shop-public/payment/payment.component').then(m => m.PaymentComponent)
+  //   },
+  //   {
+  //     path: 'shop/:slug/order-success/:orderId',
+  //     loadComponent: () =>
+  //       import('./shop-public/order-success/order-success.component').then(m => m.OrderSuccessComponent)
+  //   },
   {
-    path: 'shop/:slug/order-success/:orderId',
-    loadComponent: () =>
-      import('./shop-public/order-success/order-success.component').then(m => m.OrderSuccessComponent)
+    path: 'shop/:slug',
+    component: ShopPublicComponent,
+    children: [
+
+      //  HOME / PRODUCTS
+      {
+        path: '',
+        loadComponent: () =>
+          import('./shop-public/shop-products/shop-products.component')
+            .then(m => m.ShopProductsComponent)
+      },
+
+      //  CATEGORIES
+      {
+        path: 'categories',
+        loadComponent: () =>
+          import('./shop-public/shop-categories/shop-categories.component')
+            .then(m => m.ShopCategoriesComponent)
+      },
+
+      //  NEW ARRIVALS
+      {
+        path: 'new-arrivals',
+        loadComponent: () =>
+          import('./shop-public/shop-new-arrivals/shop-new-arrivals.component')
+            .then(m => m.ShopNewArrivalsComponent)
+      },
+
+      //  HOT DEALS
+      {
+        path: 'hot-deals',
+        loadComponent: () =>
+          import('./shop-public/shop-hot-deals/shop-hot-deals.component')
+            .then(m => m.ShopHotDealsComponent)
+      },
+
+      // ℹ ABOUT SHOP
+      {
+        path: 'about',
+        loadComponent: () =>
+          import('./shop-public/shop-about/shop-about.component')
+            .then(m => m.ShopAboutComponent)
+      },
+
+      //  CHECKOUT
+      {
+        path: 'checkout',
+        loadComponent: () =>
+          import('./shop-public/checkout/checkout.component')
+            .then(m => m.CheckoutComponent)
+      },
+      {
+        path: 'payment/:orderId',
+        loadComponent: () =>
+          import('./shop-public/payment/payment.component')
+            .then(m => m.PaymentComponent)
+      },
+      {
+        path: 'order-success/:orderId',
+        loadComponent: () =>
+          import('./shop-public/order-success/order-success.component')
+            .then(m => m.OrderSuccessComponent)
+      },
+    ]
   },
 
 
@@ -64,20 +130,20 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: { roles: ['systemAdmin', 'shopAdmin'] },
     children: [
-      
+
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashboardComponent },
       { path: 'users/add', component: AddUserComponent, canActivate: [authGuard], data: { roles: ['systemAdmin'] } },
       { path: 'users/edit/:id', component: EditUserComponent, canActivate: [authGuard], data: { roles: ['systemAdmin'] } },
       { path: 'users/all', component: ShowAllUsersComponent, canActivate: [authGuard], data: { roles: ['systemAdmin'] } },
-      { path: 'shops/add', component: AddShopComponent , canActivate: [authGuard], data: { roles: ['systemAdmin'] }},
-      { path: 'shops/view', component: AllShopsComponent , canActivate: [authGuard], data: { roles: ['systemAdmin'] }},
-      { path: 'shops/edit/:id', component: EditShopComponent , canActivate: [authGuard], data: { roles: ['systemAdmin'] }},
+      { path: 'shops/add', component: AddShopComponent, canActivate: [authGuard], data: { roles: ['systemAdmin'] } },
+      { path: 'shops/view', component: AllShopsComponent, canActivate: [authGuard], data: { roles: ['systemAdmin'] } },
+      { path: 'shops/edit/:id', component: EditShopComponent, canActivate: [authGuard], data: { roles: ['systemAdmin'] } },
 
-      { path: 'shops/:shopid/stock/all', component: StockComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
+      { path: 'shops/:shopid/stock/all', component: StockComponent, canActivate: [authGuard], data: { roles: ['shopAdmin'] } },
       //{ path: 'shops/:shopid/stock/add', component: AddStockComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
-      { path: 'shops/:shopid/products/add', component: AddProductComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
-      { path: 'shops/:shopid/products/all', component: InventoryComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
+      { path: 'shops/:shopid/products/add', component: AddProductComponent, canActivate: [authGuard], data: { roles: ['shopAdmin'] } },
+      { path: 'shops/:shopid/products/all', component: InventoryComponent, canActivate: [authGuard], data: { roles: ['shopAdmin'] } },
       //{ path: 'myshop', component: DetailShopComponent , canActivate: [authGuard], data: { roles: ['shopAdmin'] }},
 
 
@@ -85,5 +151,5 @@ export const routes: Routes = [
     ]
   },
 
- // { path: 'unauthorized', component: UnauthorizedComponent }
+  // { path: 'unauthorized', component: UnauthorizedComponent }
 ];

@@ -1,161 +1,226 @@
-<div class="min-h-screen bg-gray-50 p-4 md:p-6">
-    <div class="max-w-md mx-auto">
-        
-        <!-- Loading State -->
-        <div *ngIf="isLoading" class="text-center py-12">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600 mb-4"></div>
-            <p class="text-gray-600">Loading order details...</p>
+<div class="order-success-container">
+    
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="loading-state">
+        <div class="loading-animation">
+            <div class="loading-spinner"></div>
+            <div class="loading-checkmark">✓</div>
         </div>
+        <p class="loading-text">Loading your order details...</p>
+    </div>
 
-        <!-- Error State -->
-        <div *ngIf="!isLoading && isError" class="bg-red-50 border border-red-200 rounded-lg p-6 mb-6">
-            <div class="flex items-center">
-                <svg class="w-6 h-6 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                </svg>
-                <div>
-                    <h3 class="font-medium text-red-800">Unable to Load Order</h3>
-                    <p class="text-red-700 text-sm mt-1">{{ errorMessage }}</p>
-                    <button (click)="fetchOrderDetails()" class="mt-3 text-sm px-3 py-1.5 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors">
-                        Try Again
+    <!-- Error State -->
+    <div *ngIf="!isLoading && isError" class="error-state">
+        <div class="error-icon"></div>
+        <div class="error-content">
+            <h3>Unable to Load Order</h3>
+            <p>{{ errorMessage }}</p>
+            <button (click)="fetchOrderDetails()" class="retry-btn">Try Again</button>
+        </div>
+    </div>
+
+    <!-- Success Content - Horizontal Layout -->
+    <div *ngIf="!isLoading && !isError" class="success-horizontal-layout">
+        
+        <!-- Left Column -->
+        <div class="left-column">
+            <!-- Success Header -->
+            <div class="success-header">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                    </svg>
+                </div>
+                <h1>Order Confirmed!</h1>
+                <p class="order-id">Order #{{ orderId }}</p>
+                <p class="thank-you">Thank you for your purchase, <strong>{{ orderDetails.customer.fullName }}</strong></p>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="order-summary-card">
+                <h2 class="card-title">
+                    <span class="title-icon"></span>
+                    Order Summary
+                </h2>
+                
+                <div class="summary-grid">
+                    <div class="summary-row">
+                        <span class="summary-label">Subtotal</span>
+                        <span class="summary-value">₹{{ orderDetails.subtotal | number:'1.2-2' }}</span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span class="summary-label">Shipping</span>
+                        <span class="summary-value free" *ngIf="orderDetails.shippingCost === 0">FREE</span>
+                        <span class="summary-value" *ngIf="orderDetails.shippingCost > 0">
+                            ₹{{ orderDetails.shippingCost | number:'1.2-2' }}
+                        </span>
+                    </div>
+                    
+                    <div class="summary-row">
+                        <span class="summary-label">Tax (13%)</span>
+                        <span class="summary-value">₹{{ orderDetails.tax | number:'1.2-2' }}</span>
+                    </div>
+                    
+                    <div class="summary-divider"></div>
+                    
+                    <div class="summary-row total">
+                        <span class="summary-label">Total Amount</span>
+                        <span class="summary-value total-amount">₹{{ orderDetails.totalAmount | number:'1.2-2' }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Status Cards -->
+            <div class="status-section">
+                <div class="status-card">
+                    <div class="status-header">
+                        <span class="status-icon">📦</span>
+                        <h3>Order Status</h3>
+                    </div>
+                    <div class="status-badge" [ngClass]="getOrderStatusConfig().color">
+                        {{ getOrderStatusConfig().label }}
+                    </div>
+                </div>
+                
+                <div class="status-card">
+                    <div class="status-header">
+                        <span class="status-icon">💳</span>
+                        <h3>Payment Status</h3>
+                    </div>
+                    <div class="status-badge" [ngClass]="getPaymentStatusConfig().color">
+                        {{ getPaymentStatusConfig().label }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-section">
+                <button (click)="continueShopping()" class="primary-action-btn">
+                    <span class="btn-icon">🛒</span>
+                    Continue Shopping
+                </button>
+                
+                <div class="secondary-actions">
+                    <button (click)="printOrder()" class="secondary-btn">
+                        <span class="btn-icon"></span>
+                        Print Receipt
+                    </button>
+                    <button (click)="shareOrder()" class="secondary-btn">
+                        <span class="btn-icon"></span>
+                        Share Order
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Success Content -->
-        <div *ngIf="!isLoading && !isError" class="bg-white rounded-lg shadow-sm p-6 md:p-8">
-            
-            <!-- Logo -->
-            <div class="flex justify-center mb-6">
-                <div class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                    <span class="text-white font-bold text-xl">{{ shopSlug.charAt(0).toUpperCase() }}</span>
-                </div>
-            </div>
-
-            <!-- Header -->
-            <div class="text-center mb-8">
-                <h1 class="text-2xl font-semibold text-gray-900 mb-2">Order confirmation</h1>
-                <p class="text-gray-600">
-                    Hi <span class="font-medium">{{ orderDetails.customer.fullName }}</span>,
-                </p>
-                <p class="text-gray-600 mt-2">
-                    Thank you for shopping with us! We've received your order<br>
-                    №: <span class="font-medium">{{ orderId }}</span>. We will notify you when we send it.
-                </p>
-            </div>
-
-            <!-- Divider -->
-            <div class="border-t border-gray-200 my-6"></div>
-
-            <!-- Order Summary Title -->
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Order summary</h2>
-
+        <!-- Right Column -->
+        <div class="right-column">
             <!-- Order Items -->
-            <div class="space-y-4 mb-6">
-                <div *ngFor="let item of orderDetails.items" class="flex items-start">
-                    <div class="w-12 h-12 bg-gray-100 rounded flex items-center justify-center mr-4">
-                        <svg class="w-5 h-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <div class="flex-1">
-                        <h3 class="font-medium text-gray-900">{{ item.name }}</h3>
-                        <p class="text-gray-600 text-sm mt-1">
-                            Quantity: {{ item.quantity }} × ₹{{ item.price | number:'1.2-2' }}
-                        </p>
-                    </div>
-                    <div class="text-right">
-                        <p class="font-medium text-gray-900">₹{{ calculateItemTotal(item) | number:'1.2-2' }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Order Details Table -->
-            <div class="space-y-3 mb-6">
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Subtotal</span>
-                    <span class="font-medium">₹{{ orderDetails.subtotal | number:'1.2-2' }}</span>
-                </div>
+            <div class="order-items-card">
+                <h2 class="card-title">
+                    <span class="title-icon"></span>
+                    Order Items ({{ orderDetails.items.length }})
+                </h2>
                 
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Shipping</span>
-                    <span [ngClass]="{'text-green-600 font-medium': orderDetails.shippingCost === 0, 'font-medium': orderDetails.shippingCost !== 0}">
-                        {{ orderDetails.shippingCost === 0 ? 'FREE' : '₹' + (orderDetails.shippingCost | number:'1.2-2') }}
-                    </span>
+                <div class="items-list">
+                    <div *ngFor="let item of orderDetails.items" class="order-item">
+                        <div class="item-image">{{ item.name.charAt(0) }}</div>
+                        <div class="item-info">
+                            <h4 class="item-name">{{ item.name }}</h4>
+                            <div class="item-details">
+                                <span class="item-quantity">Qty: {{ item.quantity }}</span>
+                                <span class="item-price">₹{{ item.price | number:'1.2-2' }} each</span>
+                            </div>
+                        </div>
+                        <div class="item-total">
+                            ₹{{ calculateItemTotal(item) | number:'1.2-2' }}
+                        </div>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Delivery Information -->
+            <div class="delivery-card">
+                <h2 class="card-title">
+                    <span class="title-icon"></span>
+                    Delivery Information
+                </h2>
                 
-                <div class="flex justify-between">
-                    <span class="text-gray-600">Tax (13%)</span>
-                    <span class="font-medium">₹{{ orderDetails.tax | number:'1.2-2' }}</span>
+                <div class="delivery-content">
+                    <div class="delivery-row">
+                        <span class="delivery-label">Estimated Delivery:</span>
+                        <span class="delivery-value">{{ getEstimatedDeliveryDate() }}</span>
+                    </div>
+                    
+                    <div class="delivery-row">
+                        <span class="delivery-label">Customer:</span>
+                        <span class="delivery-value">{{ orderDetails.customer.fullName }}</span>
+                    </div>
+                    
+                    <div class="delivery-row">
+                        <span class="delivery-label">Phone:</span>
+                        <span class="delivery-value">{{ orderDetails.customer.phone }}</span>
+                    </div>
+                    
+                    <div class="delivery-row">
+                        <span class="delivery-label">Email:</span>
+                        <span class="delivery-value">{{ orderDetails.customer.email }}</span>
+                    </div>
+                    
+                    <div class="delivery-row address">
+                        <span class="delivery-label">Address:</span>
+                        <span class="delivery-value">
+                            {{ orderDetails.shipping.address }}, {{ orderDetails.shipping.city }}, 
+                            {{ orderDetails.shipping.province }} {{ orderDetails.shipping.postalCode }}
+                        </span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Total -->
-            <div class="border-t border-gray-200 pt-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-lg font-semibold text-gray-900">Total</span>
-                    <span class="text-xl font-bold text-gray-900">₹{{ orderDetails.totalAmount | number:'1.2-2' }}</span>
-                </div>
-            </div>
-
-            <!-- Divider -->
-            <div class="border-t border-gray-200 my-6"></div>
-
-            <!-- Shipping Info -->
-            <div class="mb-6">
-                <h3 class="font-medium text-gray-900 mb-2">Shipping to</h3>
-                <p class="text-gray-600">{{ orderDetails.customer.fullName }}</p>
-                <p class="text-gray-600">{{ orderDetails.shipping.address }}</p>
-                <p class="text-gray-600">{{ orderDetails.shipping.city }}, {{ orderDetails.shipping.province }} {{ orderDetails.shipping.postalCode }}</p>
-                <p class="text-gray-600 mt-2">Phone: {{ orderDetails.customer.phone }}</p>
-                <p class="text-gray-600">Email: {{ orderDetails.customer.email }}</p>
-            </div>
-
-            <!-- Status Badges -->
-            <div class="flex flex-wrap gap-2 mb-6">
-                <div class="inline-flex items-center px-3 py-1 rounded-full text-sm" 
-                     [ngClass]="getOrderStatusConfig().color">
-                    {{ getOrderStatusConfig().label }}
-                </div>
-                <div class="inline-flex items-center px-3 py-1 rounded-full text-sm" 
-                     [ngClass]="getPaymentStatusConfig().color">
-                    {{ getPaymentStatusConfig().label }}
-                </div>
-            </div>
-
-            <!-- Order Info -->
-            <div class="text-sm text-gray-500 space-y-1 mb-8">
-                <p>Order placed: {{ formatDate(orderDetails.createdAt) }}</p>
-                <p>Order ID: {{ orderId }}</p>
-                <p>Estimated delivery: {{ getEstimatedDeliveryDate() }}</p>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="space-y-3">
-                <button (click)="continueShopping()" 
-                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-4 rounded-md transition-colors">
-                    Continue Shopping
-                </button>
+            <!-- Order Timeline -->
+            <div class="timeline-card">
+                <h2 class="card-title">
+                    <span class="title-icon"></span>
+                    Order Timeline
+                </h2>
                 
-                <button (click)="printOrder()" 
-                        class="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-md transition-colors">
-                    Print Receipt
-                </button>
+                <div class="timeline">
+                    <div class="timeline-step active">
+                        <div class="step-dot"></div>
+                        <div class="step-content">
+                            <h3>Order Placed</h3>
+                            <p>{{ formatDate(orderDetails.createdAt) }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-step">
+                        <div class="step-dot"></div>
+                        <div class="step-content">
+                            <h3>Processing</h3>
+                            <p>Will start soon</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-step">
+                        <div class="step-dot"></div>
+                        <div class="step-content">
+                            <h3>Shipped</h3>
+                            <p>Estimated: {{ getEstimatedDeliveryDate() }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-step">
+                        <div class="step-dot"></div>
+                        <div class="step-content">
+                            <h3>Delivered</h3>
+                            <p>Will be updated</p>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Support Info -->
-            <div class="mt-8 pt-6 border-t border-gray-200 text-center">
-                <p class="text-gray-600 text-sm">
-                    Need help? Contact us at 
-                    <a [href]="'mailto:support@' + shopSlug + '.com'" class="text-blue-600 hover:text-blue-700">
-                        
-                    </a>
-                </p>
-                <p class="text-gray-500 text-xs mt-2">
-                    We'll email you updates about your order.
-                </p>
-            </div>
+      
         </div>
     </div>
 </div>

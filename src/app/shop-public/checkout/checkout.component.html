@@ -285,7 +285,7 @@
           </div>
 
           <!-- Place Order Button -->
-          <button class="place-order-btn" (click)="placeOrder()" [disabled]="isPlacingOrder">
+          <button class="place-order-btn"  [disabled]="shopId === null || isPlacingOrder" (click)="placeOrder()">
             <i class="fas fa-shopping-bag" *ngIf="!isPlacingOrder"></i>
             <i class="fas fa-spinner fa-spin" *ngIf="isPlacingOrder"></i>
             {{ isPlacingOrder ? 'Placing Order...' : 'Place Order' }}
