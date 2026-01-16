@@ -41,6 +41,7 @@ export class ShopPublicService {
 
   //private apiUrl = 'https://localhost:7058/api/Shop';
   private apiUrl = 'https://192.168.70.94:7058/api/Shop'
+  private baseUrl = 'https://192.168.70.94:7058/api/Product'
 
 
   constructor(private http: HttpClient) {}
@@ -90,14 +91,14 @@ export class ShopPublicService {
 
   // ---------------- API ----------------
   getShopBySlug(slug: string): Observable<Shop> {
-  console.log('📡 Service called with slug:', slug);
+  //console.log('📡 Service called with slug:', slug);
 
   return this.http
     .get<Shop>(`${this.apiUrl}/public/${slug}`)
     .pipe(
       tap(res => {
-        console.log('📡 RAW API response:', res);
-        console.log('📡 res.shopId:', (res as any)?.shopId);
+        //console.log('📡 RAW API response:', res);
+        //console.log('📡 res.shopId:', (res as any)?.shopId);
         
       })
     );
@@ -110,6 +111,24 @@ export class ShopPublicService {
   }
 
 
+searchProductsByShop(
+  slug: string,
+  query: string,
+  page: number = 1,
+  size: number = 9
+): Observable<any> {
+
+  return this.http.get<any>(
+    `${this.baseUrl}/shops/${slug}/products/search`,
+    {
+      params: {
+        q: query,
+        page,
+        pageSize: size
+      }
+    }
+  );
+}
 
 
 
@@ -118,57 +137,6 @@ export class ShopPublicService {
 
 
 
-//   private wishlist: Product[] = [];
-//   private wishlistSubject = new BehaviorSubject<Product[]>(this.wishlist);
-
-//   wishlist$ = this.wishlistSubject.asObservable()
 
 
-//   constructor(private http: HttpClient) {
-
-//     const savedWishlist = localStorage.getItem('wishlist');
-//   if (savedWishlist) {
-//     this.wishlist = JSON.parse(savedWishlist);
-//   }
-
-//   this.wishlistSubject.next([...this.wishlist]);
-
-//   }
-
-//   getShopBySlug(slug: string): Observable<Shop> {
-//     return this.http.get<Shop>(`${this.apiUrl}/public/${slug}`);
-//   }
-
-//   // Products by Shop Slug (with pagination)
-//   getProductsBySlug(slug: string, page: number = 1, pageSize: number = 9): Observable<any> {
-//     return this.http.get<any>(`${this.apiUrl}/public/${slug}/products?page=${page}&pageSize=${pageSize}`);
-//   }
-
-
-//   // Wishlist Functions
-//   getWishlist(): Product[] {
-//     return this.wishlist;
-//   }
-
-// toggleWishlist(product: Product): void {
-//   const index = this.wishlist.findIndex(p => p.productId === product.productId);
-
-//   if (index > -1) {
-//     this.wishlist.splice(index, 1); // remove
-//   } else {
-//     this.wishlist.push(product); // add
-//   }
-
-//   this.saveWishlist();
-//   this.wishlistSubject.next([...this.wishlist]); // notify subscribers
-// }
-
-
-//   isInWishlist(productId: number): boolean {
-//     return this.wishlist.some(p => p.productId === productId);
-//   }
-
-//   private saveWishlist(): void {
-//     localStorage.setItem('wishlist', JSON.stringify(this.wishlist));
-//   }
 }

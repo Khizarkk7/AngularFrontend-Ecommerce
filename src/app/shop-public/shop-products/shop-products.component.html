@@ -1,12 +1,11 @@
-
-
 <section class="products-section">
 
   <!-- Section Header -->
   <div class="section-header">
-    <h2 class="section-title">Featured Products</h2>
+    <h2 class="section-title">
+      {{ searchQuery ? 'Search Results' : 'Featured Products' }}
+    </h2>
 
-    <!-- (Future use: grid / list toggle) -->
     <div class="view-controls">
       <button class="view-btn active">
         <i class="fas fa-th"></i>
@@ -14,46 +13,49 @@
     </div>
   </div>
 
-  <!-- Loading State -->
-  <div *ngIf="loading" class="loading-state">
-    <div class="spinner"></div>
-    <p>Loading amazing products for you...</p>
-  </div>
 
-  <!-- Error State -->
+
+  <!--  Loading State -->
+
+  <!-- <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Searching products...</p>
+  </div> -->
+  <div *ngIf="loading" class="products-grid">
+  <div class="product-card skeleton" *ngFor="let i of [].constructor(9)">
+    <div class="skeleton-img"></div>
+    <div class="skeleton-text"></div>
+    <div class="skeleton-text small"></div>
+  </div>
+</div>
+
+  <!--  Error State -->
   <div *ngIf="error && !loading" class="error-state">
     <i class="fas fa-exclamation-triangle"></i>
-    <h3>Oops! Something went wrong</h3>
+    <h3>Something went wrong</h3>
     <p>{{ error }}</p>
-    <button class="retry-btn" (click)="getProducts()">Try Again</button>
+    <button class="retry-btn" (click)="loadProducts()">Try Again</button>
   </div>
 
-  <!-- Products Grid -->
+  <!--  Products Grid -->
   <div *ngIf="!loading && products?.length" class="products-grid">
 
-    <div *ngFor="let product of products" class="product-card">
+    <!-- 👇 ANIMATION YAHAN LAGI HAI -->
+    <div *ngFor="let product of products; trackBy: trackByProductId" class="product-card" @fadeUp>
 
       <!-- Product Image -->
       <div class="product-image">
-        <img
-          [src]="product.imageUrl || 'assets/product-placeholder.png'"
-          [alt]="product.name"
-          (error)="product.imageUrl = 'assets/product-placeholder.png'"
-        />
+        <img [src]="product.imageUrl || 'assets/product-placeholder.png'" [alt]="product.name" loading="lazy"
+          decoding="async" (error)="product.imageUrl = 'assets/product-placeholder.png'" />
 
-        <!-- Overlay Actions -->
+
         <div class="product-overlay">
-          <button
-            class="wishlist-btn"
-            (click)="toggleWishlist(product)">
-            <i
-              class="fas fa-heart"
-              [class.active]="isInWishlist(product.productId)">
+          <button class="wishlist-btn" (click)="toggleWishlist(product)">
+            <i class="fas fa-heart" [class.active]="isInWishlist(product.productId)">
             </i>
           </button>
         </div>
 
-        <!-- Discount Badge -->
         <span class="product-badge" *ngIf="product.discount">
           -{{ product.discount }}%
         </span>
@@ -67,13 +69,12 @@
 
         <p class="product-description">
           {{
-            product.description?.length > 70
-              ? (product.description | slice:0:70) + '...'
-              : product.description
+          product.description?.length > 70
+          ? (product.description | slice:0:70) + '...'
+          : product.description
           }}
         </p>
 
-        <!-- Price -->
         <div class="product-price">
           <span class="current-price">
             Rs. {{ product.price | number:'1.0-0' }}
@@ -84,10 +85,7 @@
           </span>
         </div>
 
-        <!-- CTA -->
-        <button
-          class="add-to-cart-btn"
-          (click)="addToCart(product)">
+        <button class="add-to-cart-btn" (click)="addToCart(product)">
           <i class="fas fa-shopping-cart"></i>
           Add to Cart
         </button>
@@ -96,35 +94,26 @@
     </div>
   </div>
 
-  <!-- Empty State -->
+  <!--  Empty Search Result -->
   <div *ngIf="!loading && !products?.length" class="empty-state">
-    <i class="fas fa-box-open"></i>
-    <h3>No products available</h3>
-    <p>Please check back later.</p>
+    <i class="fas fa-search"></i>
+    <h3>No products found</h3>
+    <p>Try searching with a different keyword.</p>
   </div>
 
-  <!-- Pagination -->
+  <!-- 🔢 Pagination -->
   <div *ngIf="totalPages > 1" class="pagination-container">
     <nav class="pagination">
-      <button
-        class="pagination-btn"
-        [disabled]="page === 1"
-        (click)="changePage(page - 1)">
+      <button class="pagination-btn" [disabled]="page === 1" (click)="changePage(page - 1)">
         <i class="fas fa-chevron-left"></i>
       </button>
 
-      <button
-        *ngFor="let p of [].constructor(totalPages); let i = index"
-        class="pagination-btn"
-        [class.active]="page === i + 1"
-        (click)="changePage(i + 1)">
+      <button *ngFor="let p of [].constructor(totalPages); let i = index" class="pagination-btn"
+        [class.active]="page === i + 1" (click)="changePage(i + 1)">
         {{ i + 1 }}
       </button>
 
-      <button
-        class="pagination-btn"
-        [disabled]="page === totalPages"
-        (click)="changePage(page + 1)">
+      <button class="pagination-btn" [disabled]="page === totalPages" (click)="changePage(page + 1)">
         <i class="fas fa-chevron-right"></i>
       </button>
     </nav>

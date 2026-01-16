@@ -105,12 +105,20 @@
       <a [routerLink]="['/shop', shopSlug, 'new-arrivals']">New Arrivals</a>
       <a [routerLink]="['/shop', shopSlug, 'hot-deals']">Hot Deals</a>
       <a [routerLink]="['/shop', shopSlug, 'about']">About</a>
-      <div class="search-bar">
-        <input type="text" placeholder="Search products..." class="search-input">
-        <button class="search-btn">
-          <i class="fas fa-search"></i>
-        </button>
-      </div>
+     <div class="search-bar">
+  <input
+    type="text"
+    class="search-input"
+    placeholder="Search products..."
+    [(ngModel)]="searchQuery"
+    (keyup.enter)="onSearch()"
+  />
+
+  <button class="search-btn" (click)="onSearch()">
+    <i class="fas fa-search"></i>
+  </button>
+</div>
+
     </div>
   </nav>
 
@@ -121,114 +129,6 @@
       <!-- 👇 CHILD PAGE RENDERS HERE -->
       <router-outlet></router-outlet>
 
-      <!-- Featured Products -->
-      <!-- <section class="products-section">
-        <div class="section-header">
-          <h2 class="section-title">Featured Products</h2>
-          <div class="view-controls">
-            <button class="view-btn active" data-view="grid">
-              <i class="fas fa-th"></i>
-            </button> -->
-      <!-- <button class="view-btn" data-view="list">
-              <i class="fas fa-list"></i>
-            </button> -->
-      <!-- </div>
-        </div> -->
-
-      <!-- Loading State -->
-      <!-- <div *ngIf="loading" class="loading-state">
-          <div class="spinner"></div>
-          <p>Loading amazing products for you...</p>
-        </div> -->
-
-      <!-- Error State -->
-      <!-- <div *ngIf="error && !loading" class="error-state">
-          <i class="fas fa-exclamation-triangle"></i>
-          <h3>Oops! Something went wrong</h3>
-          <p>{{ error }}</p>
-          <button class="retry-btn" (click)="retryLoading()">Try Again</button>
-        </div> -->
-
-      <!-- Products Grid -->
-      <!-- <div *ngIf="!loading && products?.length" class="products-grid" id="productsView">
-          <div *ngFor="let product of products" class="product-card">
-            <div class="product-image">
-              <img [src]="product.imageUrl" [alt]="product.name" (error)="handleImageError($event)">
-              <div class="product-overlay">
-                <button class="quick-view-btn" (click)="quickView(product)">
-                  <i class="fas fa-eye"></i>
-                </button> -->
-      <!-- Product Card -->
-      <!-- <button class="wishlist-btn" (click)="toggleWishlist(product)">
-                  <i class="fas fa-heart" [class.active]="isInWishlist(product)"></i>
-                </button>
-              </div>
-              <span class="product-badge" *ngIf="product.discount">
-                -{{ product.discount }}%
-              </span>
-            </div> -->
-
-      <!-- <div class="product-info">
-              <h3 class="product-name">{{ product.name }}</h3>
-              <p class="product-description">
-                {{ product.description?.length > 60 ? (product.description | slice:0:60) + '...' : product.description
-                }}
-              </p> -->
-
-      <!-- <div class="product-rating">
-                <div class="stars">
-                  <i class="fas fa-star" *ngFor="let star of [1,2,3,4,5]"></i>
-                </div>
-                <span class="rating-count">({{ product.ratingCount || 0 }})</span>
-              </div>
-
-              <div class="product-price">
-                <span class="current-price">Rs. {{ product.price | number:'1.0-0' }}</span>
-                <span class="original-price" *ngIf="product.originalPrice">
-                  Rs. {{ product.originalPrice | number:'1.0-0' }}
-                </span>
-              </div> -->
-
-      <!-- <button class="add-to-cart-btn" (click)="addToCart(product)">
-                <i class="fas fa-shopping-cart"></i>
-                Add to Cart
-              </button>
-            </div>
-          </div>
-        </div> -->
-
-      <!-- Empty State -->
-      <!-- <div *ngIf="!loading && !products?.length" class="empty-state">
-          <i class="fas fa-box-open"></i>
-          <h3>No products available yet</h3>
-          <p>Check back later for amazing products!</p>
-        </div> -->
-
-      <!-- Pagination -->
-      <!-- <div *ngIf="totalCount > pageSize" class="pagination-container">
-          <div class="pagination-info">
-            Showing {{ (page - 1) * pageSize + 1 }} to
-            {{ getMin(page * pageSize, totalCount) }} of {{ totalCount }} products
-          </div>
-
-          <nav class="pagination">
-            <button class="pagination-btn" [disabled]="page === 1" (click)="changePage(page - 1)">
-              <i class="fas fa-chevron-left"></i>
-            </button> -->
-
-      <!-- <button *ngFor="let pageNum of getPaginationPages()" class="pagination-btn"
-              [class.active]="page === pageNum" (click)="changePage(pageNum)">
-              {{ pageNum }}
-            </button>
-
-            <button class="pagination-btn" [disabled]="page === totalPages" (click)="changePage(page + 1)">
-              <i class="fas fa-chevron-right"></i>
-            </button>
-          </nav>
-        </div>
-      </section>
-    </div>
-  </main> -->
 
       <!-- Shopping Cart Sidebar -->
       <div class="cart-sidebar" [class.open]="cartOpen">

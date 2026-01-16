@@ -1,6 +1,31 @@
 import { Component } from '@angular/core';
 import { AuthService } from '../../core/services/auth.service';
 
+interface Order {
+  id: string;
+  customer: {
+    name: string;
+    email: string;
+    phone: string;
+    address: string;
+  };
+  amount: number;
+  payment: {
+    method: string;
+    status: string;
+    transactionId: string;
+  };
+  status: string;
+  date: Date;
+  products: {
+    name: string;
+    sku: string;
+    quantity: number;
+    price: number;
+    subtotal: number;
+  }[];
+}
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -8,14 +33,23 @@ import { AuthService } from '../../core/services/auth.service';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
+
+
+
+
 export class DashboardComponent {
+
+
 
 constructor(
   private authService: AuthService,
-){}
+){
+  
+}
 
    userName: string = '';
    userRole: string = '';
+   //isRefreshing: boolean;
 
     ngOnInit(): void {
     
@@ -26,5 +60,15 @@ constructor(
        this.userRole = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
     }
     console.log(this.userName)
+
+
+    
+
   }
+
+
+  
+
+
 }
+

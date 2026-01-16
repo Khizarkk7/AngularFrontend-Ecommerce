@@ -8,12 +8,13 @@ import { RouterOutlet } from '@angular/router';
 import { CartService } from '../../core/services/cart.service';
 import { WishlistService } from '../../core/services/wishlist.service';
 import Swal from 'sweetalert2';
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
   selector: 'app-shop-public',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink],
+  imports: [CommonModule, RouterOutlet, RouterLink, FormsModule],
   templateUrl: './shop-public.component.html',
   styleUrls: ['./shop-public.component.css']
 })
@@ -33,7 +34,7 @@ export class ShopPublicComponent implements OnInit {
   // wishlist: Product[] = [];
   // wishlistPopupOpen = false;
   // shopSlug!: string;
-
+  //products: Product[] = [];
   shop: any;
   shopSlug!: string;
   cartOpen = false;
@@ -53,8 +54,8 @@ export class ShopPublicComponent implements OnInit {
 
   ngOnInit() {
     this.shopSlug = this.route.snapshot.paramMap.get('slug')!;
-    this.shopPublicService.getShopBySlug(this.shopSlug)
-      .subscribe(s => this.shop = s);
+    // this.shopPublicService.getShopBySlug(this.shopSlug)
+    //   .subscribe(s => this.shop = s);
 
     //  VERY IMPORTANT 
     this.cartService.setShop(this.shopSlug);
@@ -70,6 +71,28 @@ export class ShopPublicComponent implements OnInit {
       this.wishlist = list;
     });
   }
+
+  searchQuery = '';
+  // isSearching = false;
+
+onSearch() {
+  const query = this.searchQuery.trim();
+  if (!query) return;
+
+  this.router.navigate(
+    ['/shop', this.shopSlug],
+    {
+      queryParams: {
+        search: query,
+        page: 1
+      }
+    }
+  );
+}
+
+
+
+
 
   toggleCart() {
     this.cartService.toggleCart();
@@ -87,23 +110,23 @@ export class ShopPublicComponent implements OnInit {
     return this.cartService.getTotal();
   }
 
- proceedToCheckout() {
-  // Close the cart drawer or overlay
-  this.cartService.closeCart();
+  proceedToCheckout() {
+    // Close the cart drawer or overlay
+    this.cartService.closeCart();
 
-  // Navigate to checkout
-  // Make sure 'shopSlug' has a valid value
-  if (this.shopSlug) {
-    this.router.navigate(['/shop', this.shopSlug, 'checkout']);
-  } else {
-    console.error('Shop slug is missing! Cannot navigate to checkout.');
+    // Navigate to checkout
+    // Make sure 'shopSlug' has a valid value
+    if (this.shopSlug) {
+      this.router.navigate(['/shop', this.shopSlug, 'checkout']);
+    } else {
+      console.error('Shop slug is missing! Cannot navigate to checkout.');
+    }
   }
-}
 
 
-// -------wishlist methods
+  // -------wishlist methods
 
-// Toggle popup
+  // Toggle popup
   toggleWishlistPopup(event: Event) {
     event.stopPropagation(); // prevent outer clicks from interfering
     this.cartService.closeCart(); // optional: close cart
@@ -114,17 +137,17 @@ export class ShopPublicComponent implements OnInit {
     this.wishlistService.remove(productId);
   }
 
-viewAllWishlist() {
-  if (!this.wishlist.length) {
-    Swal.fire({
-      icon: 'info',
-      title: 'Wishlist is empty',
-      text: 'Add some products to see them here!',
-    });
-    return;
-  }
+  viewAllWishlist() {
+    if (!this.wishlist.length) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Wishlist is empty',
+        text: 'Add some products to see them here!',
+      });
+      return;
+    }
 
-  const htmlContent = this.wishlist.map(item => `
+    const htmlContent = this.wishlist.map(item => `
     <div style="display:flex; align-items:center; margin-bottom:10px;">
       <img src="${item.imageUrl || 'assets/product-placeholder.png'}" 
            alt="${item.name}" 
@@ -136,21 +159,21 @@ viewAllWishlist() {
     </div>
   `).join('');
 
-  Swal.fire({
-    title: 'My Wishlist',
-    html: `<div style="max-height:300px; overflow-y:auto;">${htmlContent}</div>`,
-    showCloseButton: true,
-    showCancelButton: true,
-    confirmButtonText: 'Checkout',
-    cancelButtonText: 'Close',
-    width: '500px',
-  }).then(result => {
-    if (result.isConfirmed) {
-      // Navigate to checkout page
-      this.router.navigate(['/shop', this.shopSlug, 'checkout'], { state: { wishlist: this.wishlist } });
-    }
-  });
-}
+    Swal.fire({
+      title: 'My Wishlist',
+      html: `<div style="max-height:300px; overflow-y:auto;">${htmlContent}</div>`,
+      showCloseButton: true,
+      showCancelButton: true,
+      confirmButtonText: 'Checkout',
+      cancelButtonText: 'Close',
+      width: '500px',
+    }).then(result => {
+      if (result.isConfirmed) {
+        // Navigate to checkout page
+        this.router.navigate(['/shop', this.shopSlug, 'checkout'], { state: { wishlist: this.wishlist } });
+      }
+    });
+  }
 
 
 

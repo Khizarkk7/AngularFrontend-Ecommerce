@@ -1,9 +1,181 @@
 
-
+<!-- 
  <div class="welcome-container">
   <div class="welcome-card">
     <h1>Welcome, {{ userName }}</h1>
     <p class="role-text">You are logged in as <strong>{{ userRole  }}</strong></p>
   </div>
-</div>
+</div> -->
 
+
+
+  
+
+
+  <!-- Main Content -->
+  <main class="dashboard-main">
+    <!-- Header -->
+    <!-- <header class="dashboard-header">
+      <div class="header-left">
+        <h1 class="page-title">Admin Dashboard</h1>
+        <p class="page-subtitle">Manage your orders and business metrics</p>
+      </div>
+      <div class="header-right">
+        <div class="header-actions">
+          <button class="btn btn-notification">
+            <i class="fas fa-bell"></i>
+            <span class="badge bg-danger">3</span>
+          </button>
+          <div class="dropdown">
+            <button class="btn btn-user dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <i class="fas fa-user-circle me-2"></i>
+              {{ userName }}
+            </button>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
+              <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </header> -->
+
+    <!-- Stats Cards -->
+    <div class="row stats-cards">
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-primary">
+            <i class="fas fa-shopping-cart"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-value">1,234</h3>
+            <p class="stat-label">Total Orders</p>
+            <span class="stat-trend text-success">
+              <i class="fas fa-arrow-up"></i> 12.5%
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-success">
+            <i class="fas fa-dollar-sign"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-value">PKR 45,670</h3>
+            <p class="stat-label">Revenue</p>
+            <span class="stat-trend text-success">
+              <i class="fas fa-arrow-up"></i> 8.2%
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-warning">
+            <i class="fas fa-users"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-value">456</h3>
+            <p class="stat-label">Customers</p>
+            <span class="stat-trend text-success">
+              <i class="fas fa-arrow-up"></i> 5.3%
+            </span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="stat-card">
+          <div class="stat-icon bg-danger">
+            <i class="fas fa-box-open"></i>
+          </div>
+          <div class="stat-content">
+            <h3 class="stat-value">23</h3>
+            <p class="stat-label">Pending Orders</p>
+            <span class="stat-trend text-danger">
+              <i class="fas fa-arrow-down"></i> 2.1%
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Orders -->
+    <div class="card recent-orders-card">
+      <div class="card-header">
+        <h3>Recent Orders</h3>
+        <a href="#" class="btn-view-all">View All <i class="fas fa-arrow-right"></i></a>
+      </div>
+      <div class="card-body">
+        <div class="table-responsive">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Amount</th>
+                <th>Payment</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>ORD-001</strong></td>
+                <td>
+                  <div>Ahmed Hassan</div>
+                  <small class="text-secondary">ahmedexample.com</small>
+                </td>
+                <td><strong>PKR 4,500</strong></td>
+                <td>JazzCash</td>
+                <td><span class="badge bg-warning">Pending</span></td>
+                <td>2024-01-05</td>
+                <td>
+                  <button class="btn btn-sm btn-primary">
+                    <i class="fas fa-eye"></i> View
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>ORD-002</strong></td>
+                <td>
+                  <div>Fatima Khan</div>
+                  <small class="text-secondary">fatimaexample.com</small>
+                </td>
+                <td><strong>PKR 8,750</strong></td>
+                <td>EasyPaisa</td>
+                <td><span class="badge bg-success">Shipped</span></td>
+                <td>2024-01-04</td>
+                <td>
+                  <button class="btn btn-sm btn-primary">
+                    <i class="fas fa-eye"></i> View
+                  </button>
+                </td>
+              </tr>
+              <tr>
+                <td><strong>ORD-003</strong></td>
+                <td>
+                  <div>Ali Raza</div>
+                  <small class="text-secondary">aliexample.com</small>
+                </td>
+                <td><strong>PKR 3,200</strong></td>
+                <td>COD</td>
+                <td><span class="badge bg-warning">Pending</span></td>
+                <td>2024-01-06</td>
+                <td>
+                  <button class="btn btn-sm btn-primary">
+                    <i class="fas fa-eye"></i> View
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  
+  </main>

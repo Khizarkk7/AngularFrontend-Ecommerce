@@ -738,3 +738,30 @@
 .dark-mode .search-input {
   background: var(--color-bg-light);
 }
+
+.skeleton {
+  animation: pulse 1.4s infinite ease-in-out;
+}
+
+.skeleton-img {
+  height: 180px;
+  background: #e5e7eb;
+  border-radius: 12px;
+}
+
+.skeleton-text {
+  height: 14px;
+  margin-top: 10px;
+  background: #e5e7eb;
+  border-radius: 6px;
+}
+
+.skeleton-text.small {
+  width: 60%;
+}
+
+@keyframes pulse {
+  0% { opacity: 1 }
+  50% { opacity: 0.4 }
+  100% { opacity: 1 }
+}

@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { InventoryService } from '../../../core/services/inventory.service';
 import Swal from 'sweetalert2';
 import { Location } from '@angular/common';
+import { CustomSwal } from '../../../core/services/custom-swal.service';
 
 @Component({
   selector: 'app-add-product',
@@ -75,62 +76,66 @@ export class AddProductComponent implements OnInit {
     }
   }
 
-  onSubmit(): void {
-    console.log("Form Submit Clicked ", this.productForm.value);
-    this.errorMessage = null;
-    this.successMessage = null;
+ 
+onSubmit(): void {
+  console.log("Form Submit Clicked ", this.productForm.value);
 
-    if (this.productForm.invalid) {
-      this.markAllAsTouched();
-      this.errorMessage = 'Please fill all required fields correctly.';
-      return;
-    }
+  // 1️⃣ Form invalid check
+  if (this.productForm.invalid) {
+    this.markAllAsTouched(); // sari fields touched mark kar do
 
-    this.isSubmitting = true;
-
-    // Backend ke liye FormData create karte hain
-    const formData = new FormData();
-    formData.append('ProductName', this.productForm.value.productName);
-    formData.append('Description', this.productForm.value.description);
-    formData.append('Price', this.productForm.value.price.toString());
-    formData.append('StockQuantity', this.productForm.value.stockQuantity.toString());
-    formData.append('ShopId', this.productForm.value.shopId.toString());
-    formData.append('imageUrl', this.productForm.value.imageFile);
-
-    this.inventoryService.addProduct(formData).subscribe({
-      next: (response) => {
-        this.isSubmitting = false;
-        console.log("Product added", response);
-
-        Swal.fire({
-          icon: 'success',
-          title: 'Added!',
-          text: 'Product added successfully!',
-          timer: 1500,
-          showConfirmButton: false,
-          willClose: () => {
-            this.location.back();
-          }
-        });
-
-        this.productForm.reset();
-        this.productForm.patchValue({
-          shopId: this.authService.getCurrentShopId()
-        });
-      },
-      error: (error) => {
-        this.isSubmitting = false;
-        console.error('Error adding product:', error);
-
-        //  SweetAlert error
-        Swal.fire({
-          icon: 'error',
-          title: 'Error!',
-          text: error.error?.message || 'Failed to add product. Please try again.'
-        });
-      }
+    // 2️⃣ Custom SweetAlert
+    CustomSwal.fire({
+      icon: 'warning',
+      title: 'Incomplete Form',
+      text: 'Please fill all required fields correctly before submitting!',
+      confirmButtonText: 'Ok',
+      timer: 2500
     });
+
+    return; // ❌ Stop submission
   }
+
+  // ✅ Form valid hai → submit karte hain
+  this.isSubmitting = true;
+
+  const formData = new FormData();
+  formData.append('ProductName', this.productForm.value.productName);
+  formData.append('Description', this.productForm.value.description);
+  formData.append('Price', this.productForm.value.price.toString());
+  formData.append('StockQuantity', this.productForm.value.stockQuantity.toString());
+  formData.append('ShopId', this.productForm.value.shopId.toString());
+  formData.append('imageUrl', this.productForm.value.imageFile);
+
+  this.inventoryService.addProduct(formData).subscribe({
+    next: (response) => {
+      this.isSubmitting = false;
+
+      CustomSwal.fire({
+        icon: 'success',
+        title: 'Added!',
+        text: 'Product added successfully!',
+        timer: 1500,
+        showConfirmButton: false,
+        willClose: () => this.location.back()
+      });
+
+      this.productForm.reset();
+      this.productForm.patchValue({
+        shopId: this.authService.getCurrentShopId()
+      });
+    },
+    error: (error) => {
+      this.isSubmitting = false;
+
+      CustomSwal.fire({
+        icon: 'error',
+        title: 'Error!',
+        text: error.error?.message || 'Failed to add product. Please try again.'
+      });
+    }
+  });
+}
 
 
   private markAllAsTouched(): void {
